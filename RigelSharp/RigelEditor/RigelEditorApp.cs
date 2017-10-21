@@ -34,6 +34,13 @@ namespace RigelEditor
 
         private RigelDrawCall m_drawcall;
 
+        private RigelFont m_font;
+        private RigelImageData m_imagdata;
+
+        private Texture2D m_texfont;
+        private ShaderResourceView m_texfontsrv;
+        private SamplerState m_samplerState;
+
         public RigelEditorApp()
         {
             m_windowForm = new RenderForm("Rigel");
@@ -90,6 +97,42 @@ namespace RigelEditor
             m_graphics.ExecRenderCall(m_drawcall);
 
             m_graphics.ImmediateContext.InputAssembler.SetIndexBuffer(m_indicesBuffer, Format.R32_UInt, 0);
+
+
+            //fonts
+
+            m_font = new RigelFont("arial.ttf", 12);
+            m_imagdata = new RigelImageData(128, 128);
+            m_font.GenerateFontTexture(m_imagdata);
+
+
+            var texdesc = new Texture2DDescription()
+            {
+                Width = m_imagdata.Width,
+                Height = m_imagdata.Height,
+                ArraySize = 1,
+                SampleDescription = new SampleDescription(1, 0),
+                Format = Format.R8G8B8A8_UNorm,
+                Usage = ResourceUsage.Default,
+                CpuAccessFlags = CpuAccessFlags.None,
+                BindFlags = BindFlags.ShaderResource,
+                MipLevels = 1,
+                OptionFlags = ResourceOptionFlags.None,
+            };
+
+            var pinnedary = System.Runtime.InteropServices.GCHandle.Alloc(m_imagdata.Data, System.Runtime.InteropServices.GCHandleType.Pinned);
+
+            m_texfont = new Texture2D(m_graphics.Device, texdesc,new DataRectangle(pinnedary.AddrOfPinnedObject(),m_imagdata.Width *4));
+            pinnedary.Free();
+
+            
+
+            m_texfontsrv = new ShaderResourceView(m_graphics.Device, m_texfont);
+
+            m_graphics.ImmediateContext.PixelShader.SetShaderResource(0, m_texfontsrv);
+
+            m_samplerState = new SamplerState(m_graphics.Device, SamplerStateDescription.Default());
+            m_graphics.ImmediateContext.PixelShader.SetSampler(0, m_samplerState);
         }
 
         public void EnterRunloop() {
@@ -125,6 +168,15 @@ namespace RigelEditor
                 });
             });
 
+
+
+            m_imagdata.Dispose();
+            m_font.Dispose();
+
+            m_samplerState.Dispose();
+
+            m_texfontsrv.Dispose();
+            m_texfont.Dispose();
 
             shaderVertex.Dispose();
             shaderPixel.Dispose();

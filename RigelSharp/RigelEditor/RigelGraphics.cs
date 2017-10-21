@@ -92,6 +92,7 @@ namespace RigelEditor
 
             m_context.Rasterizer.SetViewport(new Viewport(0, 0, m_form.ClientSize.Width, m_form.ClientSize.Height,0.0f,1.0f));
             m_context.OutputMerger.SetTargets(m_depthStencilView, m_renderTargetView);
+
         }
 
         public void Render(Action drawfunc = null)
