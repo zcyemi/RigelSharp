@@ -22,6 +22,9 @@ namespace RigelEditor
 
         public byte[] Data { get; private set; }
         public RigelImageDataDepth Depth { get; private set; }
+        public int DataSize { get { return Data.Length; } }
+        public int PixelSize { get { return (int)Depth; } }
+        public int Pitch { get { return Width * PixelSize; } }
 
 
         public RigelImageData(int width,int height, RigelImageDataDepth depth = RigelImageDataDepth.Depth32)

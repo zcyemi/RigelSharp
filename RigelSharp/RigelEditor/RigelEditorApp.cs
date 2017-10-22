@@ -14,6 +14,8 @@ using SharpDX.Windows;
 using Buffer = SharpDX.Direct3D11.Buffer;
 using Device = SharpDX.Direct3D11.Device;
 
+using RigelEditor.ImGUI;
+
 namespace RigelEditor
 {
     public class RigelEditorApp
@@ -21,6 +23,7 @@ namespace RigelEditor
 
         private RenderForm m_windowForm;
         private RigelGraphics m_graphics;
+        private RigelImGUICtx m_imgui;
 
 
         private VertexShader shaderVertex;
@@ -49,6 +52,7 @@ namespace RigelEditor
             m_graphics = new RigelGraphics();
             m_graphics.CreateWithSwapChain(m_windowForm);
 
+            m_imgui = new RigelImGUICtx(m_windowForm,m_graphics);
 
             var vertexshaderbytecode = ShaderBytecode.CompileFromFile("MiniCube.fx", "VS", "vs_4_0");
             shaderVertex = new VertexShader(m_graphics.Device, vertexshaderbytecode);
@@ -102,7 +106,7 @@ namespace RigelEditor
             //fonts
 
             m_font = new RigelFont("arial.ttf", 12);
-            m_imagdata = new RigelImageData(128, 128);
+            m_imagdata = new RigelImageData(100, 100);
             m_font.GenerateFontTexture(m_imagdata);
 
 
@@ -157,6 +161,8 @@ namespace RigelEditor
 
                 m_graphics.Render(()=> {
 
+                    m_imgui.Render(m_graphics);
+
                     var worldViewProj1 = Matrix.RotationX(time) * Matrix.RotationY(time * 2) * Matrix.RotationZ(time * .7f) * viewProj;
                     worldViewProj1.Transpose();
                     m_graphics.ImmediateContext.UpdateSubresource(ref orith, cbuffer);
@@ -164,10 +170,10 @@ namespace RigelEditor
                     //m_graphics.ImmediateContext.Draw(36, 0);
                     m_graphics.ImmediateContext.DrawIndexed(6, 0, 0);
 
-                    
                 });
             });
 
+            m_imgui.Dispose();
 
 
             m_imagdata.Dispose();

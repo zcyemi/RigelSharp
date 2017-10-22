@@ -71,13 +71,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ImGUI\RigelImGUI.cs" />
+    <Compile Include="ImGUI\RigelImGUICtx.cs" />
+    <Compile Include="ImGUI\RigelImGUIGraphicsBind.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RigelDrawCall.cs" />
     <Compile Include="RigelEditorApp.cs" />
     <Compile Include="RigelFont.cs" />
     <Compile Include="RigelGraphics.cs" />
     <Compile Include="RigelImageData.cs" />
+    <Compile Include="RigelUtility.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -17,7 +17,7 @@ using Device = SharpDX.Direct3D11.Device;
 
 namespace RigelEditor
 {
-    class RigelGraphics : IDisposable
+    public class RigelGraphics : IDisposable
     {
         private RenderForm m_form;
 
