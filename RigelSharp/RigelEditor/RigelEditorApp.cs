@@ -14,7 +14,7 @@ using SharpDX.Windows;
 using Buffer = SharpDX.Direct3D11.Buffer;
 using Device = SharpDX.Direct3D11.Device;
 
-using RigelEditor.ImGUI;
+using RigelEditor.EGUI;
 
 namespace RigelEditor
 {
@@ -23,7 +23,7 @@ namespace RigelEditor
 
         private RenderForm m_windowForm;
         private RigelGraphics m_graphics;
-        private RigelImGUICtx m_imgui;
+        private RigelEGUICtx m_EGUI;
 
 
         public RigelEditorApp()
@@ -34,7 +34,7 @@ namespace RigelEditor
             m_graphics = new RigelGraphics();
             m_graphics.CreateWithSwapChain(m_windowForm);
 
-            m_imgui = new RigelImGUICtx(m_windowForm,m_graphics);
+            m_EGUI = new RigelEGUICtx(m_windowForm,m_graphics);
 
         }
 
@@ -45,12 +45,12 @@ namespace RigelEditor
 
                 m_graphics.Render(()=> {
 
-                    m_imgui.Render(m_graphics);
+                    m_EGUI.Render(m_graphics);
 
                 });
             });
 
-            m_imgui.Dispose();
+            m_EGUI.Dispose();
 
 
             m_graphics.Dispose();

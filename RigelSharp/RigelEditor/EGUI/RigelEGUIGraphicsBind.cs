@@ -17,18 +17,20 @@ using Device = SharpDX.Direct3D11.Device;
 
 using RigelEditor;
 
-namespace RigelEditor.ImGUI
+namespace RigelEditor.EGUI
 {
     [StructLayout(LayoutKind.Explicit)]
-    public struct RigelImGUIVertex
+    public struct RigelEGUIVertex
     {
         [FieldOffset(0)]
         public Vector4 Position;
         [FieldOffset(16)]
         public Vector4 Color;
+        [FieldOffset(32)]
+        public Vector2 UV;
     }
 
-    public class RigelImGUIBuffer<T> where T:struct
+    public class RigelEGUIBuffer<T> where T:struct
     {
         private const int BUFFER_INIT_SIZE = 1024;
         private const int BUFFER_EXTEND_TIMES = 2;
@@ -39,6 +41,7 @@ namespace RigelEditor.ImGUI
         public bool BufferResized { get; private set; }
 
         private int m_bufferExtendTimes = BUFFER_EXTEND_TIMES;
+        private Action<RigelEGUIBuffer<T>,int> m_extendGenrateFunc = null;
 
         public int BufferDataCount { get; private set; }
         public bool Dirty { get; private set; }
@@ -46,13 +49,15 @@ namespace RigelEditor.ImGUI
         public T[] BufferData;
 
 
-        public RigelImGUIBuffer(int buffersize = BUFFER_INIT_SIZE,int extendtimes = BUFFER_EXTEND_TIMES)
+        public RigelEGUIBuffer(int buffersize = BUFFER_INIT_SIZE,int extendtimes = BUFFER_EXTEND_TIMES,Action<RigelEGUIBuffer<T>,int> extendGenerate = null)
         {
             m_bufferExtendTimes = extendtimes;
             BufferDataCount = 0;
             BufferResized = false;
+            m_extendGenrateFunc = extendGenerate;
 
             BufferData = new T[buffersize];
+            if (m_extendGenrateFunc != null) m_extendGenrateFunc.Invoke(this,0);
         }
 
         public void IncreaseBufferDataCount(int c = 1)
@@ -65,8 +70,10 @@ namespace RigelEditor.ImGUI
         {
             if(BufferDataCount > BufferSize - tolerance)
             {
+                int extendpos = BufferSize;
                 Array.Resize(ref BufferData, BufferSize * m_bufferExtendTimes);
                 BufferResized = true;
+                if (m_extendGenrateFunc != null) m_extendGenrateFunc.Invoke(this,extendpos);
             }
         }
 
@@ -77,14 +84,14 @@ namespace RigelEditor.ImGUI
 
     }
 
-    internal class RigelImGUIGraphicsBind:IDisposable
+    internal class RigelEGUIGraphicsBind:IDisposable
     {
-        private static readonly string SHADER_FILE_PATH = "MiniCube.fx";
+        private static readonly string SHADER_FILE_PATH = "Shader/MiniCube.fx";
         private const int TEXTURE_FONT_SIZE = 128;
 
 
-        private RigelImGUIBuffer<RigelImGUIVertex> m_bufferDataVertex;
-        private RigelImGUIBuffer<int> m_bufferDataIndices;
+        private RigelEGUIBuffer<RigelEGUIVertex> m_bufferDataVertex;
+        private RigelEGUIBuffer<int> m_bufferDataIndices;
 
         private Matrix m_matrixgui;
         private bool m_guiparamsChanged = true;
@@ -111,7 +118,7 @@ namespace RigelEditor.ImGUI
         private CommandList m_commandlist = null;
 
 
-        public RigelImGUIGraphicsBind(RigelGraphics graphics)
+        public RigelEGUIGraphicsBind(RigelGraphics graphics)
         {
             m_graphics = graphics;
 
@@ -139,6 +146,7 @@ namespace RigelEditor.ImGUI
             {
                 new InputElement("POSITION",0,Format.R32G32B32A32_Float,0,0),
                 new InputElement("COLOR",0,Format.R32G32B32A32_Float,16,0),
+                new InputElement("TEXCOORD",0,Format.R32G32_Float,32,0),
             });
 
             vshaderbc.Dispose();
@@ -148,7 +156,7 @@ namespace RigelEditor.ImGUI
             //buffers
 
             //vertexbuffer
-            m_bufferDataVertex = new RigelImGUIBuffer<RigelImGUIVertex>(1024);
+            m_bufferDataVertex = new RigelEGUIBuffer<RigelEGUIVertex>(1024);
             m_bufferDataVertex.BufferData[0].Position = new Vector4(0, 0, 0, 1);
             m_bufferDataVertex.BufferData[1].Position = new Vector4(0, 100, 0, 1);
             m_bufferDataVertex.BufferData[2].Position = new Vector4(100, 100, 0, 1);
@@ -158,6 +166,11 @@ namespace RigelEditor.ImGUI
             m_bufferDataVertex.BufferData[1].Color = Vector4.Zero;
             m_bufferDataVertex.BufferData[2].Color = Vector4.One;
             m_bufferDataVertex.BufferData[3].Color = Vector4.One;
+
+            m_bufferDataVertex.BufferData[0].UV = new Vector2(0,0);
+            m_bufferDataVertex.BufferData[1].UV = new Vector2(0,1);
+            m_bufferDataVertex.BufferData[2].UV = new Vector2(1,1);
+            m_bufferDataVertex.BufferData[3].UV = new Vector2(1,0);
 
             m_bufferDataVertex.IncreaseBufferDataCount(4);
 
@@ -172,7 +185,7 @@ namespace RigelEditor.ImGUI
             };
 
             m_vertexBuffer = new Buffer(m_graphics.Device, vbufferdesc);
-            m_vertexBufferBinding = new VertexBufferBinding(m_vertexBuffer, Utilities.SizeOf<Vector4>() * 2, 0);
+            m_vertexBufferBinding = new VertexBufferBinding(m_vertexBuffer, m_bufferDataVertex.ItemSizeInByte, 0);
 
             //const buffer
             var cbufferdesc = new BufferDescription()
@@ -191,7 +204,24 @@ namespace RigelEditor.ImGUI
 
             //indices buffer
 
-            m_bufferDataIndices = new RigelImGUIBuffer<int>();
+            m_bufferDataIndices = new RigelEGUIBuffer<int>(1024,2,(b,pos)=> {
+                int tric = pos / 6;
+                int trie = b.BufferSize / 6;
+                for(int i = tric; i < trie; i++)
+                {
+                    int i6 = i * 6;
+                    int i4 = i * 4;
+                    b.BufferData[i6] = i4;
+                    b.BufferData[i6+1] = i4+2;
+                    b.BufferData[i6+2] = i4+1;
+
+                    b.BufferData[i6+3] = i4;
+                    b.BufferData[i6+4] = i4+3;
+                    b.BufferData[i6+5] = i4+2;
+                }
+
+                b.IncreaseBufferDataCount(b.BufferSize - pos);
+            });
 
             var ibufferdesc = new BufferDescription()
             {
@@ -204,13 +234,6 @@ namespace RigelEditor.ImGUI
             };
 
             m_indicesBuffer = new Buffer(m_graphics.Device, ibufferdesc);
-            m_bufferDataIndices.BufferData[0] = 0;
-            m_bufferDataIndices.BufferData[1] = 2;
-            m_bufferDataIndices.BufferData[2] = 1;
-            m_bufferDataIndices.BufferData[3] = 0;
-            m_bufferDataIndices.BufferData[4] = 3;
-            m_bufferDataIndices.BufferData[5] = 2;
-            m_bufferDataIndices.IncreaseBufferDataCount(6);
 
         }
 

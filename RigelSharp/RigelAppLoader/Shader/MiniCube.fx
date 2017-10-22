@@ -21,6 +21,7 @@ struct VS_IN
 {
 	float4 pos : POSITION;
 	float4 col : COLOR;
+	float4 uv : TEXCOORD;
 };
 
 struct PS_IN
@@ -42,7 +43,7 @@ PS_IN VS( VS_IN input )
 	float4 pos = input.pos;
 	output.pos = mul(pos, worldViewProj);
 	output.col = input.col;
-	output.uv = input.pos.xy / 100;
+	output.uv = input.uv;
 	return output;
 }
 
