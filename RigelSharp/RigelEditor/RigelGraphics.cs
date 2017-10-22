@@ -21,7 +21,6 @@ namespace RigelEditor
     {
         private RenderForm m_form;
 
-
         private Device m_device;
         public Device Device { get { return m_device; } }
         private SwapChain m_swapchain;
@@ -29,13 +28,21 @@ namespace RigelEditor
         private DeviceContext m_context;
         public DeviceContext ImmediateContext { get { return m_context; } }
 
+        public event Action EventReleaseCommandList = delegate { };
 
         private Texture2D m_backBuffer;
         private RenderTargetView m_renderTargetView;
         private Texture2D m_deptBuffer;
         private DepthStencilView m_depthStencilView;
 
+        private Viewport m_viewportDefault;
+        
+        public RenderTargetView RenderTargetViewDefault { get { return m_renderTargetView; } }
+        public DepthStencilView DepthStencilViewDefault { get { return m_depthStencilView; } }
+        public Viewport ViewPortDefault { get { return m_viewportDefault; } }
+
         private bool m_needResize = true;
+        public bool NeedRebuildCommandList { get; private set; }
 
 
         public void CreateWithSwapChain(RenderForm form)
@@ -66,6 +73,8 @@ namespace RigelEditor
 
         public void Resize()
         {
+            EventReleaseCommandList.Invoke();
+
             Utilities.Dispose(ref m_backBuffer);
             Utilities.Dispose(ref m_renderTargetView);
             Utilities.Dispose(ref m_deptBuffer);
@@ -91,7 +100,8 @@ namespace RigelEditor
 
             m_depthStencilView = new DepthStencilView(m_device, m_deptBuffer);
 
-            m_context.Rasterizer.SetViewport(new Viewport(0, 0, m_form.ClientSize.Width, m_form.ClientSize.Height,0.0f,1.0f));
+            m_viewportDefault = new Viewport(0, 0, m_form.ClientSize.Width, m_form.ClientSize.Height, 0.0f, 1.0f);
+            m_context.Rasterizer.SetViewport(m_viewportDefault);
             m_context.OutputMerger.SetTargets(m_depthStencilView, m_renderTargetView);
 
         }
@@ -102,6 +112,8 @@ namespace RigelEditor
             {
                 Resize();
                 m_needResize = false;
+
+                NeedRebuildCommandList = true;
             }
 
             m_context.ClearDepthStencilView(m_depthStencilView, DepthStencilClearFlags.Depth, 1.0f, 0);
@@ -111,6 +123,8 @@ namespace RigelEditor
             if (drawfunc != null) drawfunc.Invoke();
 
             m_swapchain.Present(0, PresentFlags.None);
+
+            NeedRebuildCommandList = false;
         }
 
         public void Dispose()

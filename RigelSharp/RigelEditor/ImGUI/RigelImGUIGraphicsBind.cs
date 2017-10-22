@@ -107,16 +107,26 @@ namespace RigelEditor.ImGUI
         private SamplerState m_fontTextureSampler = null;
 
 
+        private DeviceContext m_deferredContext = null;
+        private CommandList m_commandlist = null;
+
 
         public RigelImGUIGraphicsBind(RigelGraphics graphics)
         {
             m_graphics = graphics;
 
+            graphics.EventReleaseCommandList += ReleaseCommandList;
+
             InitGraphicsObjects();
         }
 
+
         private void InitGraphicsObjects()
         {
+
+            //deferred context;
+            m_deferredContext = new DeviceContext(m_graphics.Device);
+
             //shaders
             var vshaderbc = ShaderBytecode.CompileFromFile(SHADER_FILE_PATH, "VS", "vs_4_0");
             var pshaderbc = ShaderBytecode.CompileFromFile(SHADER_FILE_PATH, "PS", "ps_4_0");
@@ -244,6 +254,39 @@ namespace RigelEditor.ImGUI
             
         }
 
+        private void ReleaseCommandList()
+        {
+            if(m_commandlist != null) {
+                m_commandlist.Dispose();
+                m_commandlist = null;
+            }
+        }
+
+        private void BuildCommandList()
+        {
+            m_deferredContext.OutputMerger.SetRenderTargets(m_graphics.DepthStencilViewDefault, m_graphics.RenderTargetViewDefault);
+            m_deferredContext.Rasterizer.SetViewport(m_graphics.ViewPortDefault);
+            //draw rects
+
+            m_deferredContext.InputAssembler.InputLayout = m_inputlayout;
+            m_deferredContext.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
+
+            m_deferredContext.InputAssembler.SetVertexBuffers(0, m_vertexBufferBinding);
+            m_deferredContext.InputAssembler.SetIndexBuffer(m_indicesBuffer, Format.R32_UInt, 0);
+
+            m_deferredContext.VertexShader.SetConstantBuffer(0, m_constBuffer);
+            m_deferredContext.VertexShader.Set(m_shaderVertex);
+
+            m_deferredContext.PixelShader.Set(m_shaderPixel);
+            m_deferredContext.PixelShader.SetShaderResource(0, m_fontTextureView);
+            m_deferredContext.PixelShader.SetSampler(0, m_fontTextureSampler);
+
+            m_deferredContext.DrawIndexed(6, 0, 0);
+
+            m_commandlist = m_deferredContext.FinishCommandList(false);
+
+        }
+
         public void Render(RigelGraphics graphics)
         {
             if (m_graphics != graphics) throw new Exception("RigelGraphics not match!");
@@ -285,20 +328,16 @@ namespace RigelEditor.ImGUI
                 RigelUtility.Log("update indicesbuffer data");
             }
 
-            m_graphics.ImmediateContext.InputAssembler.InputLayout = m_inputlayout;
-            m_graphics.ImmediateContext.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
+            if (graphics.NeedRebuildCommandList)
+            {
+                if(m_commandlist != null)
+                {
+                    m_commandlist.Dispose();
+                }
+                BuildCommandList();
+            }
 
-            m_graphics.ImmediateContext.InputAssembler.SetVertexBuffers(0, m_vertexBufferBinding);
-            m_graphics.ImmediateContext.InputAssembler.SetIndexBuffer(m_indicesBuffer, Format.R32_UInt, 0);
-
-            m_graphics.ImmediateContext.VertexShader.SetConstantBuffer(0, m_constBuffer);
-            m_graphics.ImmediateContext.VertexShader.Set(m_shaderVertex);
-
-            m_graphics.ImmediateContext.PixelShader.Set(m_shaderPixel);
-            m_graphics.ImmediateContext.PixelShader.SetShaderResource(0, m_fontTextureView);
-            m_graphics.ImmediateContext.PixelShader.SetSampler(0, m_fontTextureSampler);
-
-            m_graphics.ImmediateContext.DrawIndexed(6, 0, 0);
+            graphics.ImmediateContext.ExecuteCommandList(m_commandlist,false);
 
 
         }
@@ -315,6 +354,9 @@ namespace RigelEditor.ImGUI
             if(m_fontTextureView != null) m_fontTextureView.Dispose();
             if(m_fontTexture != null) m_fontTexture.Dispose();
             if(m_fontTextureSampler != null) m_fontTextureSampler.Dispose();
+
+            if (m_commandlist != null) m_commandlist.Dispose();
+            if (m_deferredContext != null) m_deferredContext.Dispose();
 
             m_graphics = null;
         }
