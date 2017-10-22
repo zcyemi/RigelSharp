@@ -21,6 +21,7 @@ namespace RigelEditor
     {
         private RenderForm m_form;
 
+
         private Device m_device;
         public Device Device { get { return m_device; } }
         private SwapChain m_swapchain;
@@ -104,7 +105,7 @@ namespace RigelEditor
             }
 
             m_context.ClearDepthStencilView(m_depthStencilView, DepthStencilClearFlags.Depth, 1.0f, 0);
-            m_context.ClearRenderTargetView(m_renderTargetView, Color.Black);
+            m_context.ClearRenderTargetView(m_renderTargetView, Color.Red);
             
 
             if (drawfunc != null) drawfunc.Invoke();
@@ -166,7 +167,7 @@ namespace RigelEditor
             }
             if(drawcall.VertexBufferBinding != null)
             {
-                m_context.InputAssembler.SetVertexBuffers(0,(VertexBufferBinding)drawcall.VertexBufferBinding);
+                //m_context.InputAssembler.SetVertexBuffers(0,(VertexBufferBinding)drawcall.VertexBufferBinding);
             }
 
         }

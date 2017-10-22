@@ -43,7 +43,7 @@ namespace RigelEditor.ImGUI
         public int BufferDataCount { get; private set; }
         public bool Dirty { get; private set; }
 
-        public RigelImGUIVertex[] BufferData;
+        public T[] BufferData;
 
 
         public RigelImGUIBuffer(int buffersize = BUFFER_INIT_SIZE,int extendtimes = BUFFER_EXTEND_TIMES)
@@ -52,7 +52,7 @@ namespace RigelEditor.ImGUI
             BufferDataCount = 0;
             BufferResized = false;
 
-            BufferData = new RigelImGUIVertex[BufferSize];
+            BufferData = new T[buffersize];
         }
 
         public void IncreaseBufferDataCount(int c = 1)
@@ -87,7 +87,7 @@ namespace RigelEditor.ImGUI
         private RigelImGUIBuffer<int> m_bufferDataIndices;
 
         private Matrix m_matrixgui;
-        private bool m_guiparamsChanged = false;
+        private bool m_guiparamsChanged = true;
 
 
         private RigelGraphics m_graphics = null;
@@ -158,11 +158,11 @@ namespace RigelEditor.ImGUI
                 Usage = ResourceUsage.Default,
                 CpuAccessFlags = CpuAccessFlags.None,
                 OptionFlags = ResourceOptionFlags.None,
-                StructureByteStride = m_bufferDataVertex.ItemSizeInByte
+                StructureByteStride = 0,
             };
 
             m_vertexBuffer = new Buffer(m_graphics.Device, vbufferdesc);
-            m_vertexBufferBinding = new VertexBufferBinding(m_vertexBuffer, m_bufferDataVertex.BufferSizeInByte, 0);
+            m_vertexBufferBinding = new VertexBufferBinding(m_vertexBuffer, Utilities.SizeOf<Vector4>() * 2, 0);
 
             //const buffer
             var cbufferdesc = new BufferDescription()
@@ -175,16 +175,38 @@ namespace RigelEditor.ImGUI
                 StructureByteStride = 0,
             };
 
+            m_matrixgui = Matrix.OrthoOffCenterLH(0, 800, 600, 0, 0, 1.0f);
+            m_matrixgui.Transpose();
             m_constBuffer = Buffer.Create(m_graphics.Device, ref m_matrixgui, cbufferdesc);
 
             //indices buffer
 
             m_bufferDataIndices = new RigelImGUIBuffer<int>();
+
+            var ibufferdesc = new BufferDescription()
+            {
+                SizeInBytes = m_bufferDataIndices.BufferSizeInByte,
+                BindFlags = BindFlags.IndexBuffer,
+                Usage = ResourceUsage.Default,
+                CpuAccessFlags = CpuAccessFlags.None,
+                OptionFlags = ResourceOptionFlags.None,
+                StructureByteStride = m_bufferDataIndices.ItemSizeInByte
+            };
+
+            m_indicesBuffer = new Buffer(m_graphics.Device, ibufferdesc);
+            m_bufferDataIndices.BufferData[0] = 0;
+            m_bufferDataIndices.BufferData[1] = 2;
+            m_bufferDataIndices.BufferData[2] = 1;
+            m_bufferDataIndices.BufferData[3] = 0;
+            m_bufferDataIndices.BufferData[4] = 3;
+            m_bufferDataIndices.BufferData[5] = 2;
+            m_bufferDataIndices.IncreaseBufferDataCount(6);
+
         }
 
         public void UpdateGUIParams(int width,int height)
         {
-            m_matrixgui = Matrix.OrthoOffCenterRH(0,width, height, 0, 0, 1.0f);
+            m_matrixgui = Matrix.OrthoOffCenterLH(0,width, height, 0, 0, 1.0f);
             m_matrixgui.Transpose();
 
             m_guiparamsChanged = true;
@@ -232,29 +254,52 @@ namespace RigelEditor.ImGUI
                 m_graphics.ImmediateContext.UpdateSubresource(ref m_matrixgui, m_constBuffer);
                 m_guiparamsChanged = false;
             }
+
+
             if (m_bufferDataVertex.Dirty)
             {
-                var pinnedptr = GCHandle.Alloc(m_bufferDataVertex.BufferData);
+                var pinnedptr = GCHandle.Alloc(m_bufferDataVertex.BufferData, GCHandleType.Pinned);
                 m_graphics.ImmediateContext.UpdateSubresource(new DataBox()
                 {
-                    DataPointer = pinnedptr.AddrOfPinnedObject(),
-                    RowPitch = 0,
-                    SlicePitch = m_bufferDataVertex.ItemSizeInByte
+                    DataPointer = pinnedptr.AddrOfPinnedObject()
                 }, m_vertexBuffer, 0);
                 pinnedptr.Free();
 
                 m_bufferDataVertex.SetDirty(false);
+
+                RigelUtility.Log("update vertexbuffer data");
+            }
+
+            if (m_bufferDataIndices.Dirty)
+            {
+                var pinnedptr = GCHandle.Alloc(m_bufferDataIndices.BufferData, GCHandleType.Pinned);
+                m_graphics.ImmediateContext.UpdateSubresource(new DataBox()
+                {
+                    DataPointer = pinnedptr.AddrOfPinnedObject(),
+                    RowPitch = 0,
+                    SlicePitch = m_bufferDataIndices.ItemSizeInByte,
+                }, m_indicesBuffer, 0);
+                pinnedptr.Free();
+
+                m_bufferDataIndices.SetDirty(false);
+                RigelUtility.Log("update indicesbuffer data");
             }
 
             m_graphics.ImmediateContext.InputAssembler.InputLayout = m_inputlayout;
             m_graphics.ImmediateContext.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
 
             m_graphics.ImmediateContext.InputAssembler.SetVertexBuffers(0, m_vertexBufferBinding);
+            m_graphics.ImmediateContext.InputAssembler.SetIndexBuffer(m_indicesBuffer, Format.R32_UInt, 0);
 
             m_graphics.ImmediateContext.VertexShader.SetConstantBuffer(0, m_constBuffer);
             m_graphics.ImmediateContext.VertexShader.Set(m_shaderVertex);
 
             m_graphics.ImmediateContext.PixelShader.Set(m_shaderPixel);
+            m_graphics.ImmediateContext.PixelShader.SetShaderResource(0, m_fontTextureView);
+            m_graphics.ImmediateContext.PixelShader.SetSampler(0, m_fontTextureSampler);
+
+            m_graphics.ImmediateContext.DrawIndexed(6, 0, 0);
+
 
         }
 

@@ -27,6 +27,7 @@ namespace RigelEditor.ImGUI
         public RigelImGUICtx(RenderForm form,RigelGraphics graphics)
         {
             m_form = form;
+            
             m_graphicsBind = new RigelImGUIGraphicsBind(graphics);
 
             m_font = new RigelFont("arial.ttf");
@@ -37,14 +38,16 @@ namespace RigelEditor.ImGUI
 
         private void RegisterEvent()
         {
-
+            m_form.UserResized += (sender, e) => {
+                m_graphicsBind.UpdateGUIParams(m_form.ClientSize.Width, m_form.ClientSize.Height);
+            };
         }
 
 
 
         public void Render(RigelGraphics graphics)
         {
-
+            m_graphicsBind.Render(graphics);
         }
 
         public void Dispose()

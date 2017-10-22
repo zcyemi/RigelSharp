@@ -17,5 +17,10 @@ namespace RigelEditor
         {
             return System.Runtime.InteropServices.Marshal.SizeOf<T>();
         }
+
+        public static void Log(string info)
+        {
+            Console.WriteLine(info);
+        }
     }
 }
