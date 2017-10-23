@@ -93,6 +93,7 @@ namespace RigelEditor.EGUI
     internal class RigelEGUIGraphicsBind:IDisposable
     {
         private static readonly string SHADER_FILE_PATH = "Shader/MiniCube.fx";
+        private static readonly string SHADER_FILE_PATH_RECT = "Shader/gui_rect.fx";
         private const int TEXTURE_FONT_SIZE = 128;
 
 
@@ -109,6 +110,7 @@ namespace RigelEditor.EGUI
 
         private VertexShader m_shaderVertex = null;
         private PixelShader m_shaderPixel = null;
+        private PixelShader m_shaderPixelRect = null;
         private InputLayout m_inputlayout = null;
 
 

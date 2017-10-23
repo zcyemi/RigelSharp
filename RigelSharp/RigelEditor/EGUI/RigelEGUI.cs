@@ -41,7 +41,6 @@ namespace RigelEditor.EGUI
                 Color = color,
                 UV = Vector2.Zero
             });
-
         }
 
 
