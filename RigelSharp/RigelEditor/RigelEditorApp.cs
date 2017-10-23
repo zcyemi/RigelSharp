@@ -38,6 +38,7 @@ namespace RigelEditor
 
             //test
             var testwind = RigelEditorGUIWindow.GetWindow<RigelEditorAboutPage>();
+            var consolewin = RigelEditorGUIWindow.GetWindow<RigelEditorConsoleWindow>();
         }
 
         public void EnterRunloop() {

@@ -103,7 +103,7 @@ namespace RigelEditor.EGUI
         private void InternalEndWindow()
         {
             var curwin = RigelEditorGUI.s_currentWindow;
-            RigelEditorGUI.s_currentCtx = null;
+            RigelEditorGUI.s_currentWindow = null;
 
             var buffercount = m_bufferRect.Count();
 
@@ -112,7 +112,6 @@ namespace RigelEditor.EGUI
                 RigelUtility.Log("temp draw buffer count:" + buffercount);
                 return;
             }
-
             //applytobuffer
             if (curwin.m_bufferInfo.BufferInited == false)
             {

@@ -81,6 +81,7 @@
     <Compile Include="RigelDrawCall.cs" />
     <Compile Include="RigelEditorAboutPage.cs" />
     <Compile Include="RigelEditorApp.cs" />
+    <Compile Include="RigelEditorConsoleWindow.cs" />
     <Compile Include="RigelFont.cs" />
     <Compile Include="RigelGraphics.cs" />
     <Compile Include="RigelImageData.cs" />

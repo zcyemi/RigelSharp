@@ -92,7 +92,7 @@ namespace RigelEditor.EGUI
 
     internal class RigelEGUIGraphicsBind:IDisposable
     {
-        private static readonly string SHADER_FILE_PATH = "Shader/MiniCube.fx";
+        private static readonly string SHADER_FILE_PATH_FONT = "Shader/gui_font.fx";
         private static readonly string SHADER_FILE_PATH_RECT = "Shader/gui_rect.fx";
         private const int TEXTURE_FONT_SIZE = 128;
 
@@ -109,7 +109,7 @@ namespace RigelEditor.EGUI
         private RigelGraphics m_graphics = null;
 
         private VertexShader m_shaderVertex = null;
-        private PixelShader m_shaderPixel = null;
+        private PixelShader m_shaderPixelFont = null;
         private PixelShader m_shaderPixelRect = null;
         private InputLayout m_inputlayout = null;
 
@@ -150,11 +150,13 @@ namespace RigelEditor.EGUI
             m_deferredContext = new DeviceContext(m_graphics.Device);
 
             //shaders
-            var vshaderbc = ShaderBytecode.CompileFromFile(SHADER_FILE_PATH, "VS", "vs_4_0");
-            var pshaderbc = ShaderBytecode.CompileFromFile(SHADER_FILE_PATH, "PS", "ps_4_0");
+            var vshaderbc = ShaderBytecode.CompileFromFile(SHADER_FILE_PATH_FONT, "VS", "vs_4_0");
+            var pshaderbcFont = ShaderBytecode.CompileFromFile(SHADER_FILE_PATH_FONT, "PS", "ps_4_0");
+            var pshaderbcRect = ShaderBytecode.CompileFromFile(SHADER_FILE_PATH_RECT, "PS", "ps_4_0");
 
             m_shaderVertex = new VertexShader(m_graphics.Device, vshaderbc);
-            m_shaderPixel = new PixelShader(m_graphics.Device, pshaderbc);
+            m_shaderPixelFont = new PixelShader(m_graphics.Device, pshaderbcFont);
+            m_shaderPixelRect = new PixelShader(m_graphics.Device, pshaderbcRect);
 
             var signature = ShaderSignature.GetInputSignature(vshaderbc);
             m_inputlayout = new InputLayout(m_graphics.Device, signature, new[]
@@ -165,7 +167,8 @@ namespace RigelEditor.EGUI
             });
 
             vshaderbc.Dispose();
-            pshaderbc.Dispose();
+            pshaderbcFont.Dispose();
+            pshaderbcRect.Dispose();
             signature.Dispose();
 
             //buffers
@@ -304,8 +307,8 @@ namespace RigelEditor.EGUI
         {
             m_deferredContext.OutputMerger.SetRenderTargets(m_graphics.DepthStencilViewDefault, m_graphics.RenderTargetViewDefault);
             m_deferredContext.Rasterizer.SetViewport(m_graphics.ViewPortDefault);
+            
             //draw rects
-
             m_deferredContext.InputAssembler.InputLayout = m_inputlayout;
             m_deferredContext.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
 
@@ -315,9 +318,9 @@ namespace RigelEditor.EGUI
             m_deferredContext.VertexShader.SetConstantBuffer(0, m_constBuffer);
             m_deferredContext.VertexShader.Set(m_shaderVertex);
 
-            m_deferredContext.PixelShader.Set(m_shaderPixel);
-            m_deferredContext.PixelShader.SetShaderResource(0, m_fontTextureView);
-            m_deferredContext.PixelShader.SetSampler(0, m_fontTextureSampler);
+            m_deferredContext.PixelShader.Set(m_shaderPixelRect);
+            //m_deferredContext.PixelShader.SetShaderResource(0, m_fontTextureView);
+            //m_deferredContext.PixelShader.SetSampler(0, m_fontTextureSampler);
 
             RigelUtility.Log("buffer data count:" + m_bufferDataVertex.BufferDataCount);
             int indexedCount = m_bufferDataVertex.BufferDataCount / 2 * 3;
@@ -386,7 +389,8 @@ namespace RigelEditor.EGUI
 
         public void Dispose()
         {
-            if( m_shaderPixel != null) m_shaderPixel.Dispose();
+            if (m_shaderPixelRect != null) m_shaderPixelRect.Dispose();
+            if( m_shaderPixelFont != null) m_shaderPixelFont.Dispose();
             if (m_shaderVertex != null) m_shaderVertex.Dispose();
             if (m_inputlayout != null) m_inputlayout.Dispose();
             if (m_vertexBuffer != null) m_vertexBuffer.Dispose();

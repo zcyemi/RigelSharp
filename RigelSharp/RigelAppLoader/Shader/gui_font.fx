@@ -14,8 +14,8 @@ struct PS_IN
 
 float4x4 worldViewProj;
 
-//Texture2D texfont;
-//SamplerState MeshTextureSampler;
+Texture2D texfont;
+SamplerState MeshTextureSampler;
 
 PS_IN VS( VS_IN input )
 {
@@ -30,5 +30,7 @@ PS_IN VS( VS_IN input )
 
 float4 PS( PS_IN input ) : SV_Target
 {
-	return input.col;
+	float4 v = texfont.Sample(MeshTextureSampler,input.uv);
+	v.a = 1;
+	return v;
 }
