@@ -117,7 +117,7 @@ namespace RigelEditor
             }
 
             m_context.ClearDepthStencilView(m_depthStencilView, DepthStencilClearFlags.Depth, 1.0f, 0);
-            m_context.ClearRenderTargetView(m_renderTargetView, Color.Red);
+            m_context.ClearRenderTargetView(m_renderTargetView, Color.Black);
             
 
             if (drawfunc != null) drawfunc.Invoke();

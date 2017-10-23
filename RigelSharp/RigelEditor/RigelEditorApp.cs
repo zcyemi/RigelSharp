@@ -36,13 +36,14 @@ namespace RigelEditor
 
             m_EGUI = new RigelEGUICtx(m_windowForm,m_graphics);
 
+            //test
+            var testwind = RigelEditorGUIWindow.GetWindow<RigelEditorAboutPage>();
         }
 
         public void EnterRunloop() {
 
             RenderLoop.Run(m_windowForm, () =>
             {
-
                 m_graphics.Render(()=> {
 
                     m_EGUI.Render(m_graphics);

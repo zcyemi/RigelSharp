@@ -11,22 +11,39 @@ namespace RigelEditor.EGUI
     public static class RigelEditorGUI
     {
         internal static RigelEGUICtx s_currentCtx = null;
+        internal static RigelEditorGUIWindow s_currentWindow = null;
 
-        public static void NewFrame(RigelEGUICtx ctx)
+
+
+        public static void DrawRect(Vector4 rect,Vector4 color)
         {
-            s_currentCtx = ctx;
+            s_currentCtx.BufferRect.Add(new RigelEGUIVertex()
+            {
+                Position = new Vector4(rect.X, rect.Y, 0, 1),
+                Color = color,
+                UV = Vector2.Zero
+            });
+            s_currentCtx.BufferRect.Add(new RigelEGUIVertex()
+            {
+                Position = new Vector4(rect.X, rect.Y + rect.W, 0, 1),
+                Color = color,
+                UV = Vector2.Zero
+            });
+            s_currentCtx.BufferRect.Add(new RigelEGUIVertex()
+            {
+                Position = new Vector4(rect.X +rect.Z, rect.Y + rect.W, 0, 1),
+                Color = color,
+                UV = Vector2.Zero
+            });
+            s_currentCtx.BufferRect.Add(new RigelEGUIVertex()
+            {
+                Position = new Vector4(rect.X + rect.Z, rect.Y, 0, 1),
+                Color = color,
+                UV = Vector2.Zero
+            });
+
         }
 
-        public static void EndFrame()
-        {
-            s_currentCtx = null;
-        }
-
-
-        public static void DrawRect(Vector4 rect)
-        {
-
-        }
 
     }
 
@@ -50,7 +67,7 @@ namespace RigelEditor.EGUI
 
     internal struct RigelEditorGUIWindowBufferInfo
     {
-        public bool FirstGenerated;
+        public bool BufferInited;
         public int BufferRectStartPos;
         public int BufferRectEndPos;
         public int BufferTextStartPos;
@@ -64,14 +81,13 @@ namespace RigelEditor.EGUI
         public Vector4 Rect { get; private set; }
         public bool Focused { get { return m_focused; } internal set { m_focused = value; } }
 
-        private RigelEditorGUIWindowBufferInfo m_bufferInfo;
+        internal RigelEditorGUIWindowBufferInfo m_bufferInfo;
         private bool m_focused = false;
 
-        internal RigelEditorGUIWindowBufferInfo InternalBufferInfo { get { return m_bufferInfo; } }
 
         public RigelEditorGUIWindow()
         {
-            m_bufferInfo.FirstGenerated = false;
+            m_bufferInfo.BufferInited = false;
             m_bufferInfo.BufferRectEndPos = 0;
             m_bufferInfo.BufferRectStartPos = 0;
             m_bufferInfo.BufferTextEndPos = 0;
@@ -85,7 +101,7 @@ namespace RigelEditor.EGUI
 
         public virtual void OnGUI()
         {
-
+            
         }
 
         public static T GetWindow<T>() where T : RigelEditorGUIWindow, new ()

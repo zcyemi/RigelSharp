@@ -82,6 +82,12 @@ namespace RigelEditor.EGUI
             Dirty = dirty;
         }
 
+        internal void InternalSetBufferDataCount(int count)
+        {
+            BufferDataCount = count;
+            Dirty = true;
+        }
+
     }
 
     internal class RigelEGUIGraphicsBind:IDisposable
@@ -92,6 +98,8 @@ namespace RigelEditor.EGUI
 
         private RigelEGUIBuffer<RigelEGUIVertex> m_bufferDataVertex;
         private RigelEGUIBuffer<int> m_bufferDataIndices;
+
+        public RigelEGUIBuffer<RigelEGUIVertex> BufferVertexRect { get { return m_bufferDataVertex; } }
 
         private Matrix m_matrixgui;
         private bool m_guiparamsChanged = true;
@@ -116,6 +124,11 @@ namespace RigelEditor.EGUI
 
         private DeviceContext m_deferredContext = null;
         private CommandList m_commandlist = null;
+
+        /// <summary>
+        /// mark true when buffer is modified
+        /// </summary>
+        internal bool NeedRebuildCommandList = false;
 
 
         public RigelEGUIGraphicsBind(RigelGraphics graphics)
@@ -304,7 +317,9 @@ namespace RigelEditor.EGUI
             m_deferredContext.PixelShader.SetShaderResource(0, m_fontTextureView);
             m_deferredContext.PixelShader.SetSampler(0, m_fontTextureSampler);
 
-            m_deferredContext.DrawIndexed(6, 0, 0);
+            RigelUtility.Log("buffer data count:" + m_bufferDataVertex.BufferDataCount);
+            int indexedCount = m_bufferDataVertex.BufferDataCount / 2 * 3;
+            m_deferredContext.DrawIndexed(indexedCount, 0, 0);
 
             m_commandlist = m_deferredContext.FinishCommandList(false);
 
@@ -351,13 +366,15 @@ namespace RigelEditor.EGUI
                 RigelUtility.Log("update indicesbuffer data");
             }
 
-            if (graphics.NeedRebuildCommandList)
+            if (graphics.NeedRebuildCommandList || NeedRebuildCommandList)
             {
                 if(m_commandlist != null)
                 {
                     m_commandlist.Dispose();
                 }
                 BuildCommandList();
+
+                NeedRebuildCommandList = false;
             }
 
             graphics.ImmediateContext.ExecuteCommandList(m_commandlist,false);

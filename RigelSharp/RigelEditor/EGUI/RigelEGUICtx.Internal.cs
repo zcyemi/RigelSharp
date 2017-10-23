@@ -13,6 +13,16 @@ namespace RigelEditor.EGUI
         private RigelEGUIMenu m_mainMenu;
         private List<RigelEditorGUIWindow> m_windows;
 
+
+        private List<RigelEGUIVertex> m_bufferRect = new List<RigelEGUIVertex>();
+        private List<RigelEGUIVertex> m_bufferText = new List<RigelEGUIVertex>();
+
+        internal List<RigelEGUIVertex> BufferRect { get { return m_bufferRect; } }
+        internal List<RigelEGUIVertex> BufferText { get { return m_bufferText; } }
+
+
+        private Dictionary<int, int> m_bufferRectEmptyBlock = new Dictionary<int, int>(); //begin end
+
         private void GUIInit()
         {
             m_windows = new List<RigelEditorGUIWindow>();
@@ -21,6 +31,8 @@ namespace RigelEditor.EGUI
             RefreshMainMenu();
 
             m_dockerMgr = new RigelEditorGUIDockerManager();
+
+            RigelEditorGUI.s_currentCtx = this;
         }
 
         private void GUIRelease()
@@ -31,12 +43,14 @@ namespace RigelEditor.EGUI
 
         private void GUIUpdate()
         {
-            //draw menu
+            m_bufferRectEmptyBlock.Clear();
 
+            //draw menu
             foreach (var win in m_windows)
             {
                 UpdateWindow(win);
             }
+
         }
 
         private void RefreshMainMenu()
@@ -60,12 +74,95 @@ namespace RigelEditor.EGUI
         private void UpdateWindow(RigelEditorGUIWindow win)
         {
             bool needupdate = false;
-            if (win.InternalBufferInfo.FirstGenerated == false) needupdate = true;
+            if (win.m_bufferInfo.BufferInited == false) needupdate = true;
+
             if (win.Focused)
             {
+                needupdate = true;
+            }
 
+            if (needupdate)
+            {
+                RigelUtility.Log("update window:" + win.ToString());
+
+                InternalBeginWindow(win);
+                win.OnGUI();
+                InternalEndWindow();
             }
 
         }
+
+
+        private void InternalBeginWindow(RigelEditorGUIWindow win)
+        {
+            m_bufferRect.Clear();
+            m_bufferText.Clear();
+            RigelEditorGUI.s_currentWindow = win;
+        }
+
+        private void InternalEndWindow()
+        {
+            var curwin = RigelEditorGUI.s_currentWindow;
+            RigelEditorGUI.s_currentCtx = null;
+
+            var buffercount = m_bufferRect.Count();
+
+            if (buffercount == 0)
+            {
+                RigelUtility.Log("temp draw buffer count:" + buffercount);
+                return;
+            }
+
+            //applytobuffer
+            if (curwin.m_bufferInfo.BufferInited == false)
+            {
+                curwin.m_bufferInfo.BufferRectStartPos = m_graphicsBind.BufferVertexRect.BufferDataCount;
+
+
+                Array.Copy(m_bufferRect.ToArray(), 0, m_graphicsBind.BufferVertexRect.BufferData, m_graphicsBind.BufferVertexRect.BufferDataCount, buffercount);
+
+                m_graphicsBind.BufferVertexRect.IncreaseBufferDataCount(buffercount);
+                curwin.m_bufferInfo.BufferRectEndPos = m_graphicsBind.BufferVertexRect.BufferDataCount;
+
+                curwin.m_bufferInfo.BufferInited = true;
+
+                RigelUtility.Log("buffer extends:" + buffercount);
+            }
+            else
+            {
+                if(curwin.m_bufferInfo.BufferRectEndPos == m_graphicsBind.BufferVertexRect.BufferDataCount)
+                {
+                    //buffer at end
+                    Array.Copy(m_bufferRect.ToArray(), 0, m_graphicsBind.BufferVertexRect.BufferData, curwin.m_bufferInfo.BufferRectStartPos, buffercount);
+                    m_graphicsBind.BufferVertexRect.InternalSetBufferDataCount(curwin.m_bufferInfo.BufferRectStartPos + buffercount);
+                    curwin.m_bufferInfo.BufferRectEndPos = m_graphicsBind.BufferVertexRect.BufferDataCount;
+                }
+                else
+                {
+                    //buffer not at end
+                    if(curwin.m_bufferInfo.BufferRectEndPos - curwin.m_bufferInfo.BufferRectStartPos != 0)
+                    {
+                        m_bufferRectEmptyBlock.Add(curwin.m_bufferInfo.BufferRectStartPos, curwin.m_bufferInfo.BufferRectEndPos);
+                    }
+                    else
+                    {
+                        RigelUtility.Log("window Buffer size is zero");
+                    }
+
+                    curwin.m_bufferInfo.BufferRectStartPos = m_graphicsBind.BufferVertexRect.BufferDataCount;
+                    Array.Copy(m_bufferRect.ToArray(),
+                        0,
+                        m_graphicsBind.BufferVertexRect.BufferData,
+                        m_graphicsBind.BufferVertexRect.BufferDataCount,
+                        buffercount
+                        );
+                    m_graphicsBind.BufferVertexRect.IncreaseBufferDataCount(buffercount);
+                    curwin.m_bufferInfo.BufferRectEndPos = m_graphicsBind.BufferVertexRect.BufferDataCount;
+                }
+            }
+
+            m_graphicsBind.NeedRebuildCommandList = true;
+        }
+
     }
 }

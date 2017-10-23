@@ -25,6 +25,8 @@ namespace RigelEditor.EGUI
         private RigelEGUIGraphicsBind m_graphicsBind = null;
         private RigelFont m_font = null;
 
+        internal RigelEGUIGraphicsBind GraphicsBind { get { return m_graphicsBind; } }
+
         public RigelEGUICtx(RenderForm form,RigelGraphics graphics)
         {
             //basis
