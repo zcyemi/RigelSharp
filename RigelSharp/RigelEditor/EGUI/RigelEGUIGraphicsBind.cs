@@ -121,7 +121,11 @@ namespace RigelEditor.EGUI
 
             //vertexbuffer
 
-            var vbufferdesc = new BufferDescription()
+            
+
+            m_bufferDataRect = new RigelEGUIBuffer<RigelEGUIVertex>(1024);
+
+            var vbufferdescRect = new BufferDescription()
             {
                 SizeInBytes = m_bufferDataRect.BufferSizeInByte,
                 BindFlags = BindFlags.VertexBuffer,
@@ -131,8 +135,7 @@ namespace RigelEditor.EGUI
                 StructureByteStride = 0,
             };
 
-            m_bufferDataRect = new RigelEGUIBuffer<RigelEGUIVertex>(1024);
-            m_vertexBufferRect = new Buffer(m_graphics.Device, vbufferdesc);
+            m_vertexBufferRect = new Buffer(m_graphics.Device, vbufferdescRect);
             m_vertexBufferRectBinding = new VertexBufferBinding(
                 m_vertexBufferRect, 
                 m_bufferDataRect.ItemSizeInByte,
@@ -140,7 +143,17 @@ namespace RigelEditor.EGUI
             );
 
             m_bufferDataText = new RigelEGUIBuffer<RigelEGUIVertex>(1024);
-            m_vertexBuffertText = new Buffer(m_graphics.Device, vbufferdesc);
+
+            var vbufferdescText = new BufferDescription()
+            {
+                SizeInBytes = m_bufferDataRect.BufferSizeInByte,
+                BindFlags = BindFlags.VertexBuffer,
+                Usage = ResourceUsage.Default,
+                CpuAccessFlags = CpuAccessFlags.None,
+                OptionFlags = ResourceOptionFlags.None,
+                StructureByteStride = 0,
+            };
+            m_vertexBuffertText = new Buffer(m_graphics.Device, vbufferdescText);
             m_vertexBufferTextBinding = new VertexBufferBinding(
                 m_vertexBuffertText, 
                 m_bufferDataText.ItemSizeInByte, 

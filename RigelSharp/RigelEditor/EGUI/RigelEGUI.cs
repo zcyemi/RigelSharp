@@ -46,6 +46,21 @@ namespace RigelEditor.EGUI
         {
 
         }
+
+
+
+
+        #region utility
+
+        internal static bool RectContainsCheck(Vector2 pos,Vector2 size,Vector2 point)
+        {
+            if (point.X < pos.X || point.X > pos.X + size.X) return false;
+            if (point.Y < pos.Y || point.Y > pos.Y + size.Y) return false;
+            return true;
+        }
+
+
+        #endregion
     }
 
 

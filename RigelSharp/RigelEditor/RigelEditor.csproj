@@ -79,6 +79,7 @@
     <Compile Include="EGUI\RigelEGUIDocker.cs" />
     <Compile Include="EGUI\RigelEGUIGraphicsBind.cs" />
     <Compile Include="EGUI\RigelEGUIMenu.cs" />
+    <Compile Include="EGUI\RigelEGUIStyle.cs" />
     <Compile Include="EGUI\RigelEGUIWindow.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RigelDrawCall.cs" />

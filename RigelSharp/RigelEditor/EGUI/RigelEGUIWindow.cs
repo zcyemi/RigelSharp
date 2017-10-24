@@ -15,17 +15,22 @@ namespace RigelEditor.EGUI
         public int BufferRectEndPos;
         public int BufferTextStartPos;
         public int BufferTextEndPos;
+
+        public int BufRectSize { get { return BufferRectEndPos - BufferRectStartPos; } }
+        public int BUfTextSize { get { return BufferTextEndPos - BufferTextStartPos; } }
     }
 
     public class RigelEGUIWindow
     {
 
-
-        public Vector4 Rect { get; private set; }
+        public Vector2 Position = new Vector2(20, 20);
+        public Vector2 Size = new Vector2(400, 300);
         public bool Focused { get { return m_focused; } internal set { m_focused = value; } }
+        public int Order { get { return m_order; } }
 
         internal RigelEGUIWindowBufferInfo m_bufferInfo;
         private bool m_focused = false;
+        internal int m_order = 0;
 
 
         public RigelEGUIWindow()
@@ -35,6 +40,13 @@ namespace RigelEditor.EGUI
             m_bufferInfo.BufferRectStartPos = 0;
             m_bufferInfo.BufferTextEndPos = 0;
             m_bufferInfo.BufferTextStartPos = 0;
+
+            OnStart();
+        }
+
+        public virtual void OnStart()
+        {
+
         }
 
         public virtual void OnMenuBar(RigelEGUIMenu menu)
@@ -50,6 +62,11 @@ namespace RigelEditor.EGUI
         public static T GetWindow<T>() where T : RigelEGUIWindow, new()
         {
             return RigelEGUI.s_currentCtx.FindWindowOfType<T>();
+        }
+
+        internal void InternalDrawBasis()
+        {
+            RigelEGUI.DrawRect(new Vector4(Position, Size.X, Size.Y), m_focused ? RigelEGUIStyle.Current.WinBGColorFocused : RigelEGUIStyle.Current.WinBGColor);
         }
     }
 }

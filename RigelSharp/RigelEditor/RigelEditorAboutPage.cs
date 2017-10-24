@@ -17,11 +17,15 @@ namespace RigelEditor
 
         }
 
+        public override void OnStart()
+        {
+            Position.X = 400;
+            Position.Y = 50;
+        }
+
         public override void OnGUI()
         {
             RigelEGUI.DrawRect(new Vector4(200, 100, 200, 50), Vector4.One);
-
-            RigelEGUI.DrawRect(new Vector4(220, 120, 40, 40), new Vector4(1,0,1,1));
         }
 
         

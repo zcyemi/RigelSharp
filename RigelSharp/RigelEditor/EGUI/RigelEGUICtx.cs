@@ -49,7 +49,7 @@ namespace RigelEditor.EGUI
         {
             RigelUtility.Log("GUIEvent:" + guievent.EventType.ToString());
 
-            GUIUpdate();
+            GUIUpdate(guievent);
         }
 
         public void Render(RigelGraphics graphics)

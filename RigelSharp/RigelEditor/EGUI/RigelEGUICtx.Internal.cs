@@ -41,56 +41,100 @@ namespace RigelEditor.EGUI
             m_mainMenu.ClearAllItems();
         }
 
-        private void GUIUpdate()
+
+        private void GUIUpdate(RigelEGUIEvent guievent)
         {
             m_bufferRectEmptyBlock.Clear();
 
+            //make sure the focused window at the first
+            m_windows.Sort((a, b) => { return b.Focused.CompareTo(a.Focused); });
+
             //draw menu
+
+            int focusedWin = 0;
+
+            int totalBufferSizeCount = 0;
             foreach (var win in m_windows)
             {
-                UpdateWindow(win);
+                UpdateWindow(win,guievent);
+                if (win.Focused) focusedWin++;
+
+                totalBufferSizeCount += win.m_bufferInfo.BufferRectEndPos - win.m_bufferInfo.BufferRectStartPos;
             }
 
-        }
+            RigelUtility.Assert(focusedWin <= 1, "[Exception] Multi Focused Window :"+focusedWin);
 
-        private void RefreshMainMenu()
-        {
-            var assembly = RigelReflectionHelper.AssemblyRigelEditor;
-            foreach (var type in assembly.GetTypes())
+            // reset window order
+            // Buffer Struct: Lesser  <<------ window.Order ------ << Greater
+            // the num of array copy operation is minium when focused window at the end of buffer
+            // it doesn't influence the effecient of rendering pipeline
+            m_windows.Sort((a,b)=>{ return a.Order.CompareTo(b.Order); });
+
+            //arrange buffer
             {
-                var methods = RigelReflectionHelper.GetMethodByAttribute<RigelEGUIMenuItemAttribute>(
-                    type, 
-                    BindingFlags.Static |
-                    BindingFlags.Public |
-                    BindingFlags.NonPublic
-                );
-
-                foreach (var m in methods)
+                var newbuf = new RigelEGUIVertex[m_graphicsBind.BufferVertexRect.BufferSize];
+                var bufrect = m_graphicsBind.BufferVertexRect.BufferData;
+                int newbufPos = 0;
+                foreach(var win in m_windows)
                 {
-                    var attr = Attribute.GetCustomAttribute(m, typeof(RigelEGUIMenuItemAttribute)) as RigelEGUIMenuItemAttribute;
-                    m_mainMenu.AddMenuItem(attr.Label, m);
+                    int winbufsize = win.m_bufferInfo.BufRectSize;
+                    Array.Copy(
+                        bufrect, 
+                        win.m_bufferInfo.BufferRectStartPos, 
+                        newbuf, 
+                        newbufPos,
+                        winbufsize);
+                    win.m_bufferInfo.BufferRectStartPos = newbufPos;
+                    newbufPos += winbufsize;
+                    win.m_bufferInfo.BufferRectEndPos = newbufPos;
                 }
-
+                m_graphicsBind.BufferVertexRect.BufferData = newbuf;
+                m_graphicsBind.BufferVertexRect.InternalSetBufferDataCount(totalBufferSizeCount);
             }
-            RigelUtility.Log("EGUI mainMenu item count:" + m_mainMenu.ItemNodes.Count());
 
         }
 
-        private void UpdateWindow(RigelEGUIWindow win)
+        private void UpdateWindow(RigelEGUIWindow win,RigelEGUIEvent guievent)
         {
             bool needupdate = false;
             if (win.m_bufferInfo.BufferInited == false) needupdate = true;
 
-            if (win.Focused)
+            if (((int)guievent.EventType | (int)RigelEGUIEventType.MouseEventActive) > 0)
             {
-                needupdate = true;
+                if(guievent.InternalFocusedWindow != null || guievent.Used)
+                {
+                    win.Focused = false;
+                }
+                else
+                {
+                    if (RigelEGUI.RectContainsCheck(win.Position, win.Size, guievent.Pointer))
+                    {
+                        RigelUtility.Log("WindowFocused:" + win.ToString());
+                        guievent.InternalFocusedWindow = win;
+                        win.Focused = true;
+                        win.m_order = GetMaxWindowOrder() + 1;
+                    }
+                    else
+                    {
+                        win.Focused = false;
+                    }
+                }
             }
+            else
+            {
+                //passive focus window
+                if (win.Focused)
+                {
+                    guievent.InternalFocusedWindow = win;
+                }
+            }
+
+            needupdate |= win.Focused;
 
             if (needupdate)
             {
-                RigelUtility.Log("update window:" + win.ToString());
-
                 InternalBeginWindow(win);
+                win.InternalDrawBasis();
                 win.OnGUI();
                 InternalEndWindow();
             }
@@ -178,7 +222,40 @@ namespace RigelEditor.EGUI
                 }
             }
 
+            RigelUtility.Assert(curwin.m_bufferInfo.BufferRectEndPos >= curwin.m_bufferInfo.BufferRectStartPos);
+
             m_graphicsBind.NeedRebuildCommandList = true;
+        }
+
+
+        private void RefreshMainMenu()
+        {
+            var assembly = RigelReflectionHelper.AssemblyRigelEditor;
+            foreach (var type in assembly.GetTypes())
+            {
+                var methods = RigelReflectionHelper.GetMethodByAttribute<RigelEGUIMenuItemAttribute>(
+                    type,
+                    BindingFlags.Static |
+                    BindingFlags.Public |
+                    BindingFlags.NonPublic
+                );
+
+                foreach (var m in methods)
+                {
+                    var attr = Attribute.GetCustomAttribute(m, typeof(RigelEGUIMenuItemAttribute)) as RigelEGUIMenuItemAttribute;
+                    m_mainMenu.AddMenuItem(attr.Label, m);
+                }
+
+            }
+            RigelUtility.Log("EGUI mainMenu item count:" + m_mainMenu.ItemNodes.Count());
+
+        }
+
+        private int GetMaxWindowOrder()
+        {
+            int order = 0;
+            m_windows.ForEach((w) => { order = w.Order > order ? w.Order : order; });
+            return order;
         }
 
     }

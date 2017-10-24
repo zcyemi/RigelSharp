@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
 
+using System.Diagnostics;
+
 namespace RigelEditor
 {
     public static class RigelUtility
@@ -22,6 +24,15 @@ namespace RigelEditor
         public static void Log(string info)
         {
             Console.WriteLine(info);
+        }
+
+        public static void Assert(bool condition)
+        {
+            Debug.Assert(condition);
+        }
+        public static void Assert(bool condition, string message)
+        {
+            Debug.Assert(condition, message);
         }
     }
 
@@ -48,4 +59,5 @@ namespace RigelEditor
             return methods;
         }
     }
+
 }

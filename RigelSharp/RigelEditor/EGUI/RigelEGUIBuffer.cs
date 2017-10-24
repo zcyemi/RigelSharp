@@ -22,7 +22,7 @@ namespace RigelEditor.EGUI
         public int BufferDataCount { get; private set; }
         public bool Dirty { get; private set; }
 
-        public T[] BufferData;
+        internal T[] BufferData;
 
 
         public RigelEGUIBuffer(int buffersize = BUFFER_INIT_SIZE, int extendtimes = BUFFER_EXTEND_TIMES, Action<RigelEGUIBuffer<T>, int> extendGenerate = null)
@@ -63,6 +63,5 @@ namespace RigelEditor.EGUI
             BufferDataCount = count;
             Dirty = true;
         }
-
     }
 }

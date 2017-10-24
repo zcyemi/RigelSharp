@@ -799,6 +799,8 @@ namespace RigelEditor.EGUI
         public int Delta { get; private set; } = 0;
         public Vector2 Pointer { get; private set; } = Vector2.Zero;
 
+        internal RigelEGUIWindow InternalFocusedWindow = null;
+
         public RigelEGUIEvent(RigelEGUIEventType eventtype,System.Windows.Forms.MouseEventArgs e)
         {
             EventType = eventtype;
@@ -838,15 +840,18 @@ namespace RigelEditor.EGUI
 
     public enum RigelEGUIEventType
     {
-        None,
-        MouseClick,
-        MouseWheel,
-        MouseDoubleClick,
-        MouseUp,
-        MouseDown,
-        KeyPress,
-        KeyDown,
-        KeyUp,
+        None                = 0,
+        MouseClick          = 1 << 0,
+        MouseDoubleClick    = 1 << 1,
+        MouseWheel          = 1 << 2,
+        MouseUp             = 1 << 3,
+        MouseDown           = 1 << 4,
+        KeyPress            = 1 << 5,
+        KeyDown             = 1 << 6,
+        KeyUp               = 1 << 7,
+
+        MouseEventActive = MouseClick | MouseDoubleClick | MouseDown,
+        KeyEvent = KeyPress | KeyDown | KeyUp,
     }
 
     public partial class RigelEGUICtx
