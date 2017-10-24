@@ -47,8 +47,6 @@ namespace RigelEditor.EGUI
 
         private void OnWindowEvent(RigelEGUIEvent guievent)
         {
-            RigelUtility.Log("GUIEvent:" + guievent.EventType.ToString());
-
             GUIUpdate(guievent);
         }
 

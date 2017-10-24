@@ -32,6 +32,8 @@ namespace RigelEditor.EGUI
         private bool m_focused = false;
         internal int m_order = 0;
 
+        public Vector4 m_debugColor;
+
 
         public RigelEGUIWindow()
         {
@@ -66,7 +68,7 @@ namespace RigelEditor.EGUI
 
         internal void InternalDrawBasis()
         {
-            RigelEGUI.DrawRect(new Vector4(Position, Size.X, Size.Y), m_focused ? RigelEGUIStyle.Current.WinBGColorFocused : RigelEGUIStyle.Current.WinBGColor);
+            RigelEGUI.DrawRect(new Vector4(Position, Size.X, Size.Y), m_debugColor);
         }
     }
 }

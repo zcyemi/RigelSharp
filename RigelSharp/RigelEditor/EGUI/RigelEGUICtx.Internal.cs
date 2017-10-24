@@ -67,10 +67,22 @@ namespace RigelEditor.EGUI
             // reset window order
             // Buffer Struct: Lesser  <<------ window.Order ------ << Greater
             // the num of array copy operation is minium when focused window at the end of buffer
-            // it doesn't influence the effecient of rendering pipeline
-            m_windows.Sort((a,b)=>{ return a.Order.CompareTo(b.Order); });
+            // it doesn't influence the effecient of graphics rendering pipeline
+            if(m_windows.Count > 1)
+            {
+                m_windows.Sort((a, b) => { return a.Order.CompareTo(b.Order); });
+
+                //need to shrink the window order to z-near/z-far range
+                if(m_windows[m_windows.Count-1].Order >= RigelEGUIGraphicsBind.GUI_CLIP_PLANE_FAR)
+                {
+                    //TODO
+                    //adjust all RigelEGUIVertex.Pos.z
+                }
+            }
+
 
             //arrange buffer
+            if (m_bufferRectEmptyBlock.Count > 0)
             {
                 var newbuf = new RigelEGUIVertex[m_graphicsBind.BufferVertexRect.BufferSize];
                 var bufrect = m_graphicsBind.BufferVertexRect.BufferData;
@@ -109,10 +121,13 @@ namespace RigelEditor.EGUI
                 {
                     if (RigelEGUI.RectContainsCheck(win.Position, win.Size, guievent.Pointer))
                     {
-                        RigelUtility.Log("WindowFocused:" + win.ToString());
+                        //RigelUtility.Log("WindowFocused:" + win.ToString());
                         guievent.InternalFocusedWindow = win;
-                        win.Focused = true;
-                        win.m_order = GetMaxWindowOrder() + 1;
+                        if(win.Focused == false)
+                        {
+                            win.Focused = true;
+                            win.m_order = GetMaxWindowOrder() + 1;
+                        }
                     }
                     else
                     {
@@ -147,6 +162,7 @@ namespace RigelEditor.EGUI
             m_bufferRect.Clear();
             m_bufferText.Clear();
             RigelEGUI.s_currentWindow = win;
+            RigelEGUI.s_depthz = RigelEGUIGraphicsBind.GUI_CLIP_PLANE_FAR - (win.Order + RigelEGUI.s_depthStep);
         }
 
         private void InternalEndWindow()

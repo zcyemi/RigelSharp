@@ -12,34 +12,38 @@ namespace RigelEditor.EGUI
     {
         internal static RigelEGUICtx s_currentCtx = null;
         internal static RigelEGUIWindow s_currentWindow = null;
+        internal static float s_depthz = 1;
+        internal static float s_depthStep = 0.0001f;
 
 
         public static void DrawRect(Vector4 rect,Vector4 color)
         {
             s_currentCtx.BufferRect.Add(new RigelEGUIVertex()
             {
-                Position = new Vector4(rect.X, rect.Y, 0, 1),
+                Position = new Vector4(rect.X, rect.Y, s_depthz, 1),
                 Color = color,
                 UV = Vector2.Zero
             });
             s_currentCtx.BufferRect.Add(new RigelEGUIVertex()
             {
-                Position = new Vector4(rect.X, rect.Y + rect.W, 0, 1),
+                Position = new Vector4(rect.X, rect.Y + rect.W, s_depthz, 1),
                 Color = color,
                 UV = Vector2.Zero
             });
             s_currentCtx.BufferRect.Add(new RigelEGUIVertex()
             {
-                Position = new Vector4(rect.X +rect.Z, rect.Y + rect.W, 0, 1),
+                Position = new Vector4(rect.X +rect.Z, rect.Y + rect.W, s_depthz, 1),
                 Color = color,
                 UV = Vector2.Zero
             });
             s_currentCtx.BufferRect.Add(new RigelEGUIVertex()
             {
-                Position = new Vector4(rect.X + rect.Z, rect.Y, 0, 1),
+                Position = new Vector4(rect.X + rect.Z, rect.Y, s_depthz, 1),
                 Color = color,
                 UV = Vector2.Zero
             });
+
+            s_depthz -= s_depthStep;
         }
 
         public static void DrawText(Vector4 rect,string content)

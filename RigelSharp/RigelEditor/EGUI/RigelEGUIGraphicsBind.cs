@@ -36,6 +36,9 @@ namespace RigelEditor.EGUI
         private static readonly string SHADER_FILE_PATH_RECT = "Shader/gui_rect.fx";
         private const int TEXTURE_FONT_SIZE = 128;
 
+        internal const float GUI_CLIP_PLANE_FAR = 100.0f;
+        internal const float GUI_CLIP_PLANE_NEAR = 0;
+
 
         private RigelEGUIBuffer<RigelEGUIVertex> m_bufferDataRect;
         private RigelEGUIBuffer<RigelEGUIVertex> m_bufferDataText;
@@ -171,7 +174,7 @@ namespace RigelEditor.EGUI
                 StructureByteStride = 0,
             };
 
-            m_matrixgui = Matrix.OrthoOffCenterLH(0, 800, 600, 0, 0, 1.0f);
+            m_matrixgui = Matrix.OrthoOffCenterLH(0, 800, 600, 0, GUI_CLIP_PLANE_NEAR, GUI_CLIP_PLANE_FAR);
             m_matrixgui.Transpose();
             m_constBuffer = Buffer.Create(m_graphics.Device, ref m_matrixgui, cbufferdesc);
 
@@ -212,7 +215,7 @@ namespace RigelEditor.EGUI
 
         public void UpdateGUIParams(int width,int height)
         {
-            m_matrixgui = Matrix.OrthoOffCenterLH(0,width, height, 0, 0, 1.0f);
+            m_matrixgui = Matrix.OrthoOffCenterLH(0,width, height, 0, GUI_CLIP_PLANE_NEAR, GUI_CLIP_PLANE_FAR);
             m_matrixgui.Transpose();
 
             m_guiparamsChanged = true;

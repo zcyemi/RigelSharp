@@ -21,11 +21,13 @@ namespace RigelEditor
         {
             Position.X = 400;
             Position.Y = 50;
+
+            m_debugColor = new Vector4(0, 0.2f, 1.0f, 1.0f);
         }
 
         public override void OnGUI()
         {
-            RigelEGUI.DrawRect(new Vector4(200, 100, 200, 50), Vector4.One);
+            RigelEGUI.DrawRect(new Vector4(Position.X, Position.Y, 200, 50), Vector4.One);
         }
 
         

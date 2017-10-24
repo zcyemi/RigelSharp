@@ -11,6 +11,10 @@ namespace RigelEditor
 {
     public class RigelEditorConsoleWindow : RigelEGUIWindow
     {
+        public override void OnStart()
+        {
+            m_debugColor = new Vector4(0, 1, 1, 1);
+        }
 
         public override void OnGUI()
         {
