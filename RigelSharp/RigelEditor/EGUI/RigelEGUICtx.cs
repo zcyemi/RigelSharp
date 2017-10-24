@@ -19,6 +19,9 @@ using RigelEditor;
 
 namespace RigelEditor.EGUI
 {
+
+
+
     public partial class RigelEGUICtx:IDisposable
     {
         private RenderForm m_form;
@@ -40,27 +43,12 @@ namespace RigelEditor.EGUI
             RegisterEvent();
         }
 
-        private void RegisterEvent()
-        {
-            m_form.UserResized += (sender, e) => {
-                m_graphicsBind.UpdateGUIParams(m_form.ClientSize.Width, m_form.ClientSize.Height);
-                RigelUtility.Log("event resize");
-            };
-            m_form.KeyDown += OnWindowEvent;
-            m_form.KeyUp += OnWindowEvent;
-            m_form.KeyPress += OnWindowEvent;
-            m_form.MouseDown += OnWindowEvent;
-            m_form.MouseUp += OnWindowEvent;
-            m_form.MouseClick += OnWindowEvent;
-            m_form.MouseDoubleClick += OnWindowEvent;
-            m_form.MouseWheel += OnWindowEvent;
-            m_form.DragEnter += OnWindowEvent;
-            m_form.DragDrop += OnWindowEvent;
+        
 
-        }
-
-        private void OnWindowEvent(object sender, EventArgs e)
+        private void OnWindowEvent(RigelEGUIEvent guievent)
         {
+            RigelUtility.Log("GUIEvent:" + guievent.EventType.ToString());
+
             GUIUpdate();
         }
 
@@ -76,7 +64,7 @@ namespace RigelEditor.EGUI
         }
 
 
-        internal T FindWindowOfType<T>() where T : RigelEditorGUIWindow,new()
+        internal T FindWindowOfType<T>() where T : RigelEGUIWindow,new()
         {
             foreach(var w in m_windows)
             {

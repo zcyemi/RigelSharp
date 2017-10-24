@@ -9,7 +9,7 @@ using SharpDX;
 
 namespace RigelEditor
 {
-    class RigelEditorAboutPage : RigelEditorGUIWindow
+    class RigelEditorAboutPage : RigelEGUIWindow
     {
         [RigelEGUIMenuItem("Aboud")]
         public static void ShowAboudPage()
@@ -19,9 +19,9 @@ namespace RigelEditor
 
         public override void OnGUI()
         {
-            RigelEditorGUI.DrawRect(new Vector4(200, 100, 200, 50), Vector4.One);
+            RigelEGUI.DrawRect(new Vector4(200, 100, 200, 50), Vector4.One);
 
-            RigelEditorGUI.DrawRect(new Vector4(220, 120, 40, 40), new Vector4(1,0,1,1));
+            RigelEGUI.DrawRect(new Vector4(220, 120, 40, 40), new Vector4(1,0,1,1));
         }
 
         
