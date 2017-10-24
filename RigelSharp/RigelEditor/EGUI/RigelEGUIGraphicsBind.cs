@@ -30,66 +30,6 @@ namespace RigelEditor.EGUI
         public Vector2 UV;
     }
 
-    public class RigelEGUIBuffer<T> where T:struct
-    {
-        private const int BUFFER_INIT_SIZE = 1024;
-        private const int BUFFER_EXTEND_TIMES = 2;
-
-        public int BufferSize { get { return BufferData.Length; } }
-        public int BufferSizeInByte { get { return BufferSize * ItemSizeInByte; } }
-        public int ItemSizeInByte { get { return RigelUtility.SizeOf<T>(); } }
-        public bool BufferResized { get; private set; }
-
-        private int m_bufferExtendTimes = BUFFER_EXTEND_TIMES;
-        private Action<RigelEGUIBuffer<T>,int> m_extendGenrateFunc = null;
-
-        public int BufferDataCount { get; private set; }
-        public bool Dirty { get; private set; }
-
-        public T[] BufferData;
-
-
-        public RigelEGUIBuffer(int buffersize = BUFFER_INIT_SIZE,int extendtimes = BUFFER_EXTEND_TIMES,Action<RigelEGUIBuffer<T>,int> extendGenerate = null)
-        {
-            m_bufferExtendTimes = extendtimes;
-            BufferDataCount = 0;
-            BufferResized = false;
-            m_extendGenrateFunc = extendGenerate;
-
-            BufferData = new T[buffersize];
-            if (m_extendGenrateFunc != null) m_extendGenrateFunc.Invoke(this,0);
-        }
-
-        public void IncreaseBufferDataCount(int c = 1)
-        {
-            BufferDataCount += c;
-            Dirty = true;
-        }
-
-        public void CheckAndExtends(int tolerance = 16)
-        {
-            if(BufferDataCount > BufferSize - tolerance)
-            {
-                int extendpos = BufferSize;
-                Array.Resize(ref BufferData, BufferSize * m_bufferExtendTimes);
-                BufferResized = true;
-                if (m_extendGenrateFunc != null) m_extendGenrateFunc.Invoke(this,extendpos);
-            }
-        }
-
-        public void SetDirty(bool dirty)
-        {
-            Dirty = dirty;
-        }
-
-        internal void InternalSetBufferDataCount(int count)
-        {
-            BufferDataCount = count;
-            Dirty = true;
-        }
-
-    }
-
     internal class RigelEGUIGraphicsBind:IDisposable
     {
         private static readonly string SHADER_FILE_PATH_FONT = "Shader/gui_font.fx";
@@ -97,10 +37,11 @@ namespace RigelEditor.EGUI
         private const int TEXTURE_FONT_SIZE = 128;
 
 
-        private RigelEGUIBuffer<RigelEGUIVertex> m_bufferDataVertex;
+        private RigelEGUIBuffer<RigelEGUIVertex> m_bufferDataRect;
+        private RigelEGUIBuffer<RigelEGUIVertex> m_bufferDataText;
         private RigelEGUIBuffer<int> m_bufferDataIndices;
 
-        public RigelEGUIBuffer<RigelEGUIVertex> BufferVertexRect { get { return m_bufferDataVertex; } }
+        public RigelEGUIBuffer<RigelEGUIVertex> BufferVertexRect { get { return m_bufferDataRect; } }
 
         private Matrix m_matrixgui;
         private bool m_guiparamsChanged = true;
@@ -113,9 +54,14 @@ namespace RigelEditor.EGUI
         private PixelShader m_shaderPixelRect = null;
         private InputLayout m_inputlayout = null;
 
+        //buffer rect
+        private Buffer m_vertexBufferRect = null;
+        private VertexBufferBinding m_vertexBufferRectBinding;
 
-        private Buffer m_vertexBuffer = null;
-        private VertexBufferBinding m_vertexBufferBinding;
+        private Buffer m_vertexBuffertText = null;
+        private VertexBufferBinding m_vertexBufferTextBinding;
+
+
         private Buffer m_constBuffer = null;
         private Buffer m_indicesBuffer = null;
 
@@ -174,27 +120,10 @@ namespace RigelEditor.EGUI
             //buffers
 
             //vertexbuffer
-            m_bufferDataVertex = new RigelEGUIBuffer<RigelEGUIVertex>(1024);
-            m_bufferDataVertex.BufferData[0].Position = new Vector4(0, 0, 0, 1);
-            m_bufferDataVertex.BufferData[1].Position = new Vector4(0, 100, 0, 1);
-            m_bufferDataVertex.BufferData[2].Position = new Vector4(100, 100, 0, 1);
-            m_bufferDataVertex.BufferData[3].Position = new Vector4(100, 0, 0, 1);
-
-            m_bufferDataVertex.BufferData[0].Color = Vector4.One;
-            m_bufferDataVertex.BufferData[1].Color = Vector4.Zero;
-            m_bufferDataVertex.BufferData[2].Color = Vector4.One;
-            m_bufferDataVertex.BufferData[3].Color = Vector4.One;
-
-            m_bufferDataVertex.BufferData[0].UV = new Vector2(0,0);
-            m_bufferDataVertex.BufferData[1].UV = new Vector2(0,1);
-            m_bufferDataVertex.BufferData[2].UV = new Vector2(1,1);
-            m_bufferDataVertex.BufferData[3].UV = new Vector2(1,0);
-
-            m_bufferDataVertex.IncreaseBufferDataCount(4);
 
             var vbufferdesc = new BufferDescription()
             {
-                SizeInBytes = m_bufferDataVertex.BufferSizeInByte,
+                SizeInBytes = m_bufferDataRect.BufferSizeInByte,
                 BindFlags = BindFlags.VertexBuffer,
                 Usage = ResourceUsage.Default,
                 CpuAccessFlags = CpuAccessFlags.None,
@@ -202,8 +131,21 @@ namespace RigelEditor.EGUI
                 StructureByteStride = 0,
             };
 
-            m_vertexBuffer = new Buffer(m_graphics.Device, vbufferdesc);
-            m_vertexBufferBinding = new VertexBufferBinding(m_vertexBuffer, m_bufferDataVertex.ItemSizeInByte, 0);
+            m_bufferDataRect = new RigelEGUIBuffer<RigelEGUIVertex>(1024);
+            m_vertexBufferRect = new Buffer(m_graphics.Device, vbufferdesc);
+            m_vertexBufferRectBinding = new VertexBufferBinding(
+                m_vertexBufferRect, 
+                m_bufferDataRect.ItemSizeInByte,
+                0
+            );
+
+            m_bufferDataText = new RigelEGUIBuffer<RigelEGUIVertex>(1024);
+            m_vertexBuffertText = new Buffer(m_graphics.Device, vbufferdesc);
+            m_vertexBufferTextBinding = new VertexBufferBinding(
+                m_vertexBuffertText, 
+                m_bufferDataText.ItemSizeInByte, 
+                0
+            );
 
             //const buffer
             var cbufferdesc = new BufferDescription()
@@ -267,7 +209,6 @@ namespace RigelEditor.EGUI
         {
             if (m_fontTexture != null) throw new Exception("font texture2d already created");
 
-
             using (RigelImageData img = new RigelImageData(TEXTURE_FONT_SIZE, TEXTURE_FONT_SIZE))
             {
                 font.GenerateFontTexture(img);
@@ -312,7 +253,7 @@ namespace RigelEditor.EGUI
             m_deferredContext.InputAssembler.InputLayout = m_inputlayout;
             m_deferredContext.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
 
-            m_deferredContext.InputAssembler.SetVertexBuffers(0, m_vertexBufferBinding);
+            m_deferredContext.InputAssembler.SetVertexBuffers(0, m_vertexBufferRectBinding);
             m_deferredContext.InputAssembler.SetIndexBuffer(m_indicesBuffer, Format.R32_UInt, 0);
 
             m_deferredContext.VertexShader.SetConstantBuffer(0, m_constBuffer);
@@ -322,8 +263,8 @@ namespace RigelEditor.EGUI
             //m_deferredContext.PixelShader.SetShaderResource(0, m_fontTextureView);
             //m_deferredContext.PixelShader.SetSampler(0, m_fontTextureSampler);
 
-            RigelUtility.Log("buffer data count:" + m_bufferDataVertex.BufferDataCount);
-            int indexedCount = m_bufferDataVertex.BufferDataCount / 2 * 3;
+            RigelUtility.Log("buffer data count:" + m_bufferDataRect.BufferDataCount);
+            int indexedCount = m_bufferDataRect.BufferDataCount / 2 * 3;
             m_deferredContext.DrawIndexed(indexedCount, 0, 0);
 
             m_commandlist = m_deferredContext.FinishCommandList(false);
@@ -342,16 +283,16 @@ namespace RigelEditor.EGUI
             }
 
 
-            if (m_bufferDataVertex.Dirty)
+            if (m_bufferDataRect.Dirty)
             {
-                var pinnedptr = GCHandle.Alloc(m_bufferDataVertex.BufferData, GCHandleType.Pinned);
+                var pinnedptr = GCHandle.Alloc(m_bufferDataRect.BufferData, GCHandleType.Pinned);
                 m_graphics.ImmediateContext.UpdateSubresource(new DataBox()
                 {
                     DataPointer = pinnedptr.AddrOfPinnedObject()
-                }, m_vertexBuffer, 0);
+                }, m_vertexBufferRect, 0);
                 pinnedptr.Free();
 
-                m_bufferDataVertex.SetDirty(false);
+                m_bufferDataRect.SetDirty(false);
 
                 RigelUtility.Log("update vertexbuffer data");
             }
@@ -393,7 +334,10 @@ namespace RigelEditor.EGUI
             if( m_shaderPixelFont != null) m_shaderPixelFont.Dispose();
             if (m_shaderVertex != null) m_shaderVertex.Dispose();
             if (m_inputlayout != null) m_inputlayout.Dispose();
-            if (m_vertexBuffer != null) m_vertexBuffer.Dispose();
+
+            if (m_vertexBufferRect != null) m_vertexBufferRect.Dispose();
+            if (m_vertexBuffertText != null) m_vertexBuffertText.Dispose();
+
             if (m_constBuffer != null) m_constBuffer.Dispose();
             if (m_indicesBuffer != null) m_indicesBuffer.Dispose();
 

@@ -73,6 +73,7 @@
   <ItemGroup>
     <Compile Include="EGUI\RigelEGUI.cs" />
     <Compile Include="EGUI\RigelEGUIBasic.cs" />
+    <Compile Include="EGUI\RigelEGUIBuffer.cs" />
     <Compile Include="EGUI\RigelEGUICtx.cs" />
     <Compile Include="EGUI\RigelEGUICtx.Internal.cs" />
     <Compile Include="EGUI\RigelEGUIDocker.cs" />

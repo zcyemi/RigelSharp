@@ -20,7 +20,6 @@ namespace RigelEditor.EGUI
         internal List<RigelEGUIVertex> BufferRect { get { return m_bufferRect; } }
         internal List<RigelEGUIVertex> BufferText { get { return m_bufferText; } }
 
-
         private Dictionary<int, int> m_bufferRectEmptyBlock = new Dictionary<int, int>(); //begin end
 
         private void GUIInit()
