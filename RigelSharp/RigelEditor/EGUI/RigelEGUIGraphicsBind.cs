@@ -40,11 +40,12 @@ namespace RigelEditor.EGUI
         internal const float GUI_CLIP_PLANE_NEAR = 0;
 
 
-        private RigelEGUIBuffer<RigelEGUIVertex> m_bufferDataRect;
-        private RigelEGUIBuffer<RigelEGUIVertex> m_bufferDataText;
+        private RigelEGUIBufferGUIWindow<RigelEGUIVertex> m_bufferDataRect;
+        private RigelEGUIBufferGUIWindow<RigelEGUIVertex> m_bufferDataText;
         private RigelEGUIBuffer<int> m_bufferDataIndices;
 
-        public RigelEGUIBuffer<RigelEGUIVertex> BufferVertexRect { get { return m_bufferDataRect; } }
+        public RigelEGUIBufferGUIWindow<RigelEGUIVertex> BufferVertexRect { get { return m_bufferDataRect; } }
+        public RigelEGUIBufferGUIWindow<RigelEGUIVertex> BufferVertexText { get { return m_bufferDataText; } }
 
         private Matrix m_matrixgui;
         private bool m_guiparamsChanged = true;
@@ -126,7 +127,7 @@ namespace RigelEditor.EGUI
 
             
 
-            m_bufferDataRect = new RigelEGUIBuffer<RigelEGUIVertex>(1024);
+            m_bufferDataRect = new RigelEGUIBufferGUIWindow<RigelEGUIVertex>(1024);
 
             var vbufferdescRect = new BufferDescription()
             {
@@ -145,7 +146,7 @@ namespace RigelEditor.EGUI
                 0
             );
 
-            m_bufferDataText = new RigelEGUIBuffer<RigelEGUIVertex>(1024);
+            m_bufferDataText = new RigelEGUIBufferGUIWindow<RigelEGUIVertex>(1024);
 
             var vbufferdescText = new BufferDescription()
             {
@@ -276,12 +277,19 @@ namespace RigelEditor.EGUI
             m_deferredContext.VertexShader.Set(m_shaderVertex);
 
             m_deferredContext.PixelShader.Set(m_shaderPixelRect);
-            //m_deferredContext.PixelShader.SetShaderResource(0, m_fontTextureView);
-            //m_deferredContext.PixelShader.SetSampler(0, m_fontTextureSampler);
 
             RigelUtility.Log("buffer data count:" + m_bufferDataRect.BufferDataCount);
             int indexedCount = m_bufferDataRect.BufferDataCount / 2 * 3;
             m_deferredContext.DrawIndexed(indexedCount, 0, 0);
+
+            //draw text
+            m_deferredContext.InputAssembler.SetVertexBuffers(0, m_vertexBufferTextBinding);
+            m_deferredContext.PixelShader.Set(m_shaderPixelFont);
+            m_deferredContext.PixelShader.SetShaderResource(0, m_fontTextureView);
+            m_deferredContext.PixelShader.SetSampler(0, m_fontTextureSampler);
+
+            int textIndexedCount = m_bufferDataText.BufferDataCount / 2 * 3;
+            m_deferredContext.DrawIndexed(textIndexedCount, 0, 0);
 
             m_commandlist = m_deferredContext.FinishCommandList(false);
 
@@ -310,7 +318,21 @@ namespace RigelEditor.EGUI
 
                 m_bufferDataRect.SetDirty(false);
 
-                RigelUtility.Log("update vertexbuffer data");
+                RigelUtility.Log("update vertexbuffer rect data");
+            }
+
+            if (m_bufferDataText.Dirty)
+            {
+                var pinnedptr = GCHandle.Alloc(m_bufferDataText.BufferData, GCHandleType.Pinned);
+                m_graphics.ImmediateContext.UpdateSubresource(new DataBox()
+                {
+                    DataPointer = pinnedptr.AddrOfPinnedObject()
+                }, m_vertexBuffertText, 0);
+                pinnedptr.Free();
+
+                m_bufferDataRect.SetDirty(false);
+
+                RigelUtility.Log("update vertexbuffer text data");
             }
 
             if (m_bufferDataIndices.Dirty)

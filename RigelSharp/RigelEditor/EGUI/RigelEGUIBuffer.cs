@@ -8,8 +8,8 @@ namespace RigelEditor.EGUI
 {
     public class RigelEGUIBuffer<T> where T : struct
     {
-        private const int BUFFER_INIT_SIZE = 1024;
-        private const int BUFFER_EXTEND_TIMES = 2;
+        protected const int BUFFER_INIT_SIZE = 1024;
+        protected const int BUFFER_EXTEND_TIMES = 2;
 
         public int BufferSize { get { return BufferData.Length; } }
         public int BufferSizeInByte { get { return BufferSize * ItemSizeInByte; } }

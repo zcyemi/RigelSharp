@@ -20,7 +20,8 @@ namespace RigelEditor.EGUI
         internal List<RigelEGUIVertex> BufferRect { get { return m_bufferRect; } }
         internal List<RigelEGUIVertex> BufferText { get { return m_bufferText; } }
 
-        private Dictionary<int, int> m_bufferRectEmptyBlock = new Dictionary<int, int>(); //begin end
+        private bool m_bufferRectEmptyBlock = false;
+        private bool m_bufferTextEmptyBlock = false;
 
         private void GUIInit()
         {
@@ -48,7 +49,8 @@ namespace RigelEditor.EGUI
 
             RigelEGUI.m_event = guievent;
 
-            m_bufferRectEmptyBlock.Clear();
+            m_bufferRectEmptyBlock = false;
+            m_bufferTextEmptyBlock = false;
 
             //make sure the focused window at the first
             m_windows.Sort((a, b) => { return b.Focused.CompareTo(a.Focused); });
@@ -57,13 +59,15 @@ namespace RigelEditor.EGUI
 
             int focusedWin = 0;
 
-            int totalBufferSizeCount = 0;
+            int totalBufferRectSizeCount = 0;
+            int totalBufferTextSizeCount = 0;
             foreach (var win in m_windows)
             {
                 UpdateWindow(win,guievent);
                 if (win.Focused) focusedWin++;
 
-                totalBufferSizeCount += win.m_bufferInfo.BufferRectEndPos - win.m_bufferInfo.BufferRectStartPos;
+                totalBufferRectSizeCount += win.BufferInfoRect.Size;
+                totalBufferTextSizeCount += win.BufferInfoText.Size;
             }
 
             RigelUtility.Assert(focusedWin <= 1, "[Exception] Multi Focused Window :"+focusedWin);
@@ -86,26 +90,54 @@ namespace RigelEditor.EGUI
 
 
             //arrange buffer
-            if (m_bufferRectEmptyBlock.Count > 0)
+            if (m_bufferRectEmptyBlock)
             {
-                var newbuf = new RigelEGUIVertex[m_graphicsBind.BufferVertexRect.BufferSize];
-                var bufrect = m_graphicsBind.BufferVertexRect.BufferData;
-                int newbufPos = 0;
+                var newbufRect = new RigelEGUIVertex[m_graphicsBind.BufferVertexRect.BufferSize];
+                var bufRect = m_graphicsBind.BufferVertexRect.BufferData;
+                int newbufPosRect = 0;
                 foreach(var win in m_windows)
                 {
-                    int winbufsize = win.m_bufferInfo.BufRectSize;
+                    //rect
+                    int winbufsizeRect = win.BufferInfoRect.Size;
                     Array.Copy(
-                        bufrect, 
-                        win.m_bufferInfo.BufferRectStartPos, 
-                        newbuf, 
-                        newbufPos,
-                        winbufsize);
-                    win.m_bufferInfo.BufferRectStartPos = newbufPos;
-                    newbufPos += winbufsize;
-                    win.m_bufferInfo.BufferRectEndPos = newbufPos;
+                        bufRect, 
+                        win.BufferInfoRect.StartPos, 
+                        newbufRect, 
+                        newbufPosRect,
+                        winbufsizeRect);
+                    win.BufferInfoRect.StartPos = newbufPosRect;
+                    newbufPosRect += winbufsizeRect;
+                    win.BufferInfoRect.EndPos = newbufPosRect;
                 }
-                m_graphicsBind.BufferVertexRect.BufferData = newbuf;
-                m_graphicsBind.BufferVertexRect.InternalSetBufferDataCount(totalBufferSizeCount);
+
+                m_graphicsBind.BufferVertexRect.BufferData = newbufRect;
+                m_graphicsBind.BufferVertexRect.InternalSetBufferDataCount(totalBufferRectSizeCount);
+
+            }
+
+            if (m_bufferTextEmptyBlock)
+            {
+                var newbufText = new RigelEGUIVertex[m_graphicsBind.BufferVertexText.BufferSize];
+                var bufText = m_graphicsBind.BufferVertexText.BufferData;
+                var newbufPosText = 0;
+                foreach (var win in m_windows)
+                {
+                    //text
+                    int winbufsizeText = win.BufferInfoText.Size;
+                    Array.Copy(
+                        bufText,
+                        win.BufferInfoText.StartPos,
+                        newbufText,
+                        newbufPosText,
+                        winbufsizeText);
+                    win.BufferInfoText.StartPos = newbufPosText;
+                    newbufPosText += winbufsizeText;
+                    win.BufferInfoText.EndPos = newbufPosText;
+
+                }
+                m_graphicsBind.BufferVertexText.BufferData = newbufText;
+                m_graphicsBind.BufferVertexText.InternalSetBufferDataCount(totalBufferTextSizeCount);
+
             }
 
         }
@@ -114,7 +146,8 @@ namespace RigelEditor.EGUI
         {
             bool needupdate = false;
             bool lastFrameFocused = win.Focused;
-            if (win.m_bufferInfo.BufferInited == false) needupdate = true;
+            if (win.BufferInfoRect.Inited == false && win.BufferInfoText.Inited == false)
+                needupdate = true;
 
 
             if ((guievent.EventType & RigelEGUIEventType.MouseEventActive) > 0)
@@ -179,75 +212,14 @@ namespace RigelEditor.EGUI
             var curwin = RigelEGUI.s_currentWindow;
             RigelEGUI.s_currentWindow = null;
 
-            var buffercount = m_bufferRect.Count();
 
-            if (buffercount == 0)
-            {
-                RigelUtility.Log("temp draw buffer count:" + buffercount);
-                return;
-            }
             //applytobuffer
-            if (curwin.m_bufferInfo.BufferInited == false)
-            {
-                curwin.m_bufferInfo.BufferRectStartPos = m_graphicsBind.BufferVertexRect.BufferDataCount;
+            m_bufferRectEmptyBlock |= m_graphicsBind.BufferVertexRect.UpdateGUIWindowBuffer(ref curwin.BufferInfoRect, BufferRect);
+            m_bufferTextEmptyBlock |= m_graphicsBind.BufferVertexText.UpdateGUIWindowBuffer(ref curwin.BufferInfoText, BufferText);
 
-
-                Array.Copy(
-                    m_bufferRect.ToArray(),
-                    0,
-                    m_graphicsBind.BufferVertexRect.BufferData,
-                    m_graphicsBind.BufferVertexRect.BufferDataCount,
-                    buffercount
-                );
-
-                m_graphicsBind.BufferVertexRect.IncreaseBufferDataCount(buffercount);
-                curwin.m_bufferInfo.BufferRectEndPos = m_graphicsBind.BufferVertexRect.BufferDataCount;
-
-                curwin.m_bufferInfo.BufferInited = true;
-
-                RigelUtility.Log("buffer extends:" + buffercount);
-            }
-            else
-            {
-                if (curwin.m_bufferInfo.BufferRectEndPos == m_graphicsBind.BufferVertexRect.BufferDataCount)
-                {
-                    //buffer at end
-                    Array.Copy(
-                        m_bufferRect.ToArray(),
-                        0,
-                        m_graphicsBind.BufferVertexRect.BufferData,
-                        curwin.m_bufferInfo.BufferRectStartPos,
-                        buffercount
-                    );
-                    m_graphicsBind.BufferVertexRect.InternalSetBufferDataCount(curwin.m_bufferInfo.BufferRectStartPos + buffercount);
-                    curwin.m_bufferInfo.BufferRectEndPos = m_graphicsBind.BufferVertexRect.BufferDataCount;
-                }
-                else
-                {
-                    //buffer not at end
-                    if (curwin.m_bufferInfo.BufferRectEndPos - curwin.m_bufferInfo.BufferRectStartPos != 0)
-                    {
-                        m_bufferRectEmptyBlock.Add(curwin.m_bufferInfo.BufferRectStartPos, curwin.m_bufferInfo.BufferRectEndPos);
-                    }
-                    else
-                    {
-                        RigelUtility.Log("window Buffer size is zero");
-                    }
-
-                    curwin.m_bufferInfo.BufferRectStartPos = m_graphicsBind.BufferVertexRect.BufferDataCount;
-                    Array.Copy(
-                        m_bufferRect.ToArray(),
-                        0,
-                        m_graphicsBind.BufferVertexRect.BufferData,
-                        m_graphicsBind.BufferVertexRect.BufferDataCount,
-                        buffercount
-                        );
-                    m_graphicsBind.BufferVertexRect.IncreaseBufferDataCount(buffercount);
-                    curwin.m_bufferInfo.BufferRectEndPos = m_graphicsBind.BufferVertexRect.BufferDataCount;
-                }
-            }
-
-            RigelUtility.Assert(curwin.m_bufferInfo.BufferRectEndPos >= curwin.m_bufferInfo.BufferRectStartPos);
+            RigelUtility.Assert(curwin.BufferInfoRect.EndPos >= curwin.BufferInfoRect.StartPos);
+            RigelUtility.Assert(curwin.BufferInfoText.EndPos >= curwin.BufferInfoText.StartPos);
+            
 
             m_graphicsBind.NeedRebuildCommandList = true;
         }

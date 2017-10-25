@@ -69,6 +69,8 @@ namespace RigelEditor
             factory.Dispose();
 
             m_form.UserResized += (sender, e) => { OnWindowResize(); };
+
+            
         }
 
         public void Resize()

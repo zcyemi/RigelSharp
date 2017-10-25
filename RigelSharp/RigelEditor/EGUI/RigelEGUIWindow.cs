@@ -10,14 +10,12 @@ namespace RigelEditor.EGUI
 {
     internal struct RigelEGUIWindowBufferInfo
     {
-        public bool BufferInited;
-        public int BufferRectStartPos;
-        public int BufferRectEndPos;
-        public int BufferTextStartPos;
-        public int BufferTextEndPos;
+        public bool Inited;
+        public int StartPos;
+        public int EndPos;
 
-        public int BufRectSize { get { return BufferRectEndPos - BufferRectStartPos; } }
-        public int BUfTextSize { get { return BufferTextEndPos - BufferTextStartPos; } }
+        public int Size { get { return EndPos - StartPos; } }
+
     }
 
     public class RigelEGUIWindow
@@ -29,7 +27,8 @@ namespace RigelEditor.EGUI
         public int Order { get { return m_order; } }
         public string WindowTitle { get; protected set; }
 
-        internal RigelEGUIWindowBufferInfo m_bufferInfo;
+        internal RigelEGUIWindowBufferInfo BufferInfoRect = new RigelEGUIWindowBufferInfo() { Inited = false, StartPos = 0, EndPos = 0 };
+        internal RigelEGUIWindowBufferInfo BufferInfoText = new RigelEGUIWindowBufferInfo() { Inited = false, StartPos = 0, EndPos = 0 };
         
         internal int m_order = 0;
 
@@ -44,11 +43,6 @@ namespace RigelEditor.EGUI
         {
             WindowTitle = this.GetType().ToString();
 
-            m_bufferInfo.BufferInited = false;
-            m_bufferInfo.BufferRectEndPos = 0;
-            m_bufferInfo.BufferRectStartPos = 0;
-            m_bufferInfo.BufferTextEndPos = 0;
-            m_bufferInfo.BufferTextStartPos = 0;
 
             OnStart();
         }
