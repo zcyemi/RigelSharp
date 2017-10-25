@@ -79,7 +79,7 @@ namespace RigelEditor.EGUI
 
             RigelUtility.Log("draw window:" + WindowTitle + " " + m_focused);
             RigelEGUI.DrawRect(new Vector4(Position, Size.X, Size.Y), m_focused ? RigelEGUIStyle .Current.WinBGColorFocused: RigelEGUIStyle.Current.WinBGColor);
-            RigelEGUI.DrawRect(new Vector4(Position, Size.X, 16f), RigelEGUIStyle.Current.WinHeaderColor);
+            RigelEGUI.DrawRect(new Vector4(Position, Size.X, RigelEGUIStyle.Current.WinHeaderHeight), RigelEGUIStyle.Current.WinHeaderColor);
 
             
         }
@@ -89,7 +89,7 @@ namespace RigelEditor.EGUI
             if (RigelEGUI.Event.Used) return;
             if(RigelEGUI.Event.EventType == RigelEGUIEventType.MouseDragEnter)
             {
-                if (RigelEGUI.RectContainsCheck(Position, Size, RigelEGUI.Event.Pointer))
+                if (RigelEGUI.RectContainsCheck(Position,new Vector2(Size.X,RigelEGUIStyle.Current.WinHeaderHeight), RigelEGUI.Event.Pointer))
                 {
                     m_onWindowMoveDrag = true;
                     RigelEGUI.Event.Use();
