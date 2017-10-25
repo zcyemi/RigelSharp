@@ -44,6 +44,10 @@ namespace RigelEditor.EGUI
 
         private void GUIUpdate(RigelEGUIEvent guievent)
         {
+            RigelUtility.Log("------------- New Frame -----------");
+
+            RigelEGUI.m_event = guievent;
+
             m_bufferRectEmptyBlock.Clear();
 
             //make sure the focused window at the first
@@ -109,9 +113,11 @@ namespace RigelEditor.EGUI
         private void UpdateWindow(RigelEGUIWindow win,RigelEGUIEvent guievent)
         {
             bool needupdate = false;
+            bool lastFrameFocused = win.Focused;
             if (win.m_bufferInfo.BufferInited == false) needupdate = true;
 
-            if (((int)guievent.EventType | (int)RigelEGUIEventType.MouseEventActive) > 0)
+
+            if (((int)guievent.EventType & (int)RigelEGUIEventType.MouseEventActive) > 0)
             {
                 if(guievent.InternalFocusedWindow != null || guievent.Used)
                 {
@@ -145,6 +151,9 @@ namespace RigelEditor.EGUI
             }
 
             needupdate |= win.Focused;
+
+            //updateWindow when focused mode changed
+            if (lastFrameFocused && !win.Focused) needupdate = true;
 
             if (needupdate)
             {

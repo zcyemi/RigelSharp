@@ -23,7 +23,7 @@ namespace RigelEditor
 
         public static void Log(string info)
         {
-            Console.WriteLine(info);
+            //Console.WriteLine(info);
         }
 
         public static void Assert(bool condition)

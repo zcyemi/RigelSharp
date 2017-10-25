@@ -786,7 +786,7 @@ namespace RigelEditor.EGUI
     public class RigelEGUIEvent
     {
         public bool Used { get; set; } = false;
-        public RigelEGUIEventType EventType { get; private set; } = RigelEGUIEventType.None;
+        public RigelEGUIEventType EventType { get; internal set; } = RigelEGUIEventType.None;
         public bool Alt { get; private set; } = false;
         public bool Control { get; private set; } = false;
         public bool Shift { get; private set; } = false;
@@ -798,6 +798,7 @@ namespace RigelEditor.EGUI
         public int Clicks { get; private set; } = 0;
         public int Delta { get; private set; } = 0;
         public Vector2 Pointer { get; private set; } = Vector2.Zero;
+        public Vector2 DragOffset { get; internal set; } = Vector2.Zero;
 
         internal RigelEGUIWindow InternalFocusedWindow = null;
 
@@ -836,6 +837,16 @@ namespace RigelEditor.EGUI
         {
             Used = true;
         }
+
+        public bool IsMouseEvent()
+        {
+            return ((int)EventType & (int)RigelEGUIEventType.MouseEvent) > 0;
+        }
+
+        public bool IsMouseDragEvent()
+        {
+            return ((int)EventType & (int)RigelEGUIEventType.MouseEventDrag) > 0;
+        }
     }
 
     public enum RigelEGUIEventType
@@ -849,8 +860,13 @@ namespace RigelEditor.EGUI
         KeyPress            = 1 << 5,
         KeyDown             = 1 << 6,
         KeyUp               = 1 << 7,
+        MouseDragEnter      = 1 << 8,
+        MouseDragLeave      = 1 << 9,
+        MouseDragUpdate     = 1 << 10,
 
+        MouseEvent = MouseClick | MouseDoubleClick | MouseDown | MouseUp | MouseDragUpdate,
         MouseEventActive = MouseClick | MouseDoubleClick | MouseDown,
+        MouseEventDrag = MouseDragEnter | MouseDragLeave | MouseDragUpdate,
         KeyEvent = KeyPress | KeyDown | KeyUp,
     }
 
@@ -873,6 +889,11 @@ namespace RigelEditor.EGUI
             m_form.KeyPress += (s, e) =>
             {
                 //OnWindowEvent(new RigelEGUIEvent(RigelEGUIEventType.KeyPress,e));
+            };
+            m_form.MouseMove += (s, e) =>
+            {
+                if (e.Button != System.Windows.Forms.MouseButtons.Left) return;
+                OnWindowEvent(new RigelEGUIEvent(RigelEGUIEventType.MouseDragUpdate, e));
             };
             m_form.MouseDown += (s, e) =>
             {

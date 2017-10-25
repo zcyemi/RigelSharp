@@ -13,7 +13,8 @@ namespace RigelEditor.EGUI
         public static RigelEGUIStyle Current { get { return m_currentStyle; } }
         private static RigelEGUIStyle m_currentStyle = new RigelEGUIStyle();
 
-        public Vector4 WinBGColor = Color.Red.ToVector4();
+        public Vector4 WinBGColor = new Vector4(0.5f, 0.5f, 0.5f, 1.0f);
         public Vector4 WinBGColorFocused = new Vector4(0.6f, 0.6f, 0.6f, 1.0f);
+        public Vector4 WinHeaderColor = new Vector4(0.2f, 0.2f, 0.2f, 1.0f);
     }
 }

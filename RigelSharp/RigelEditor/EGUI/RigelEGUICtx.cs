@@ -27,6 +27,8 @@ namespace RigelEditor.EGUI
         private RenderForm m_form;
         private RigelEGUIGraphicsBind m_graphicsBind = null;
         private RigelFont m_font = null;
+        private bool m_lastFrameDrag = false;
+        private Vector2 m_LastPointerDrag;
 
         internal RigelEGUIGraphicsBind GraphicsBind { get { return m_graphicsBind; } }
 
@@ -47,7 +49,30 @@ namespace RigelEditor.EGUI
 
         private void OnWindowEvent(RigelEGUIEvent guievent)
         {
+            if(guievent.EventType == RigelEGUIEventType.MouseDragUpdate)
+            {
+                if(m_lastFrameDrag == false)
+                {
+                    guievent.EventType = RigelEGUIEventType.MouseDragEnter;
+                    m_lastFrameDrag = true;
+                }
+            }
+            else if (m_lastFrameDrag == true && ((int)guievent.EventType & (int)RigelEGUIEventType.MouseEvent) > 0)
+            {
+                m_lastFrameDrag = false;
+                guievent.EventType = RigelEGUIEventType.MouseDragLeave;
+            }
+
+            if (guievent.IsMouseDragEvent())
+            {
+                if(guievent.EventType == RigelEGUIEventType.MouseDragUpdate)
+                {
+                    guievent.DragOffset = guievent.Pointer - m_LastPointerDrag;
+                }
+                m_LastPointerDrag = guievent.Pointer;
+            }
             GUIUpdate(guievent);
+
         }
 
         public void Render(RigelGraphics graphics)

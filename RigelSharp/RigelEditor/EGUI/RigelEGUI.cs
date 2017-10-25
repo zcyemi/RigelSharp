@@ -14,6 +14,8 @@ namespace RigelEditor.EGUI
         internal static RigelEGUIWindow s_currentWindow = null;
         internal static float s_depthz = 1;
         internal static float s_depthStep = 0.0001f;
+        internal static RigelEGUIEvent m_event = null;
+        public static RigelEGUIEvent Event { get { return m_event; } }
 
 
         public static void DrawRect(Vector4 rect,Vector4 color)
