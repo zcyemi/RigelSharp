@@ -117,7 +117,7 @@ namespace RigelEditor.EGUI
             if (win.m_bufferInfo.BufferInited == false) needupdate = true;
 
 
-            if (((int)guievent.EventType & (int)RigelEGUIEventType.MouseEventActive) > 0)
+            if ((guievent.EventType & RigelEGUIEventType.MouseEventActive) > 0)
             {
                 if(guievent.InternalFocusedWindow != null || guievent.Used)
                 {

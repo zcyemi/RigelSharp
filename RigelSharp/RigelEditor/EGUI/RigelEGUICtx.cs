@@ -57,7 +57,7 @@ namespace RigelEditor.EGUI
                     m_lastFrameDrag = true;
                 }
             }
-            else if (m_lastFrameDrag == true && ((int)guievent.EventType & (int)RigelEGUIEventType.MouseEvent) > 0)
+            else if (m_lastFrameDrag == true && (guievent.EventType & RigelEGUIEventType.MouseEvent) > 0)
             {
                 m_lastFrameDrag = false;
                 guievent.EventType = RigelEGUIEventType.MouseDragLeave;
