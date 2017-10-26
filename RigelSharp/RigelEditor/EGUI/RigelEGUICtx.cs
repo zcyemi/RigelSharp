@@ -31,6 +31,7 @@ namespace RigelEditor.EGUI
         private Vector2 m_LastPointerDrag;
 
         internal RigelEGUIGraphicsBind GraphicsBind { get { return m_graphicsBind; } }
+        internal RigelFont Font { get { return m_font; } }
 
         public RigelEGUICtx(RenderForm form,RigelGraphics graphics)
         {
