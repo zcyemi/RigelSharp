@@ -72,10 +72,13 @@ namespace RigelEditor.EGUI
         private Texture2D m_fontTexture = null;
         private ShaderResourceView m_fontTextureView = null;
         private SamplerState m_fontTextureSampler = null;
+        private BlendState m_fontBlendState = null;
 
 
         private DeviceContext m_deferredContext = null;
         private CommandList m_commandlist = null;
+
+
 
         /// <summary>
         /// mark true when buffer is modified
@@ -121,11 +124,29 @@ namespace RigelEditor.EGUI
             pshaderbcRect.Dispose();
             signature.Dispose();
 
+            //blendstate
+            {
+                var blenddesc = BlendStateDescription.Default();
+                blenddesc.RenderTarget[0].IsBlendEnabled = true;
+                blenddesc.RenderTarget[0].BlendOperation = BlendOperation.Add;
+                blenddesc.RenderTarget[0].SourceBlend = BlendOption.SourceAlpha;
+                blenddesc.RenderTarget[0].DestinationBlend = BlendOption.InverseSourceAlpha;
+                blenddesc.RenderTarget[0].SourceAlphaBlend = BlendOption.One;
+                blenddesc.RenderTarget[0].DestinationAlphaBlend = BlendOption.Zero;
+                blenddesc.RenderTarget[0].AlphaBlendOperation = BlendOperation.Add;
+                blenddesc.RenderTarget[0].RenderTargetWriteMask = ColorWriteMaskFlags.All;
+
+                m_fontBlendState = new BlendState(m_graphics.Device, blenddesc);
+            }
+            
+
+
+
             //buffers
 
             //vertexbuffer
 
-            
+
 
             m_bufferDataRect = new RigelEGUIBufferGUIWindow<RigelEGUIVertex>(1024);
 
@@ -288,6 +309,8 @@ namespace RigelEditor.EGUI
             m_deferredContext.PixelShader.SetShaderResource(0, m_fontTextureView);
             m_deferredContext.PixelShader.SetSampler(0, m_fontTextureSampler);
 
+            m_deferredContext.OutputMerger.SetBlendState(m_fontBlendState);
+
             int textIndexedCount = m_bufferDataText.BufferDataCount / 2 * 3;
             m_deferredContext.DrawIndexed(textIndexedCount, 0, 0);
 
@@ -373,6 +396,7 @@ namespace RigelEditor.EGUI
             if (m_shaderVertex != null) m_shaderVertex.Dispose();
             if (m_inputlayout != null) m_inputlayout.Dispose();
 
+
             if (m_vertexBufferRect != null) m_vertexBufferRect.Dispose();
             if (m_vertexBuffertText != null) m_vertexBuffertText.Dispose();
 
@@ -382,6 +406,7 @@ namespace RigelEditor.EGUI
             if(m_fontTextureView != null) m_fontTextureView.Dispose();
             if(m_fontTexture != null) m_fontTexture.Dispose();
             if(m_fontTextureSampler != null) m_fontTextureSampler.Dispose();
+            if (m_fontBlendState != null) m_fontBlendState.Dispose();
 
             if (m_commandlist != null) m_commandlist.Dispose();
             if (m_deferredContext != null) m_deferredContext.Dispose();

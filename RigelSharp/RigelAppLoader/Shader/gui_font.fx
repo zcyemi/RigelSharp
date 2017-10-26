@@ -30,7 +30,7 @@ PS_IN VS( VS_IN input )
 
 float4 PS( PS_IN input ) : SV_Target
 {
-	float4 v = texfont.Sample(MeshTextureSampler,input.uv);
-	v.a = 1;
+	float4 v = input.col;
+	v.a = texfont.Sample(MeshTextureSampler,input.uv).r;
 	return v;
 }
