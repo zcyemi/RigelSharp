@@ -25,6 +25,9 @@ namespace RigelEditor.EGUI
 
         private void GUIInit()
         {
+            ClientWidth = m_form.Width;
+            ClientHeight = m_form.Height;
+
             m_windows = new List<RigelEGUIWindow>();
 
             m_mainMenu = new RigelEGUIMenu();

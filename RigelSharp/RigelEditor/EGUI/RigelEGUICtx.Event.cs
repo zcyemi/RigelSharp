@@ -875,8 +875,9 @@ namespace RigelEditor.EGUI
         private void RegisterEvent()
         {
             m_form.UserResized += (sender, e) => {
-                m_graphicsBind.UpdateGUIParams(m_form.ClientSize.Width, m_form.ClientSize.Height);
-                RigelUtility.Log("event resize");
+                ClientWidth = m_form.ClientSize.Width;
+                ClientHeight = m_form.ClientSize.Height;
+                m_graphicsBind.UpdateGUIParams(ClientWidth,ClientHeight);
             };
             m_form.KeyDown += (s, e) =>
             {

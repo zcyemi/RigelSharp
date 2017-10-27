@@ -71,8 +71,8 @@ namespace RigelEditor.EGUI
 
         void UpdateValues()
         {
-            m_rectContent.X = Position.X;
-            m_rectContent.Y = Position.Y + RigelEGUIStyle.Current.WinHeaderHeight;
+            m_rectContent.X = 0;
+            m_rectContent.Y = RigelEGUIStyle.Current.WinHeaderHeight;
             m_rectContent.Z = Size.X;
             m_rectContent.W = Size.Y - RigelEGUIStyle.Current.WinHeaderHeight;
 
@@ -85,11 +85,16 @@ namespace RigelEditor.EGUI
             UpdateValues();
 
             RigelUtility.Log("draw window:" + WindowTitle + " " + m_focused);
-            RigelEGUI.DrawRect(new Vector4(Position, Size.X, Size.Y), m_focused ? RigelEGUIStyle .Current.WinBGColorFocused: RigelEGUIStyle.Current.WinBGColor);
-            RigelEGUI.DrawRect(new Vector4(Position, Size.X, RigelEGUIStyle.Current.WinHeaderHeight), m_focused ? RigelEGUIStyle.Current.WinHeaderColorFocused : RigelEGUIStyle.Current.WinHeaderColor);
-
-            RigelEGUI.DrawText(new Vector4(Position, Size.X - 100, RigelEGUIStyle.Current.WinHeaderHeight), WindowTitle,RigelColor.White);
             
+            //background
+            RigelEGUI.DrawRect(new Vector4(0,0, Size.X, Size.Y), m_focused ? RigelEGUIStyle .Current.WinBGColorFocused: RigelEGUIStyle.Current.WinBGColor);
+            //header
+            RigelEGUI.DrawRect(new Vector4(0,0, Size.X, RigelEGUIStyle.Current.WinHeaderHeight), m_focused ? RigelEGUIStyle.Current.WinHeaderColorFocused : RigelEGUIStyle.Current.WinHeaderColor);
+            //title
+            RigelEGUI.DrawText(new Vector4(5,5, Size.X - 100, RigelEGUIStyle.Current.WinHeaderHeight), WindowTitle,RigelColor.White);
+
+            //content group
+            RigelEGUI.BeginGroup(m_rectContent);
         }
 
         void CheckWindowMoveDrag()

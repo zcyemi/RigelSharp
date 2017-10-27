@@ -7,6 +7,8 @@ using System.Reflection;
 
 using System.Diagnostics;
 
+using SharpDX;
+
 namespace RigelEditor
 {
     public static class RigelUtility
@@ -59,6 +61,18 @@ namespace RigelEditor
             }
             
             return methods;
+        }
+    }
+
+    public static class VectorExtension
+    {
+        public static Vector2 Pos(this Vector4 v)
+        {
+            return new Vector2(v.X, v.Y);
+        }
+        public static Vector2 Size(this Vector4 v)
+        {
+            return new Vector2(v.Z, v.W);
         }
     }
 

@@ -124,7 +124,7 @@ namespace RigelEditor
 
             if (drawfunc != null) drawfunc.Invoke();
 
-            m_swapchain.Present(0, PresentFlags.None);
+            m_swapchain.Present(1, PresentFlags.None);
 
             NeedRebuildCommandList = false;
         }

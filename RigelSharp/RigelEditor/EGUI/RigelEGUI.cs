@@ -17,6 +17,7 @@ namespace RigelEditor.EGUI
         public static RigelEGUIEvent Event { get; private set; }
 
         private static Stack<Vector4> s_groupStack = new Stack<Vector4>();
+        private static Vector4 s_groupCurrent;
         private static int s_windowGroupCount = 0;
 
         internal static void InternalResetContext(RigelEGUICtx ctx)
@@ -27,6 +28,9 @@ namespace RigelEditor.EGUI
         internal static void InternalFrameBegin(RigelEGUIEvent e)
         {
             Event = e;
+            s_groupStack.Clear();
+            s_groupCurrent = new Vector4(0, 0, InternalContext.ClientWidth, InternalContext.ClientHeight);
+            s_groupStack.Push(s_groupCurrent);
         }
         internal static void InternalFrameEnd()
         {
@@ -36,9 +40,12 @@ namespace RigelEditor.EGUI
         {
             CurrentWindow = win;
             s_windowGroupCount = 0;
+            RigelEGUI.BeginGroup(new Vector4(win.Position, win.Size.X, win.Size.Y));
         }
         internal static void InternalWindowEnd()
         {
+            RigelEGUI.EndGroup();   //end content group
+            RigelEGUI.EndGroup();   //end window group
             RigelUtility.Assert(s_windowGroupCount == 0);
         }
 
@@ -47,7 +54,6 @@ namespace RigelEditor.EGUI
         {
             if(s_groupStack.Count == 0)
             {
-                s_groupStack.Push(rect);
             }
             else
             {
@@ -60,9 +66,10 @@ namespace RigelEditor.EGUI
 
                 rect.X += root.X;
                 rect.Y += root.Y;
-
-                s_groupStack.Push(rect);
             }
+
+            s_groupCurrent = rect;
+            s_groupStack.Push(rect);
 
             s_windowGroupCount++;
         }
@@ -71,11 +78,11 @@ namespace RigelEditor.EGUI
         {
             RigelUtility.Assert(s_groupStack.Count > 0);
             s_groupStack.Pop();
+            s_groupCurrent = s_groupStack.Peek();
             s_windowGroupCount--;
         }
 
-
-        public static void DrawRect(Vector4 rect,Vector4 color)
+        public static void DrawRectRaw(Vector4 rect, Vector4 color)
         {
             InternalContext.BufferRect.Add(new RigelEGUIVertex()
             {
@@ -91,7 +98,7 @@ namespace RigelEditor.EGUI
             });
             InternalContext.BufferRect.Add(new RigelEGUIVertex()
             {
-                Position = new Vector4(rect.X +rect.Z, rect.Y + rect.W, s_depthz, 1),
+                Position = new Vector4(rect.X + rect.Z, rect.Y + rect.W, s_depthz, 1),
                 Color = color,
                 UV = Vector2.Zero
             });
@@ -105,6 +112,15 @@ namespace RigelEditor.EGUI
             s_depthz -= s_depthStep;
         }
 
+        public static bool DrawRect(Vector4 rect,Vector4 color)
+        {
+            bool valid = RectClip(ref rect, s_groupCurrent);
+
+            if (!valid) return false;
+
+            DrawRectRaw(rect, color);
+            return true;
+        }
         public static void DrawTextDebug(Vector4 rect,Vector4 color)
         {
             InternalContext.BufferText.Add(new RigelEGUIVertex()
@@ -136,8 +152,7 @@ namespace RigelEditor.EGUI
         }
         public static void DrawText(Vector4 rect,string content,Vector4 color)
         {
-            rect.X += 3;
-            rect.Y += 3;
+            RigelEGUI.RectClip(ref rect, s_groupCurrent);
             var w = 0;
             foreach(var c in content)
             {
@@ -188,6 +203,27 @@ namespace RigelEditor.EGUI
         }
 
 
+        public static bool Button(Vector4 rect,string label,Vector4 col,Vector4 texcolor)
+        {
+            return Button(rect.Pos(), rect.Size(), label, col, texcolor);
+        }
+        public static bool Button(Vector2 pos,Vector2 size,string label,Vector4 color,Vector4 texcolor)
+        {
+            Vector4 rect = new Vector4(pos.X, pos.Y, size.X, size.Y);
+            DrawRect(rect, color);
+            DrawText(rect, label, texcolor);
+
+            if (Event.Used) return false;
+            if (Event.EventType != RigelEGUIEventType.MouseClick) return false;
+
+            var cpos = pos + s_groupCurrent.Pos();
+            if (RectContainsCheck(cpos, size, Event.Pointer))
+            {
+                Event.Use();
+                return true;
+            }
+            return false;
+        }
 
 
         #region utility
@@ -198,7 +234,26 @@ namespace RigelEditor.EGUI
             if (point.Y < pos.Y || point.Y > pos.Y + size.Y) return false;
             return true;
         }
+        /// <summary>
+        /// Clicp Rect With Group
+        /// </summary>
+        /// <param name="rect"></param>
+        /// <param name="group"></param>
+        /// <returns>return false if the size of clipped rect is zero</returns>
+        internal static bool RectClip(ref Vector4 rect,Vector4 group)
+        {
+            rect.X = MathUtil.Clamp(rect.X, 0, group.Z);
+            rect.Y = MathUtil.Clamp(rect.Y, 0, group.W);
 
+            rect.Z = MathUtil.Clamp(rect.Z, 0, group.Z - rect.X);
+            rect.W = MathUtil.Clamp(rect.W, 0, group.W - rect.Y);
+
+            rect.X += group.X;
+            rect.Y += group.Y;
+
+            if (rect.Z < 1.0f || rect.W < 1.0f) return false;
+            return true;
+        }
 
         #endregion
     }

@@ -32,6 +32,8 @@ namespace RigelEditor.EGUI
 
         internal RigelEGUIGraphicsBind GraphicsBind { get { return m_graphicsBind; } }
         internal RigelFont Font { get { return m_font; } }
+        public int ClientWidth { get; private set; }
+        public int ClientHeight { get; private set; }
 
         public RigelEGUICtx(RenderForm form,RigelGraphics graphics)
         {
