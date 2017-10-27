@@ -10,35 +10,92 @@ namespace RigelEditor.EGUI
 {
     public static class RigelEGUI
     {
-        internal static RigelEGUICtx s_currentCtx = null;
-        internal static RigelEGUIWindow s_currentWindow = null;
+        internal static RigelEGUICtx InternalContext { get; private set; }
+        internal static RigelEGUIWindow CurrentWindow { get; private set; }
         internal static float s_depthz = 1;
         internal static float s_depthStep = 0.0001f;
-        internal static RigelEGUIEvent m_event = null;
-        public static RigelEGUIEvent Event { get { return m_event; } }
+        public static RigelEGUIEvent Event { get; private set; }
+
+        private static Stack<Vector4> s_groupStack = new Stack<Vector4>();
+        private static int s_windowGroupCount = 0;
+
+        internal static void InternalResetContext(RigelEGUICtx ctx)
+        {
+            InternalContext = ctx;
+            s_groupStack.Clear();
+        }
+        internal static void InternalFrameBegin(RigelEGUIEvent e)
+        {
+            Event = e;
+        }
+        internal static void InternalFrameEnd()
+        {
+
+        }
+        internal static void InternalWindowBegin(RigelEGUIWindow win)
+        {
+            CurrentWindow = win;
+            s_windowGroupCount = 0;
+        }
+        internal static void InternalWindowEnd()
+        {
+            RigelUtility.Assert(s_windowGroupCount == 0);
+        }
+
+
+        public static void BeginGroup(Vector4 rect)
+        {
+            if(s_groupStack.Count == 0)
+            {
+                s_groupStack.Push(rect);
+            }
+            else
+            {
+                Vector4 root = s_groupStack.Peek();
+                rect.X = MathUtil.Clamp(rect.X, 0, root.Z);
+                rect.Y = MathUtil.Clamp(rect.Y, 0, root.W);
+
+                rect.Z = MathUtil.Clamp(rect.Z, 0, root.Z - rect.X);
+                rect.W = MathUtil.Clamp(rect.W, 0, root.W - rect.Y);
+
+                rect.X += root.X;
+                rect.Y += root.Y;
+
+                s_groupStack.Push(rect);
+            }
+
+            s_windowGroupCount++;
+        }
+
+        public static void EndGroup()
+        {
+            RigelUtility.Assert(s_groupStack.Count > 0);
+            s_groupStack.Pop();
+            s_windowGroupCount--;
+        }
 
 
         public static void DrawRect(Vector4 rect,Vector4 color)
         {
-            s_currentCtx.BufferRect.Add(new RigelEGUIVertex()
+            InternalContext.BufferRect.Add(new RigelEGUIVertex()
             {
                 Position = new Vector4(rect.X, rect.Y, s_depthz, 1),
                 Color = color,
                 UV = Vector2.Zero
             });
-            s_currentCtx.BufferRect.Add(new RigelEGUIVertex()
+            InternalContext.BufferRect.Add(new RigelEGUIVertex()
             {
                 Position = new Vector4(rect.X, rect.Y + rect.W, s_depthz, 1),
                 Color = color,
                 UV = Vector2.Zero
             });
-            s_currentCtx.BufferRect.Add(new RigelEGUIVertex()
+            InternalContext.BufferRect.Add(new RigelEGUIVertex()
             {
                 Position = new Vector4(rect.X +rect.Z, rect.Y + rect.W, s_depthz, 1),
                 Color = color,
                 UV = Vector2.Zero
             });
-            s_currentCtx.BufferRect.Add(new RigelEGUIVertex()
+            InternalContext.BufferRect.Add(new RigelEGUIVertex()
             {
                 Position = new Vector4(rect.X + rect.Z, rect.Y, s_depthz, 1),
                 Color = color,
@@ -50,25 +107,25 @@ namespace RigelEditor.EGUI
 
         public static void DrawTextDebug(Vector4 rect,Vector4 color)
         {
-            s_currentCtx.BufferText.Add(new RigelEGUIVertex()
+            InternalContext.BufferText.Add(new RigelEGUIVertex()
             {
                 Position = new Vector4(rect.X, rect.Y, s_depthz, 1),
                 Color = color,
                 UV = new Vector2(0f,0f)
             });
-            s_currentCtx.BufferText.Add(new RigelEGUIVertex()
+            InternalContext.BufferText.Add(new RigelEGUIVertex()
             {
                 Position = new Vector4(rect.X, rect.Y + rect.W, s_depthz, 1),
                 Color = color,
                 UV = new Vector2(0,1)
             });
-            s_currentCtx.BufferText.Add(new RigelEGUIVertex()
+            InternalContext.BufferText.Add(new RigelEGUIVertex()
             {
                 Position = new Vector4(rect.X + rect.Z, rect.Y + rect.W, s_depthz, 1),
                 Color = color,
                 UV = new Vector2(1,1)
             });
-            s_currentCtx.BufferText.Add(new RigelEGUIVertex()
+            InternalContext.BufferText.Add(new RigelEGUIVertex()
             {
                 Position = new Vector4(rect.X + rect.Z, rect.Y, s_depthz, 1),
                 Color = color,
@@ -77,9 +134,10 @@ namespace RigelEditor.EGUI
 
             s_depthz -= s_depthStep;
         }
-
         public static void DrawText(Vector4 rect,string content,Vector4 color)
         {
+            rect.X += 3;
+            rect.Y += 3;
             var w = 0;
             foreach(var c in content)
             {
@@ -89,36 +147,35 @@ namespace RigelEditor.EGUI
                 if (w > rect.Z) break;
             }
         }
-
         public static int DrawChar(Vector4 rect,uint c,Vector4 color)
         {
-            var glyph = s_currentCtx.Font.GetGlyphInfo(c);
-            if (glyph == null) return (int)s_currentCtx.Font.FontPixelSize;
+            var glyph = InternalContext.Font.GetGlyphInfo(c);
+            if (glyph == null) return (int)InternalContext.Font.FontPixelSize;
 
             float x1 = rect.X + glyph.LineOffsetX;
             float y1 = rect.Y + glyph.LineOffsetY;
             float x2 = x1 + glyph.PixelWidth;
             float y2 = y1 + glyph.PixelHeight;
 
-            s_currentCtx.BufferText.Add(new RigelEGUIVertex()
+            InternalContext.BufferText.Add(new RigelEGUIVertex()
             {
                 Position = new Vector4(x1,y1, s_depthz, 1),
                 Color = color,
                 UV = glyph.UV[0]
             });
-            s_currentCtx.BufferText.Add(new RigelEGUIVertex()
+            InternalContext.BufferText.Add(new RigelEGUIVertex()
             {
                 Position = new Vector4(x1,y2, s_depthz, 1),
                 Color = color,
                 UV = glyph.UV[1]
             });
-            s_currentCtx.BufferText.Add(new RigelEGUIVertex()
+            InternalContext.BufferText.Add(new RigelEGUIVertex()
             {
                 Position = new Vector4(x2,y2, s_depthz, 1),
                 Color = color,
                 UV = glyph.UV[2]
             });
-            s_currentCtx.BufferText.Add(new RigelEGUIVertex()
+            InternalContext.BufferText.Add(new RigelEGUIVertex()
             {
                 Position = new Vector4(x2,y1, s_depthz, 1),
                 Color = color,

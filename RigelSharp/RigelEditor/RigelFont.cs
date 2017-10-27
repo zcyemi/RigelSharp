@@ -88,7 +88,7 @@ namespace RigelEditor
 
         private int m_ascender;
 
-        public RigelFont(string fontpath, uint pixelsize = 12)
+        public RigelFont(string fontpath, uint pixelsize = 13)
         {
             FontFilePath = fontpath;
             FontPixelSize = pixelsize;

@@ -30,9 +30,11 @@ namespace RigelEditor
         {
             Debug.Assert(condition);
         }
-        public static void Assert(bool condition, string message)
+
+        public static void Assert(bool condition, string message = null, RigelAssertLevel level = RigelAssertLevel.Fatel)
         {
-            Debug.Assert(condition, message);
+            if(level >= RigelConfig.AssertLevel)
+                Debug.Assert(condition, message);
         }
     }
 

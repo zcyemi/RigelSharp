@@ -27,6 +27,7 @@ namespace RigelEditor.EGUI
         public int Order { get { return m_order; } }
         public string WindowTitle { get; protected set; }
 
+
         internal RigelEGUIWindowBufferInfo BufferInfoRect = new RigelEGUIWindowBufferInfo() { Inited = false, StartPos = 0, EndPos = 0 };
         internal RigelEGUIWindowBufferInfo BufferInfoText = new RigelEGUIWindowBufferInfo() { Inited = false, StartPos = 0, EndPos = 0 };
         
@@ -37,6 +38,7 @@ namespace RigelEditor.EGUI
 
         private bool m_focused = false;
         private bool m_onWindowMoveDrag = false;
+        private Vector4 m_rectContent;
 
 
         public RigelEGUIWindow()
@@ -64,17 +66,29 @@ namespace RigelEditor.EGUI
 
         public static T GetWindow<T>() where T : RigelEGUIWindow, new()
         {
-            return RigelEGUI.s_currentCtx.FindWindowOfType<T>();
+            return RigelEGUI.InternalContext.FindWindowOfType<T>();
+        }
+
+        void UpdateValues()
+        {
+            m_rectContent.X = Position.X;
+            m_rectContent.Y = Position.Y + RigelEGUIStyle.Current.WinHeaderHeight;
+            m_rectContent.Z = Size.X;
+            m_rectContent.W = Size.Y - RigelEGUIStyle.Current.WinHeaderHeight;
+
         }
 
         internal void InternalDrawBasis()
         {
             CheckWindowMoveDrag();
 
+            UpdateValues();
+
             RigelUtility.Log("draw window:" + WindowTitle + " " + m_focused);
             RigelEGUI.DrawRect(new Vector4(Position, Size.X, Size.Y), m_focused ? RigelEGUIStyle .Current.WinBGColorFocused: RigelEGUIStyle.Current.WinBGColor);
-            RigelEGUI.DrawRect(new Vector4(Position, Size.X, RigelEGUIStyle.Current.WinHeaderHeight), RigelEGUIStyle.Current.WinHeaderColor);
+            RigelEGUI.DrawRect(new Vector4(Position, Size.X, RigelEGUIStyle.Current.WinHeaderHeight), m_focused ? RigelEGUIStyle.Current.WinHeaderColorFocused : RigelEGUIStyle.Current.WinHeaderColor);
 
+            RigelEGUI.DrawText(new Vector4(Position, Size.X - 100, RigelEGUIStyle.Current.WinHeaderHeight), WindowTitle,RigelColor.White);
             
         }
 

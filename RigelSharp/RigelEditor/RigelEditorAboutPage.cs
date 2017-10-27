@@ -27,7 +27,7 @@ namespace RigelEditor
 
         public override void OnGUI()
         {
-            RigelEGUI.DrawRect(new Vector4(Position.X, Position.Y, 200, 50), Vector4.One);
+            
         }
 
         

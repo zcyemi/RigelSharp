@@ -32,7 +32,7 @@ namespace RigelEditor.EGUI
 
             m_dockerMgr = new RigelEGUIDockerManager();
 
-            RigelEGUI.s_currentCtx = this;
+            RigelEGUI.InternalResetContext(this);
 
         }
 
@@ -47,7 +47,7 @@ namespace RigelEditor.EGUI
         {
             RigelUtility.Log("------------- New Frame -----------");
 
-            RigelEGUI.m_event = guievent;
+            RigelEGUI.InternalFrameBegin(guievent);
 
             m_bufferRectEmptyBlock = false;
             m_bufferTextEmptyBlock = false;
@@ -88,6 +88,9 @@ namespace RigelEditor.EGUI
                 }
             }
 
+
+            //draw end
+            RigelEGUI.InternalFrameEnd();
 
             //arrange buffer
             if (m_bufferRectEmptyBlock)
@@ -203,14 +206,14 @@ namespace RigelEditor.EGUI
         {
             m_bufferRect.Clear();
             m_bufferText.Clear();
-            RigelEGUI.s_currentWindow = win;
+            RigelEGUI.InternalWindowBegin(win);
             RigelEGUI.s_depthz = RigelEGUIGraphicsBind.GUI_CLIP_PLANE_FAR - (win.Order + RigelEGUI.s_depthStep);
         }
 
         private void InternalEndWindow()
         {
-            var curwin = RigelEGUI.s_currentWindow;
-            RigelEGUI.s_currentWindow = null;
+            var curwin = RigelEGUI.CurrentWindow;
+            RigelEGUI.InternalWindowEnd();
 
 
             //applytobuffer
