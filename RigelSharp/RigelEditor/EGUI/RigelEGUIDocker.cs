@@ -16,9 +16,5 @@ namespace RigelEditor.EGUI
 
     }
 
-    public struct RigelEGUILayout
-    {
-
-    }
 
 }

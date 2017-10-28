@@ -83,13 +83,48 @@ namespace RigelEditor.EGUI
             m_graphicsBind.Render(graphics);
         }
 
+        private void GUIInit()
+        {
+            ClientWidth = m_form.Width;
+            ClientHeight = m_form.Height;
+
+            m_windows = new List<RigelEGUIWindow>();
+
+            m_mainMenu = new RigelEGUIMenu();
+            RefreshMainMenu();
+
+            m_dockerMgr = new RigelEGUIDockerManager();
+
+            RigelEGUI.InternalResetContext(this);
+
+        }
+        private void GUIRelease()
+        {
+            m_windows.Clear();
+            m_mainMenu.ClearAllItems();
+        }
+        private void GUIUpdate(RigelEGUIEvent guievent)
+        {
+            RigelUtility.Log("------------- New Frame -----------");
+            RigelEGUI.InternalFrameBegin(guievent);
+
+            GUIUpdateMainBegin(guievent);
+            GUIUpdateWindow(guievent);
+            GUIUpdateMainEnd(guievent);
+
+
+            //draw end
+            RigelEGUI.InternalFrameEnd();
+
+        }
+
         public void Dispose()
         {
             m_graphicsBind.Dispose();
             m_form = null;
         }
 
-
+        
         internal T FindWindowOfType<T>() where T : RigelEGUIWindow,new()
         {
             foreach(var w in m_windows)
@@ -103,6 +138,28 @@ namespace RigelEditor.EGUI
             m_windows.Add(win);
 
             return win;
+        }
+        private void RefreshMainMenu()
+        {
+            var assembly = RigelReflectionHelper.AssemblyRigelEditor;
+            foreach (var type in assembly.GetTypes())
+            {
+                var methods = RigelReflectionHelper.GetMethodByAttribute<RigelEGUIMenuItemAttribute>(
+                    type,
+                    BindingFlags.Static |
+                    BindingFlags.Public |
+                    BindingFlags.NonPublic
+                );
+
+                foreach (var m in methods)
+                {
+                    var attr = Attribute.GetCustomAttribute(m, typeof(RigelEGUIMenuItemAttribute)) as RigelEGUIMenuItemAttribute;
+                    m_mainMenu.AddMenuItem(attr.Label, m);
+                }
+
+            }
+            RigelUtility.Log("EGUI mainMenu item count:" + m_mainMenu.ItemNodes.Count());
+
         }
 
     }

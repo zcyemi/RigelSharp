@@ -18,5 +18,7 @@ namespace RigelEditor.EGUI
         public Vector4 WinHeaderColor = new Vector4(0.2f, 0.2f, 0.2f, 1.0f);
         public Vector4 WinHeaderColorFocused = RigelColor.RGBA(0, 122, 204, 255);
         public float WinHeaderHeight = 25f;
+
+        public Vector4 MainMenuBGColor = new Vector4(0.3f, 0.3f, 0.3f, 1.0f);
     }
 }

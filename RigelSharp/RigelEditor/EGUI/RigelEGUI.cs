@@ -20,6 +20,9 @@ namespace RigelEditor.EGUI
         private static Vector4 s_groupCurrent;
         private static int s_windowGroupCount = 0;
 
+        private static List<RigelEGUIVertex> BufferText;
+        private static List<RigelEGUIVertex> BufferRect;
+
         internal static void InternalResetContext(RigelEGUICtx ctx)
         {
             InternalContext = ctx;
@@ -31,13 +34,32 @@ namespace RigelEditor.EGUI
             s_groupStack.Clear();
             s_groupCurrent = new Vector4(0, 0, InternalContext.ClientWidth, InternalContext.ClientHeight);
             s_groupStack.Push(s_groupCurrent);
+
+            SetDrawTarget(true);
         }
         internal static void InternalFrameEnd()
         {
 
         }
+        
+        internal static void SetDrawTarget(bool main)
+        {
+            if (main)
+            {
+                BufferText = InternalContext.BufMainText;
+                BufferRect = InternalContext.BufMainRect;
+            }
+            else
+            {
+                BufferText = InternalContext.BufferText;
+                BufferRect = InternalContext.BufferRect;
+            }
+        }
+
         internal static void InternalWindowBegin(RigelEGUIWindow win)
         {
+            SetDrawTarget(false);
+
             CurrentWindow = win;
             s_windowGroupCount = 0;
             RigelEGUI.BeginGroup(new Vector4(win.Position, win.Size.X, win.Size.Y));
@@ -47,6 +69,8 @@ namespace RigelEditor.EGUI
             RigelEGUI.EndGroup();   //end content group
             RigelEGUI.EndGroup();   //end window group
             RigelUtility.Assert(s_windowGroupCount == 0);
+
+            SetDrawTarget(true);
         }
 
 
@@ -84,25 +108,25 @@ namespace RigelEditor.EGUI
 
         public static void DrawRectRaw(Vector4 rect, Vector4 color)
         {
-            InternalContext.BufferRect.Add(new RigelEGUIVertex()
+            BufferRect.Add(new RigelEGUIVertex()
             {
                 Position = new Vector4(rect.X, rect.Y, s_depthz, 1),
                 Color = color,
                 UV = Vector2.Zero
             });
-            InternalContext.BufferRect.Add(new RigelEGUIVertex()
+            BufferRect.Add(new RigelEGUIVertex()
             {
                 Position = new Vector4(rect.X, rect.Y + rect.W, s_depthz, 1),
                 Color = color,
                 UV = Vector2.Zero
             });
-            InternalContext.BufferRect.Add(new RigelEGUIVertex()
+            BufferRect.Add(new RigelEGUIVertex()
             {
                 Position = new Vector4(rect.X + rect.Z, rect.Y + rect.W, s_depthz, 1),
                 Color = color,
                 UV = Vector2.Zero
             });
-            InternalContext.BufferRect.Add(new RigelEGUIVertex()
+            BufferRect.Add(new RigelEGUIVertex()
             {
                 Position = new Vector4(rect.X + rect.Z, rect.Y, s_depthz, 1),
                 Color = color,
@@ -123,25 +147,25 @@ namespace RigelEditor.EGUI
         }
         public static void DrawTextDebug(Vector4 rect,Vector4 color)
         {
-            InternalContext.BufferText.Add(new RigelEGUIVertex()
+            BufferText.Add(new RigelEGUIVertex()
             {
                 Position = new Vector4(rect.X, rect.Y, s_depthz, 1),
                 Color = color,
                 UV = new Vector2(0f,0f)
             });
-            InternalContext.BufferText.Add(new RigelEGUIVertex()
+            BufferText.Add(new RigelEGUIVertex()
             {
                 Position = new Vector4(rect.X, rect.Y + rect.W, s_depthz, 1),
                 Color = color,
                 UV = new Vector2(0,1)
             });
-            InternalContext.BufferText.Add(new RigelEGUIVertex()
+            BufferText.Add(new RigelEGUIVertex()
             {
                 Position = new Vector4(rect.X + rect.Z, rect.Y + rect.W, s_depthz, 1),
                 Color = color,
                 UV = new Vector2(1,1)
             });
-            InternalContext.BufferText.Add(new RigelEGUIVertex()
+            BufferText.Add(new RigelEGUIVertex()
             {
                 Position = new Vector4(rect.X + rect.Z, rect.Y, s_depthz, 1),
                 Color = color,
@@ -172,25 +196,25 @@ namespace RigelEditor.EGUI
             float x2 = x1 + glyph.PixelWidth;
             float y2 = y1 + glyph.PixelHeight;
 
-            InternalContext.BufferText.Add(new RigelEGUIVertex()
+            BufferText.Add(new RigelEGUIVertex()
             {
                 Position = new Vector4(x1,y1, s_depthz, 1),
                 Color = color,
                 UV = glyph.UV[0]
             });
-            InternalContext.BufferText.Add(new RigelEGUIVertex()
+            BufferText.Add(new RigelEGUIVertex()
             {
                 Position = new Vector4(x1,y2, s_depthz, 1),
                 Color = color,
                 UV = glyph.UV[1]
             });
-            InternalContext.BufferText.Add(new RigelEGUIVertex()
+            BufferText.Add(new RigelEGUIVertex()
             {
                 Position = new Vector4(x2,y2, s_depthz, 1),
                 Color = color,
                 UV = glyph.UV[2]
             });
-            InternalContext.BufferText.Add(new RigelEGUIVertex()
+            BufferText.Add(new RigelEGUIVertex()
             {
                 Position = new Vector4(x2,y1, s_depthz, 1),
                 Color = color,

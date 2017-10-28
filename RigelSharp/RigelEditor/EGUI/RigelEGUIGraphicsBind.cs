@@ -39,13 +39,20 @@ namespace RigelEditor.EGUI
         internal const float GUI_CLIP_PLANE_FAR = 100.0f;
         internal const float GUI_CLIP_PLANE_NEAR = 0;
 
-
-        private RigelEGUIBufferGUIWindow<RigelEGUIVertex> m_bufferDataRect;
-        private RigelEGUIBufferGUIWindow<RigelEGUIVertex> m_bufferDataText;
+        //shared indices buffer
         private RigelEGUIBuffer<int> m_bufferDataIndices;
 
+        //window buffer
+        private RigelEGUIBufferGUIWindow<RigelEGUIVertex> m_bufferDataRect;
+        private RigelEGUIBufferGUIWindow<RigelEGUIVertex> m_bufferDataText;
         public RigelEGUIBufferGUIWindow<RigelEGUIVertex> BufferVertexRect { get { return m_bufferDataRect; } }
         public RigelEGUIBufferGUIWindow<RigelEGUIVertex> BufferVertexText { get { return m_bufferDataText; } }
+
+        //main buffer
+        private RigelEGUIBuffer<RigelEGUIVertex> m_bufferMainRect;
+        private RigelEGUIBuffer<RigelEGUIVertex> m_bufferMainText;
+        public RigelEGUIBuffer<RigelEGUIVertex> BufferMainRect { get { return m_bufferMainRect; } }
+        public RigelEGUIBuffer<RigelEGUIVertex> BufferMainText { get { return m_bufferMainText; } }
 
         private Matrix m_matrixgui;
         private bool m_guiparamsChanged = true;
@@ -53,30 +60,34 @@ namespace RigelEditor.EGUI
 
         private RigelGraphics m_graphics = null;
 
-        private VertexShader m_shaderVertex = null;
-        private PixelShader m_shaderPixelFont = null;
-        private PixelShader m_shaderPixelRect = null;
-        private InputLayout m_inputlayout = null;
+        private VertexShader m_gShaderVertex = null;
+        private PixelShader m_gShaderPixelFont = null;
+        private PixelShader m_gShaderPixelRect = null;
+        private InputLayout m_gInputlayout = null;
 
         //buffer rect
-        private Buffer m_vertexBufferRect = null;
-        private VertexBufferBinding m_vertexBufferRectBinding;
+        private Buffer m_gVertBufferWindowRect = null;
+        private VertexBufferBinding m_gVertBufferWindowRectBinding;
+        private Buffer m_gVertBufferWindowText = null;
+        private VertexBufferBinding m_gVertBufferWindowTextBinding;
 
-        private Buffer m_vertexBuffertText = null;
-        private VertexBufferBinding m_vertexBufferTextBinding;
-
-
-        private Buffer m_constBuffer = null;
-        private Buffer m_indicesBuffer = null;
-
-        private Texture2D m_fontTexture = null;
-        private ShaderResourceView m_fontTextureView = null;
-        private SamplerState m_fontTextureSampler = null;
-        private BlendState m_fontBlendState = null;
+        private Buffer m_gVertBufferMainRect = null;
+        private VertexBufferBinding m_gVertBufferMainRectBinding;
+        private Buffer m_gVertBufferMainText = null;
+        private VertexBufferBinding m_gVertBufferMainTextBinding;
 
 
-        private DeviceContext m_deferredContext = null;
-        private CommandList m_commandlist = null;
+        private Buffer m_gConstBuffer = null;
+        private Buffer m_gIndicesBuffer = null;
+
+        private Texture2D m_gFontTexture = null;
+        private ShaderResourceView m_gFontTextureView = null;
+        private SamplerState m_gFontTextureSampler = null;
+        private BlendState m_gFontBlendState = null;
+
+
+        private DeviceContext m_gDeferredContext = null;
+        private CommandList m_gCommandlist = null;
 
 
 
@@ -100,19 +111,19 @@ namespace RigelEditor.EGUI
         {
 
             //deferred context;
-            m_deferredContext = new DeviceContext(m_graphics.Device);
+            m_gDeferredContext = new DeviceContext(m_graphics.Device);
 
             //shaders
             var vshaderbc = ShaderBytecode.CompileFromFile(SHADER_FILE_PATH_FONT, "VS", "vs_4_0");
             var pshaderbcFont = ShaderBytecode.CompileFromFile(SHADER_FILE_PATH_FONT, "PS", "ps_4_0");
             var pshaderbcRect = ShaderBytecode.CompileFromFile(SHADER_FILE_PATH_RECT, "PS", "ps_4_0");
 
-            m_shaderVertex = new VertexShader(m_graphics.Device, vshaderbc);
-            m_shaderPixelFont = new PixelShader(m_graphics.Device, pshaderbcFont);
-            m_shaderPixelRect = new PixelShader(m_graphics.Device, pshaderbcRect);
+            m_gShaderVertex = new VertexShader(m_graphics.Device, vshaderbc);
+            m_gShaderPixelFont = new PixelShader(m_graphics.Device, pshaderbcFont);
+            m_gShaderPixelRect = new PixelShader(m_graphics.Device, pshaderbcRect);
 
             var signature = ShaderSignature.GetInputSignature(vshaderbc);
-            m_inputlayout = new InputLayout(m_graphics.Device, signature, new[]
+            m_gInputlayout = new InputLayout(m_graphics.Device, signature, new[]
             {
                 new InputElement("POSITION",0,Format.R32G32B32A32_Float,0,0),
                 new InputElement("COLOR",0,Format.R32G32B32A32_Float,16,0),
@@ -136,20 +147,15 @@ namespace RigelEditor.EGUI
                 blenddesc.RenderTarget[0].AlphaBlendOperation = BlendOperation.Add;
                 blenddesc.RenderTarget[0].RenderTargetWriteMask = ColorWriteMaskFlags.All;
 
-                m_fontBlendState = new BlendState(m_graphics.Device, blenddesc);
+                m_gFontBlendState = new BlendState(m_graphics.Device, blenddesc);
             }
             
 
 
 
             //buffers
-
-            //vertexbuffer
-
-
-
+            //vertexbuffer window
             m_bufferDataRect = new RigelEGUIBufferGUIWindow<RigelEGUIVertex>(1024);
-
             var vbufferdescRect = new BufferDescription()
             {
                 SizeInBytes = m_bufferDataRect.BufferSizeInByte,
@@ -160,15 +166,14 @@ namespace RigelEditor.EGUI
                 StructureByteStride = 0,
             };
 
-            m_vertexBufferRect = new Buffer(m_graphics.Device, vbufferdescRect);
-            m_vertexBufferRectBinding = new VertexBufferBinding(
-                m_vertexBufferRect, 
+            m_gVertBufferWindowRect = new Buffer(m_graphics.Device, vbufferdescRect);
+            m_gVertBufferWindowRectBinding = new VertexBufferBinding(
+                m_gVertBufferWindowRect, 
                 m_bufferDataRect.ItemSizeInByte,
                 0
             );
-
+            //textbuffer window 
             m_bufferDataText = new RigelEGUIBufferGUIWindow<RigelEGUIVertex>(1024);
-
             var vbufferdescText = new BufferDescription()
             {
                 SizeInBytes = m_bufferDataRect.BufferSizeInByte,
@@ -178,10 +183,27 @@ namespace RigelEditor.EGUI
                 OptionFlags = ResourceOptionFlags.None,
                 StructureByteStride = 0,
             };
-            m_vertexBuffertText = new Buffer(m_graphics.Device, vbufferdescText);
-            m_vertexBufferTextBinding = new VertexBufferBinding(
-                m_vertexBuffertText, 
+            m_gVertBufferWindowText = new Buffer(m_graphics.Device, vbufferdescText);
+            m_gVertBufferWindowTextBinding = new VertexBufferBinding(
+                m_gVertBufferWindowText, 
                 m_bufferDataText.ItemSizeInByte, 
+                0
+            );
+
+            //vertexbuffer main
+            m_bufferMainRect = new RigelEGUIBufferGUIWindow<RigelEGUIVertex>(256);
+            m_gVertBufferMainRect = new Buffer(m_graphics.Device, vbufferdescRect);
+            m_gVertBufferMainRectBinding = new VertexBufferBinding(
+                m_gVertBufferMainRect,
+                m_bufferMainRect.ItemSizeInByte,
+                0
+            );
+            //textbuffer main
+            m_bufferMainText = new RigelEGUIBuffer<RigelEGUIVertex>(256);
+            m_gVertBufferMainText = new Buffer(m_graphics.Device, vbufferdescText);
+            m_gVertBufferMainTextBinding = new VertexBufferBinding(
+                m_gVertBufferMainText,
+                m_bufferMainText.ItemSizeInByte,
                 0
             );
 
@@ -198,7 +220,7 @@ namespace RigelEditor.EGUI
 
             m_matrixgui = Matrix.OrthoOffCenterLH(0, 800, 600, 0, GUI_CLIP_PLANE_NEAR, GUI_CLIP_PLANE_FAR);
             m_matrixgui.Transpose();
-            m_constBuffer = Buffer.Create(m_graphics.Device, ref m_matrixgui, cbufferdesc);
+            m_gConstBuffer = Buffer.Create(m_graphics.Device, ref m_matrixgui, cbufferdesc);
 
             //indices buffer
 
@@ -231,7 +253,7 @@ namespace RigelEditor.EGUI
                 StructureByteStride = m_bufferDataIndices.ItemSizeInByte
             };
 
-            m_indicesBuffer = new Buffer(m_graphics.Device, ibufferdesc);
+            m_gIndicesBuffer = new Buffer(m_graphics.Device, ibufferdesc);
 
         }
 
@@ -245,7 +267,7 @@ namespace RigelEditor.EGUI
 
         public void CrateFontTexture(RigelFont font)
         {
-            if (m_fontTexture != null) throw new Exception("font texture2d already created");
+            if (m_gFontTexture != null) throw new Exception("font texture2d already created");
 
             using (RigelImageData img = new RigelImageData(TEXTURE_FONT_SIZE, TEXTURE_FONT_SIZE))
             {
@@ -265,56 +287,56 @@ namespace RigelEditor.EGUI
                 };
 
                 var pinnedptr = System.Runtime.InteropServices.GCHandle.Alloc(img.Data, System.Runtime.InteropServices.GCHandleType.Pinned);
-                m_fontTexture = new Texture2D(m_graphics.Device, desc, new DataRectangle(pinnedptr.AddrOfPinnedObject(), img.Pitch));
+                m_gFontTexture = new Texture2D(m_graphics.Device, desc, new DataRectangle(pinnedptr.AddrOfPinnedObject(), img.Pitch));
                 pinnedptr.Free();
             }
 
-            m_fontTextureView = new ShaderResourceView(m_graphics.Device,m_fontTexture);
-            m_fontTextureSampler = new SamplerState(m_graphics.Device,SamplerStateDescription.Default());
+            m_gFontTextureView = new ShaderResourceView(m_graphics.Device,m_gFontTexture);
+            m_gFontTextureSampler = new SamplerState(m_graphics.Device,SamplerStateDescription.Default());
             
         }
 
         private void ReleaseCommandList()
         {
-            if(m_commandlist != null) {
-                m_commandlist.Dispose();
-                m_commandlist = null;
+            if(m_gCommandlist != null) {
+                m_gCommandlist.Dispose();
+                m_gCommandlist = null;
             }
         }
 
         private void BuildCommandList()
         {
-            m_deferredContext.OutputMerger.SetRenderTargets(m_graphics.DepthStencilViewDefault, m_graphics.RenderTargetViewDefault);
-            m_deferredContext.Rasterizer.SetViewport(m_graphics.ViewPortDefault);
+            m_gDeferredContext.OutputMerger.SetRenderTargets(m_graphics.DepthStencilViewDefault, m_graphics.RenderTargetViewDefault);
+            m_gDeferredContext.Rasterizer.SetViewport(m_graphics.ViewPortDefault);
             
             //draw rects
-            m_deferredContext.InputAssembler.InputLayout = m_inputlayout;
-            m_deferredContext.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
+            m_gDeferredContext.InputAssembler.InputLayout = m_gInputlayout;
+            m_gDeferredContext.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
 
-            m_deferredContext.InputAssembler.SetVertexBuffers(0, m_vertexBufferRectBinding);
-            m_deferredContext.InputAssembler.SetIndexBuffer(m_indicesBuffer, Format.R32_UInt, 0);
+            m_gDeferredContext.InputAssembler.SetVertexBuffers(0, m_gVertBufferWindowRectBinding);
+            m_gDeferredContext.InputAssembler.SetIndexBuffer(m_gIndicesBuffer, Format.R32_UInt, 0);
 
-            m_deferredContext.VertexShader.SetConstantBuffer(0, m_constBuffer);
-            m_deferredContext.VertexShader.Set(m_shaderVertex);
+            m_gDeferredContext.VertexShader.SetConstantBuffer(0, m_gConstBuffer);
+            m_gDeferredContext.VertexShader.Set(m_gShaderVertex);
 
-            m_deferredContext.PixelShader.Set(m_shaderPixelRect);
+            m_gDeferredContext.PixelShader.Set(m_gShaderPixelRect);
 
             RigelUtility.Log("buffer data count:" + m_bufferDataRect.BufferDataCount);
             int indexedCount = m_bufferDataRect.BufferDataCount / 2 * 3;
-            m_deferredContext.DrawIndexed(indexedCount, 0, 0);
+            m_gDeferredContext.DrawIndexed(indexedCount, 0, 0);
 
             //draw text
-            m_deferredContext.InputAssembler.SetVertexBuffers(0, m_vertexBufferTextBinding);
-            m_deferredContext.PixelShader.Set(m_shaderPixelFont);
-            m_deferredContext.PixelShader.SetShaderResource(0, m_fontTextureView);
-            m_deferredContext.PixelShader.SetSampler(0, m_fontTextureSampler);
+            m_gDeferredContext.InputAssembler.SetVertexBuffers(0, m_gVertBufferWindowTextBinding);
+            m_gDeferredContext.PixelShader.Set(m_gShaderPixelFont);
+            m_gDeferredContext.PixelShader.SetShaderResource(0, m_gFontTextureView);
+            m_gDeferredContext.PixelShader.SetSampler(0, m_gFontTextureSampler);
 
-            m_deferredContext.OutputMerger.SetBlendState(m_fontBlendState);
+            m_gDeferredContext.OutputMerger.SetBlendState(m_gFontBlendState);
 
             int textIndexedCount = m_bufferDataText.BufferDataCount / 2 * 3;
-            m_deferredContext.DrawIndexed(textIndexedCount, 0, 0);
+            m_gDeferredContext.DrawIndexed(textIndexedCount, 0, 0);
 
-            m_commandlist = m_deferredContext.FinishCommandList(false);
+            m_gCommandlist = m_gDeferredContext.FinishCommandList(false);
 
         }
 
@@ -325,7 +347,7 @@ namespace RigelEditor.EGUI
             //bufferData
             if (m_guiparamsChanged)
             {
-                m_graphics.ImmediateContext.UpdateSubresource(ref m_matrixgui, m_constBuffer);
+                m_graphics.ImmediateContext.UpdateSubresource(ref m_matrixgui, m_gConstBuffer);
                 m_guiparamsChanged = false;
             }
 
@@ -336,7 +358,7 @@ namespace RigelEditor.EGUI
                 m_graphics.ImmediateContext.UpdateSubresource(new DataBox()
                 {
                     DataPointer = pinnedptr.AddrOfPinnedObject()
-                }, m_vertexBufferRect, 0);
+                }, m_gVertBufferWindowRect, 0);
                 pinnedptr.Free();
 
                 m_bufferDataRect.SetDirty(false);
@@ -350,7 +372,7 @@ namespace RigelEditor.EGUI
                 m_graphics.ImmediateContext.UpdateSubresource(new DataBox()
                 {
                     DataPointer = pinnedptr.AddrOfPinnedObject()
-                }, m_vertexBuffertText, 0);
+                }, m_gVertBufferWindowText, 0);
                 pinnedptr.Free();
 
                 m_bufferDataRect.SetDirty(false);
@@ -366,7 +388,7 @@ namespace RigelEditor.EGUI
                     DataPointer = pinnedptr.AddrOfPinnedObject(),
                     RowPitch = 0,
                     SlicePitch = m_bufferDataIndices.ItemSizeInByte,
-                }, m_indicesBuffer, 0);
+                }, m_gIndicesBuffer, 0);
                 pinnedptr.Free();
 
                 m_bufferDataIndices.SetDirty(false);
@@ -375,41 +397,44 @@ namespace RigelEditor.EGUI
 
             if (graphics.NeedRebuildCommandList || NeedRebuildCommandList)
             {
-                if(m_commandlist != null)
+                if(m_gCommandlist != null)
                 {
-                    m_commandlist.Dispose();
+                    m_gCommandlist.Dispose();
                 }
                 BuildCommandList();
 
                 NeedRebuildCommandList = false;
             }
 
-            graphics.ImmediateContext.ExecuteCommandList(m_commandlist,false);
+            graphics.ImmediateContext.ExecuteCommandList(m_gCommandlist,false);
 
 
         }
 
         public void Dispose()
         {
-            if (m_shaderPixelRect != null) m_shaderPixelRect.Dispose();
-            if( m_shaderPixelFont != null) m_shaderPixelFont.Dispose();
-            if (m_shaderVertex != null) m_shaderVertex.Dispose();
-            if (m_inputlayout != null) m_inputlayout.Dispose();
+            if (m_gShaderPixelRect != null) m_gShaderPixelRect.Dispose();
+            if( m_gShaderPixelFont != null) m_gShaderPixelFont.Dispose();
+            if (m_gShaderVertex != null) m_gShaderVertex.Dispose();
+            if (m_gInputlayout != null) m_gInputlayout.Dispose();
 
 
-            if (m_vertexBufferRect != null) m_vertexBufferRect.Dispose();
-            if (m_vertexBuffertText != null) m_vertexBuffertText.Dispose();
+            if (m_gVertBufferWindowRect != null) m_gVertBufferWindowRect.Dispose();
+            if (m_gVertBufferWindowText != null) m_gVertBufferWindowText.Dispose();
 
-            if (m_constBuffer != null) m_constBuffer.Dispose();
-            if (m_indicesBuffer != null) m_indicesBuffer.Dispose();
+            if (m_gVertBufferMainRect != null) m_gVertBufferMainRect.Dispose();
+            if (m_gVertBufferMainText != null) m_gVertBufferMainText.Dispose();
 
-            if(m_fontTextureView != null) m_fontTextureView.Dispose();
-            if(m_fontTexture != null) m_fontTexture.Dispose();
-            if(m_fontTextureSampler != null) m_fontTextureSampler.Dispose();
-            if (m_fontBlendState != null) m_fontBlendState.Dispose();
+            if (m_gConstBuffer != null) m_gConstBuffer.Dispose();
+            if (m_gIndicesBuffer != null) m_gIndicesBuffer.Dispose();
 
-            if (m_commandlist != null) m_commandlist.Dispose();
-            if (m_deferredContext != null) m_deferredContext.Dispose();
+            if(m_gFontTextureView != null) m_gFontTextureView.Dispose();
+            if(m_gFontTexture != null) m_gFontTexture.Dispose();
+            if(m_gFontTextureSampler != null) m_gFontTextureSampler.Dispose();
+            if (m_gFontBlendState != null) m_gFontBlendState.Dispose();
+
+            if (m_gCommandlist != null) m_gCommandlist.Dispose();
+            if (m_gDeferredContext != null) m_gDeferredContext.Dispose();
 
             m_graphics = null;
         }

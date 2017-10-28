@@ -9,8 +9,8 @@ namespace RigelEditor.EGUI
 {
     public partial class RigelEGUICtx
     {
-        private RigelEGUIDockerManager m_dockerMgr;
-        private RigelEGUIMenu m_mainMenu;
+        
+        
         private List<RigelEGUIWindow> m_windows;
 
 
@@ -23,35 +23,10 @@ namespace RigelEditor.EGUI
         private bool m_bufferRectEmptyBlock = false;
         private bool m_bufferTextEmptyBlock = false;
 
-        private void GUIInit()
+
+
+        private void GUIUpdateWindow(RigelEGUIEvent guievent)
         {
-            ClientWidth = m_form.Width;
-            ClientHeight = m_form.Height;
-
-            m_windows = new List<RigelEGUIWindow>();
-
-            m_mainMenu = new RigelEGUIMenu();
-            RefreshMainMenu();
-
-            m_dockerMgr = new RigelEGUIDockerManager();
-
-            RigelEGUI.InternalResetContext(this);
-
-        }
-
-        private void GUIRelease()
-        {
-            m_windows.Clear();
-            m_mainMenu.ClearAllItems();
-        }
-
-
-        private void GUIUpdate(RigelEGUIEvent guievent)
-        {
-            RigelUtility.Log("------------- New Frame -----------");
-
-            RigelEGUI.InternalFrameBegin(guievent);
-
             m_bufferRectEmptyBlock = false;
             m_bufferTextEmptyBlock = false;
 
@@ -66,25 +41,25 @@ namespace RigelEditor.EGUI
             int totalBufferTextSizeCount = 0;
             foreach (var win in m_windows)
             {
-                UpdateWindow(win,guievent);
+                UpdateWindow(win, guievent);
                 if (win.Focused) focusedWin++;
 
                 totalBufferRectSizeCount += win.BufferInfoRect.Size;
                 totalBufferTextSizeCount += win.BufferInfoText.Size;
             }
 
-            RigelUtility.Assert(focusedWin <= 1, "[Exception] Multi Focused Window :"+focusedWin);
+            RigelUtility.Assert(focusedWin <= 1, "[Exception] Multi Focused Window :" + focusedWin);
 
             // reset window order
             // Buffer Struct: Lesser  <<------ window.Order ------ << Greater
             // the num of array copy operation is minium when focused window at the end of buffer
             // it doesn't influence the effecient of graphics rendering pipeline
-            if(m_windows.Count > 1)
+            if (m_windows.Count > 1)
             {
                 m_windows.Sort((a, b) => { return a.Order.CompareTo(b.Order); });
 
                 //need to shrink the window order to z-near/z-far range
-                if(m_windows[m_windows.Count-1].Order >= RigelEGUIGraphicsBind.GUI_CLIP_PLANE_FAR)
+                if (m_windows[m_windows.Count - 1].Order >= RigelEGUIGraphicsBind.GUI_CLIP_PLANE_FAR)
                 {
                     //TODO
                     //adjust all RigelEGUIVertex.Pos.z
@@ -92,8 +67,7 @@ namespace RigelEditor.EGUI
             }
 
 
-            //draw end
-            RigelEGUI.InternalFrameEnd();
+
 
             //arrange buffer
             if (m_bufferRectEmptyBlock)
@@ -101,14 +75,14 @@ namespace RigelEditor.EGUI
                 var newbufRect = new RigelEGUIVertex[m_graphicsBind.BufferVertexRect.BufferSize];
                 var bufRect = m_graphicsBind.BufferVertexRect.BufferData;
                 int newbufPosRect = 0;
-                foreach(var win in m_windows)
+                foreach (var win in m_windows)
                 {
                     //rect
                     int winbufsizeRect = win.BufferInfoRect.Size;
                     Array.Copy(
-                        bufRect, 
-                        win.BufferInfoRect.StartPos, 
-                        newbufRect, 
+                        bufRect,
+                        win.BufferInfoRect.StartPos,
+                        newbufRect,
                         newbufPosRect,
                         winbufsizeRect);
                     win.BufferInfoRect.StartPos = newbufPosRect;
@@ -145,8 +119,8 @@ namespace RigelEditor.EGUI
                 m_graphicsBind.BufferVertexText.InternalSetBufferDataCount(totalBufferTextSizeCount);
 
             }
-
         }
+
 
         private void UpdateWindow(RigelEGUIWindow win,RigelEGUIEvent guievent)
         {
@@ -212,7 +186,6 @@ namespace RigelEditor.EGUI
             RigelEGUI.InternalWindowBegin(win);
             RigelEGUI.s_depthz = RigelEGUIGraphicsBind.GUI_CLIP_PLANE_FAR - (win.Order + RigelEGUI.s_depthStep);
         }
-
         private void InternalEndWindow()
         {
             var curwin = RigelEGUI.CurrentWindow;
@@ -231,28 +204,7 @@ namespace RigelEditor.EGUI
         }
 
 
-        private void RefreshMainMenu()
-        {
-            var assembly = RigelReflectionHelper.AssemblyRigelEditor;
-            foreach (var type in assembly.GetTypes())
-            {
-                var methods = RigelReflectionHelper.GetMethodByAttribute<RigelEGUIMenuItemAttribute>(
-                    type,
-                    BindingFlags.Static |
-                    BindingFlags.Public |
-                    BindingFlags.NonPublic
-                );
-
-                foreach (var m in methods)
-                {
-                    var attr = Attribute.GetCustomAttribute(m, typeof(RigelEGUIMenuItemAttribute)) as RigelEGUIMenuItemAttribute;
-                    m_mainMenu.AddMenuItem(attr.Label, m);
-                }
-
-            }
-            RigelUtility.Log("EGUI mainMenu item count:" + m_mainMenu.ItemNodes.Count());
-
-        }
+        
 
         private int GetMaxWindowOrder()
         {
