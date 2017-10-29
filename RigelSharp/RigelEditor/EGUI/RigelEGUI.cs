@@ -63,6 +63,8 @@ namespace RigelEditor.EGUI
             CurrentWindow = win;
             s_windowGroupCount = 0;
             RigelEGUI.BeginGroup(new Vector4(win.Position, win.Size.X, win.Size.Y));
+
+            RigelEGUILayout.s_layoutOffset = Vector2.Zero;
         }
         internal static void InternalWindowEnd()
         {

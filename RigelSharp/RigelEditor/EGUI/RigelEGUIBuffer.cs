@@ -42,6 +42,17 @@ namespace RigelEditor.EGUI
             Dirty = true;
         }
 
+        public void CheckAndExtendsWithSize(int size)
+        {
+            if (BufferDataCount < size)
+            {
+                int extendpos = BufferSize;
+                Array.Resize(ref BufferData, BufferSize * m_bufferExtendTimes);
+                BufferResized = true;
+                if (m_extendGenrateFunc != null) m_extendGenrateFunc.Invoke(this, extendpos);
+            }
+        }
+
         public void CheckAndExtends(int tolerance = 16)
         {
             if (BufferDataCount > BufferSize - tolerance)
@@ -56,6 +67,14 @@ namespace RigelEditor.EGUI
         public void SetDirty(bool dirty)
         {
             Dirty = dirty;
+        }
+
+        /// <summary>
+        /// after recreate the vertexbuffer of graphics api,set this flag to false
+        /// </summary>
+        public void SetResizeDone()
+        {
+            BufferResized = false;
         }
 
         internal void InternalSetBufferDataCount(int count)

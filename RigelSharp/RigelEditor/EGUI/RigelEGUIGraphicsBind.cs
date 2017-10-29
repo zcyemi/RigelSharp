@@ -309,30 +309,39 @@ namespace RigelEditor.EGUI
             m_gDeferredContext.OutputMerger.SetRenderTargets(m_graphics.DepthStencilViewDefault, m_graphics.RenderTargetViewDefault);
             m_gDeferredContext.Rasterizer.SetViewport(m_graphics.ViewPortDefault);
             
-            //draw rects
             m_gDeferredContext.InputAssembler.InputLayout = m_gInputlayout;
             m_gDeferredContext.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
-
-            m_gDeferredContext.InputAssembler.SetVertexBuffers(0, m_gVertBufferWindowRectBinding);
             m_gDeferredContext.InputAssembler.SetIndexBuffer(m_gIndicesBuffer, Format.R32_UInt, 0);
-
             m_gDeferredContext.VertexShader.SetConstantBuffer(0, m_gConstBuffer);
             m_gDeferredContext.VertexShader.Set(m_gShaderVertex);
 
             m_gDeferredContext.PixelShader.Set(m_gShaderPixelRect);
 
+            //draw main rect
+            m_gDeferredContext.InputAssembler.SetVertexBuffers(0, m_gVertBufferMainRectBinding);
+            int mainRectIndexed = m_bufferMainRect.BufferDataCount / 2 * 3;
+            m_gDeferredContext.DrawIndexed(mainRectIndexed, 0, 0);
+
+            //draw window rect
+            m_gDeferredContext.InputAssembler.SetVertexBuffers(0, m_gVertBufferWindowRectBinding);
             RigelUtility.Log("buffer data count:" + m_bufferDataRect.BufferDataCount);
             int indexedCount = m_bufferDataRect.BufferDataCount / 2 * 3;
             m_gDeferredContext.DrawIndexed(indexedCount, 0, 0);
+       
 
-            //draw text
-            m_gDeferredContext.InputAssembler.SetVertexBuffers(0, m_gVertBufferWindowTextBinding);
+            
             m_gDeferredContext.PixelShader.Set(m_gShaderPixelFont);
             m_gDeferredContext.PixelShader.SetShaderResource(0, m_gFontTextureView);
             m_gDeferredContext.PixelShader.SetSampler(0, m_gFontTextureSampler);
-
             m_gDeferredContext.OutputMerger.SetBlendState(m_gFontBlendState);
 
+            //draw main text
+            m_gDeferredContext.InputAssembler.SetVertexBuffers(0, m_gVertBufferMainTextBinding);
+            int mainTextIndexed = m_bufferMainText.BufferDataCount / 2 * 3;
+            m_gDeferredContext.DrawIndexed(mainTextIndexed, 0, 0);
+
+            //draw window text
+            m_gDeferredContext.InputAssembler.SetVertexBuffers(0, m_gVertBufferWindowTextBinding);
             int textIndexedCount = m_bufferDataText.BufferDataCount / 2 * 3;
             m_gDeferredContext.DrawIndexed(textIndexedCount, 0, 0);
 
@@ -351,6 +360,62 @@ namespace RigelEditor.EGUI
                 m_guiparamsChanged = false;
             }
 
+            //buffer extends check
+            if (m_bufferMainText.BufferResized)
+            {
+                var desc = m_gVertBufferMainText.Description;
+                if (m_gVertBufferMainText != null)
+                {
+                    m_gVertBufferMainText.Dispose();
+                }
+                desc.SizeInBytes = m_bufferMainText.BufferSizeInByte;
+                m_gVertBufferMainText = new Buffer(m_graphics.Device, desc);
+                m_gVertBufferMainTextBinding = new VertexBufferBinding(
+                    m_gVertBufferMainText,
+                    m_bufferMainText.ItemSizeInByte,
+                    0
+                );
+                m_bufferMainText.SetResizeDone();
+            }
+
+            if (m_bufferMainRect.BufferResized)
+            {
+                var desc = m_gVertBufferMainRect.Description;
+                if(m_gVertBufferMainRect != null)
+                {
+                    m_gVertBufferMainRect.Dispose();
+                }
+                desc.SizeInBytes = m_bufferMainRect.BufferSizeInByte;
+                m_gVertBufferMainRect = new Buffer(m_graphics.Device, desc);
+                m_gVertBufferMainRectBinding = new VertexBufferBinding(
+                    m_gVertBufferMainRect,
+                    m_bufferMainRect.ItemSizeInByte,
+                    0
+                );
+                m_bufferMainRect.SetResizeDone();
+            }
+
+            //buffer data update
+            if (m_bufferMainRect.Dirty)
+            {
+                var pinnedptr = GCHandle.Alloc(m_bufferMainRect.BufferData, GCHandleType.Pinned);
+                m_graphics.ImmediateContext.UpdateSubresource(new DataBox()
+                {
+                    DataPointer = pinnedptr.AddrOfPinnedObject()
+                }, m_gVertBufferMainRect, 0);
+                pinnedptr.Free();
+                m_bufferMainRect.SetDirty(false);
+            }
+            if (m_bufferMainText.Dirty)
+            {
+                var pinnedptr = GCHandle.Alloc(m_bufferMainText.BufferData, GCHandleType.Pinned);
+                m_graphics.ImmediateContext.UpdateSubresource(new DataBox()
+                {
+                    DataPointer = pinnedptr.AddrOfPinnedObject()
+                }, m_gVertBufferMainText, 0);
+                pinnedptr.Free();
+                m_bufferMainText.SetDirty(false);
+            }
 
             if (m_bufferDataRect.Dirty)
             {

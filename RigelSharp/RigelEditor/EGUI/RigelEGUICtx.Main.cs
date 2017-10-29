@@ -8,7 +8,7 @@ using SharpDX;
 
 namespace RigelEditor.EGUI
 {
-    public partial class RigelEGUICtx
+    public partial class RigelEGUICtx : IDisposable
     {
         private RigelEGUIDockerManager m_dockerMgr;
         private RigelEGUIMenu m_mainMenu;
@@ -22,27 +22,78 @@ namespace RigelEditor.EGUI
         private bool m_bufMainRectEmptyBlock = false;
         private bool m_bufMainTextEmptyBlock = false;
 
+        private Vector4 m_mainStatusBarRect;
+
 
         private void GUIUpdateMainBegin(RigelEGUIEvent guievent)
         {
+            m_mainStatusBarRect.Y = ClientHeight - 20;
+            m_mainStatusBarRect.Z = ClientWidth;
+            m_mainStatusBarRect.W = 20;
+
             m_bufMainRectEmptyBlock = false;
             m_bufMainTextEmptyBlock = false;
 
             BufMainRect.Clear();
             BufMainText.Clear();
 
+            RigelEGUILayout.s_layoutOffset = Vector2.Zero;
+            RigelEGUILayout.s_layoutVertical = true;
+            RigelEGUILayout.s_layoutStackType.Clear();
+            RigelEGUILayout.s_layoutStackType.Push(true);
+            RigelEGUILayout.s_layoutMax = Vector2.Zero;
+
             GUIMainDrawMenuBar();
         }
 
         private void GUIUpdateMainEnd(RigelEGUIEvent guievent)
         {
+            m_graphicsBind.BufferMainRect.CheckAndExtendsWithSize(BufMainRect.Count);
+            BufMainRect.CopyTo(m_graphicsBind.BufferMainRect.BufferData);
+            m_graphicsBind.BufferMainRect.InternalSetBufferDataCount(BufMainRect.Count);
 
+
+            m_graphicsBind.BufferMainText.CheckAndExtendsWithSize(BufMainText.Count);
+            BufMainText.CopyTo(m_graphicsBind.BufferMainText.BufferData);
+            m_graphicsBind.BufferMainText.InternalSetBufferDataCount(BufMainText.Count);
         }
 
         private void GUIMainDrawMenuBar()
         {
-            RigelEGUI.DrawRect(new Vector4(0, 0, ClientWidth, 20), RigelEGUIStyle.Current.MainMenuBGColor);
+            //menu
+            RigelEGUI.DrawRect(new Vector4(0, 0, ClientWidth, 25), RigelEGUIStyle.Current.MainMenuBGColor);
 
+
+            RigelEGUILayout.Button("Button1");
+            RigelEGUILayout.Button("Button2");
+
+            RigelEGUILayout.BeginHorizontal();
+
+            RigelEGUILayout.Button("Button3");
+            RigelEGUILayout.Button("Button4");
+
+            RigelEGUILayout.BeginVertical();
+
+            RigelEGUILayout.Button("Button5");
+
+            RigelEGUILayout.BeginHorizontal();
+            RigelEGUILayout.Button("Button5v");
+            RigelEGUILayout.Button("Button5v1");
+            RigelEGUILayout.EndHorizontal();
+            RigelEGUILayout.Button("Button5v");
+            RigelEGUILayout.EndVertical();
+
+            RigelEGUILayout.Button("Button4");
+
+
+            RigelEGUILayout.EndHorizontal();
+
+            RigelEGUILayout.Button("Button6");
+
+            RigelEGUILayout.Button("Button7");
+
+            //status bar
+            RigelEGUI.DrawRect(m_mainStatusBarRect, RigelEGUIStyle.Current.MainStatusBarColor);
         }
     }
 }

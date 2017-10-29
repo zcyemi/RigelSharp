@@ -814,6 +814,11 @@ namespace RigelEditor.EGUI
             Process(e);
         }
 
+        public RigelEGUIEvent(RigelEGUIEventType eventtype, EventArgs e)
+        {
+            EventType = eventtype;
+        }
+
         public void Process(System.Windows.Forms.MouseEventArgs e)
         {
             Button = (MouseButton)(int)e.Button;
@@ -864,13 +869,15 @@ namespace RigelEditor.EGUI
         MouseDragLeave      = 1 << 9,
         MouseDragUpdate     = 1 << 10,
 
+        Resize              = 1<< 11,
+
         MouseEvent = MouseClick | MouseDoubleClick | MouseDown | MouseUp | MouseDragUpdate,
         MouseEventActive = MouseClick | MouseDoubleClick | MouseDown,
         MouseEventDrag = MouseDragEnter | MouseDragLeave | MouseDragUpdate,
         KeyEvent = KeyPress | KeyDown | KeyUp,
     }
 
-    public partial class RigelEGUICtx
+    public partial class RigelEGUICtx : IDisposable
     {
         private void RegisterEvent()
         {
@@ -878,6 +885,8 @@ namespace RigelEditor.EGUI
                 ClientWidth = m_form.ClientSize.Width;
                 ClientHeight = m_form.ClientSize.Height;
                 m_graphicsBind.UpdateGUIParams(ClientWidth,ClientHeight);
+
+                OnWindowEvent(new RigelEGUIEvent(RigelEGUIEventType.Resize, e));
             };
             m_form.KeyDown += (s, e) =>
             {

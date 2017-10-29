@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace RigelEditor.EGUI
 {
-    public partial class RigelEGUICtx
+    public partial class RigelEGUICtx : IDisposable
     {
         
         
