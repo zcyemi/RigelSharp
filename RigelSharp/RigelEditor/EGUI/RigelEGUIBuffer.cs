@@ -44,10 +44,17 @@ namespace RigelEditor.EGUI
 
         public void CheckAndExtendsWithSize(int size)
         {
-            if (BufferDataCount < size)
+            if (BufferSize < size)
             {
                 int extendpos = BufferSize;
-                Array.Resize(ref BufferData, BufferSize * m_bufferExtendTimes);
+
+                int newsize = BufferSize * m_bufferExtendTimes;
+                while (newsize < size)
+                {
+                    newsize *= m_bufferExtendTimes;
+                }
+
+                Array.Resize(ref BufferData, newsize);
                 BufferResized = true;
                 if (m_extendGenrateFunc != null) m_extendGenrateFunc.Invoke(this, extendpos);
             }

@@ -64,33 +64,9 @@ namespace RigelEditor.EGUI
             RigelEGUI.DrawRect(new Vector4(0, 0, ClientWidth, 25), RigelEGUIStyle.Current.MainMenuBGColor);
 
 
-            RigelEGUILayout.Button("Button1");
-            RigelEGUILayout.Button("Button2");
-
-            RigelEGUILayout.BeginHorizontal();
-
-            RigelEGUILayout.Button("Button3");
-            RigelEGUILayout.Button("Button4");
-
-            RigelEGUILayout.BeginVertical();
-
-            RigelEGUILayout.Button("Button5");
-
-            RigelEGUILayout.BeginHorizontal();
-            RigelEGUILayout.Button("Button5v");
-            RigelEGUILayout.Button("Button5v1");
-            RigelEGUILayout.EndHorizontal();
-            RigelEGUILayout.Button("Button5v");
-            RigelEGUILayout.EndVertical();
-
-            RigelEGUILayout.Button("Button4");
-
-
-            RigelEGUILayout.EndHorizontal();
-
-            RigelEGUILayout.Button("Button6");
-
-            RigelEGUILayout.Button("Button7");
+            RigelEGUILayoutTest.LayoutButtonTab();
+            RigelEGUILayoutTest.LayoutTextSample1();
+            RigelEGUILayoutTest.LayoutBasic();
 
             //status bar
             RigelEGUI.DrawRect(m_mainStatusBarRect, RigelEGUIStyle.Current.MainStatusBarColor);

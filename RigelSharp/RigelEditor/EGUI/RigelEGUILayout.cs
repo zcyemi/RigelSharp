@@ -11,43 +11,54 @@ namespace RigelEditor.EGUI
     public static class RigelEGUILayout
     {
         
-        internal static float s_layoutLineHeight = 25f;
+        internal static int s_layoutLineHeight = 25;
+        internal static int s_layoutLineIndent = 5;
 
-        internal static bool s_horizontal = false;
-
+        //for horizontal or vertical layout
         internal static Vector2 s_layoutOffset;
         internal static Stack<Vector2> s_layoutStack = new Stack<Vector2>();
         internal static Stack<bool> s_layoutStackType = new Stack<bool>();
-
         internal static bool s_layoutVertical = true;
         internal static Vector2 s_layoutMax;
 
-
-        public static void BeginArea(Vector4 rect)
+        internal static void AutoCaculateOffset(int w, int h)
         {
-
+            if (s_layoutVertical)
+            {
+                s_layoutOffset.Y += h;
+            }
+            else
+            {
+                s_layoutOffset.X += w;
+            }
         }
-        public static void EndArea()
+
+        internal static void AutoCaculateOffsetW(int w)
         {
-
+            AutoCaculateOffset(w, s_layoutLineHeight);
         }
 
+
+        internal static void AutoCaculateOffsetH(int h)
+        {
+            AutoCaculateOffset(s_layoutLineIndent,h);
+        }
 
 
         public static bool Button(string label)
         {
             var ret = RigelEGUI.Button(new Vector4(s_layoutOffset, 50f, 20), label, RigelEGUIStyle.Current.ButtonColor, Vector4.One);
 
-            if (s_layoutVertical)
-            {
-                s_layoutOffset.Y += s_layoutLineHeight;
-            }
-            else
-            {
-                s_layoutOffset.X += 55f;
-            }
+            AutoCaculateOffsetW(50);
 
             return ret;
+        }
+
+        public static void Text(string content)
+        {
+            var width = RigelEGUI.DrawText(new Vector4(s_layoutOffset, 400, s_layoutLineHeight), content, Vector4.One);
+
+            AutoCaculateOffsetW(width);
         }
 
         public static void BeginHorizontal()
@@ -93,10 +104,86 @@ namespace RigelEditor.EGUI
             s_layoutOffset.Y = lastOffset.Y;
         }
 
-        public static void Text()
-        {
 
+
+    }
+
+
+    internal static class RigelEGUILayoutTest
+    {
+        internal static void LayoutBasic()
+        {
+            RigelEGUILayout.Button("Button1");
+            RigelEGUILayout.Button("Button2");
+
+            RigelEGUILayout.BeginHorizontal();
+
+            RigelEGUILayout.Button("Button3");
+            RigelEGUILayout.Button("Button4");
+
+            RigelEGUILayout.BeginVertical();
+
+            RigelEGUILayout.Button("Button5");
+
+            RigelEGUILayout.BeginHorizontal();
+            RigelEGUILayout.Button("Button5v");
+            RigelEGUILayout.Button("Button5v1");
+            RigelEGUILayout.EndHorizontal();
+            RigelEGUILayout.Button("Button5v");
+            RigelEGUILayout.EndVertical();
+
+            RigelEGUILayout.Button("Button4");
+
+
+            RigelEGUILayout.EndHorizontal();
+
+            RigelEGUILayout.Button("Button6");
+
+            RigelEGUILayout.Button("Button7");
         }
 
+        static bool s_bLayoutButtonTab = true;
+        internal static void LayoutButtonTab()
+        {
+            RigelEGUILayout.BeginHorizontal();
+            if (RigelEGUILayout.Button("Tab1"))
+            {
+                s_bLayoutButtonTab = true;
+            }
+            if (RigelEGUILayout.Button("Tab2"))
+            {
+                s_bLayoutButtonTab = false;
+            }
+            RigelEGUILayout.EndHorizontal();
+            if (s_bLayoutButtonTab)
+            {
+                RigelEGUILayout.Button("AAAA");
+            }
+            else
+            {
+                RigelEGUILayout.Button("BBBB");
+            }
+            
+        }
+
+        internal static void LayoutTextSample1()
+        {
+            RigelEGUILayout.Text("Hello world!");
+
+            RigelEGUILayout.BeginHorizontal();
+
+            RigelEGUILayout.Text("www.google.com");
+
+            RigelEGUILayout.Button("Enter");
+
+            RigelEGUILayout.BeginVertical();
+            RigelEGUILayout.Text("Test");
+            RigelEGUILayout.Text("Test--------[]");
+            RigelEGUILayout.EndVertical();
+
+            RigelEGUILayout.Text("AnotherLine");
+
+            RigelEGUILayout.EndHorizontal();
+        }
     }
 }

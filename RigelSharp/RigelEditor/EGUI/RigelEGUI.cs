@@ -176,7 +176,7 @@ namespace RigelEditor.EGUI
 
             s_depthz -= s_depthStep;
         }
-        public static void DrawText(Vector4 rect,string content,Vector4 color)
+        public static int DrawText(Vector4 rect,string content,Vector4 color)
         {
             RigelEGUI.RectClip(ref rect, s_groupCurrent);
             var w = 0;
@@ -187,6 +187,8 @@ namespace RigelEditor.EGUI
                 rect.X += xoff;
                 if (w > rect.Z) break;
             }
+
+            return w;
         }
         public static int DrawChar(Vector4 rect,uint c,Vector4 color)
         {
