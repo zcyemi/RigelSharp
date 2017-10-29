@@ -26,10 +26,12 @@ namespace RigelEditor.EGUI
             if (s_layoutVertical)
             {
                 s_layoutOffset.Y += h;
+                s_layoutMax.X = Math.Max(s_layoutMax.X, w);
             }
             else
             {
                 s_layoutOffset.X += w;
+                s_layoutMax.Y = Math.Max(s_layoutMax.Y, h);
             }
         }
 
@@ -174,12 +176,15 @@ namespace RigelEditor.EGUI
 
             RigelEGUILayout.Text("www.google.com");
 
-            RigelEGUILayout.Button("Enter");
-
             RigelEGUILayout.BeginVertical();
             RigelEGUILayout.Text("Test");
             RigelEGUILayout.Text("Test--------[]");
             RigelEGUILayout.EndVertical();
+
+
+            RigelEGUILayout.Button("Enter");
+
+            
 
             RigelEGUILayout.Text("AnotherLine");
 
