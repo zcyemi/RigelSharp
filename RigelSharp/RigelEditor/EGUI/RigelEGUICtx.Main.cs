@@ -19,6 +19,8 @@ namespace RigelEditor.EGUI
         internal List<RigelEGUIVertex> BufMainRect { get { return m_bufMainRect; } }
         internal List<RigelEGUIVertex> BufMainText { get { return m_bufMainText; } }
 
+        private bool m_overlayDraw = false;
+
         private bool m_bufMainRectEmptyBlock = false;
         private bool m_bufMainTextEmptyBlock = false;
 
@@ -39,7 +41,7 @@ namespace RigelEditor.EGUI
 
             RigelEGUILayout.s_layoutOffset = Vector2.Zero;
             RigelEGUILayout.s_layoutVertical = true;
-            RigelEGUILayout.s_layoutStackType.Clear();
+            RigelEGUI.SetDepthBase(0);
             RigelEGUILayout.s_layoutStackType.Push(true);
             RigelEGUILayout.s_layoutMax = Vector2.Zero;
 

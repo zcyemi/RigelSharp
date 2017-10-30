@@ -34,13 +34,10 @@ namespace RigelEditor.EGUI
                 s_layoutMax.Y = Math.Max(s_layoutMax.Y, h);
             }
         }
-
         internal static void AutoCaculateOffsetW(int w)
         {
             AutoCaculateOffset(w, s_layoutLineHeight);
         }
-
-
         internal static void AutoCaculateOffsetH(int h)
         {
             AutoCaculateOffset(s_layoutLineIndent,h);
@@ -106,6 +103,33 @@ namespace RigelEditor.EGUI
             s_layoutOffset.Y = lastOffset.Y;
         }
 
+        public static void Space()
+        {
+            s_layoutOffset.Y += s_layoutLineHeight;
+        }
+        public static void Space(int height)
+        {
+            s_layoutOffset.Y += height;
+        }
+
+        public static void Indent()
+        {
+            s_layoutOffset.X += s_layoutLineIndent;
+        }
+        public static void Indent(int width)
+        {
+            s_layoutOffset.X += width;
+        }
+
+        public static void BeginArea(Vector4 rect)
+        {
+
+        }
+
+        public static void EndArea()
+        {
+
+        }
 
 
     }
@@ -178,13 +202,14 @@ namespace RigelEditor.EGUI
 
             RigelEGUILayout.BeginVertical();
             RigelEGUILayout.Text("Test");
+            RigelEGUILayout.Space();
+            
             RigelEGUILayout.Text("Test--------[]");
             RigelEGUILayout.EndVertical();
 
-
+            RigelEGUILayout.Indent();
             RigelEGUILayout.Button("Enter");
 
-            
 
             RigelEGUILayout.Text("AnotherLine");
 

@@ -256,6 +256,11 @@ namespace RigelEditor.EGUI
 
         #region utility
 
+        internal static void SetDepthBase(int order)
+        {
+            RigelEGUI.s_depthz = RigelEGUIGraphicsBind.GUI_CLIP_PLANE_FAR - (order + RigelEGUI.s_depthStep);
+        }
+
         internal static bool RectContainsCheck(Vector2 pos,Vector2 size,Vector2 point)
         {
             if (point.X < pos.X || point.X > pos.X + size.X) return false;

@@ -184,7 +184,8 @@ namespace RigelEditor.EGUI
             m_bufferRect.Clear();
             m_bufferText.Clear();
             RigelEGUI.InternalWindowBegin(win);
-            RigelEGUI.s_depthz = RigelEGUIGraphicsBind.GUI_CLIP_PLANE_FAR - (win.Order + RigelEGUI.s_depthStep);
+
+            RigelEGUI.SetDepthBase(win.Order);
         }
         private void InternalEndWindow()
         {
