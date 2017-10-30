@@ -14,24 +14,32 @@ namespace RigelEditor.EGUI
         internal static int s_layoutLineHeight = 25;
         internal static int s_layoutLineIndent = 5;
 
-        //for horizontal or vertical layout
-        internal static Vector2 s_layoutOffset;
-        internal static Stack<Vector2> s_layoutStack = new Stack<Vector2>();
-        internal static Stack<bool> s_layoutStackType = new Stack<bool>();
-        internal static bool s_layoutVertical = true;
-        internal static Vector2 s_layoutMax;
+
+        internal static Stack<LayoutInfo> s_layoutStack = new Stack<LayoutInfo>();
+        internal static LayoutInfo s_layout;
+
+        internal static Stack<Vector4> s_areaStack = new Stack<Vector4>();
+        internal static Vector4 s_area;
+
+        public struct LayoutInfo
+        {
+            public bool Verticle;
+            public Vector2 Offset;
+            public Vector2 SizeMax;
+        }
+
 
         internal static void AutoCaculateOffset(int w, int h)
         {
-            if (s_layoutVertical)
+            if (s_layout.Verticle)
             {
-                s_layoutOffset.Y += h;
-                s_layoutMax.X = Math.Max(s_layoutMax.X, w);
+                s_layout.Offset.Y += h;
+                s_layout.SizeMax.X = Math.Max(s_layout.SizeMax.X, w);
             }
             else
             {
-                s_layoutOffset.X += w;
-                s_layoutMax.Y = Math.Max(s_layoutMax.Y, h);
+                s_layout.Offset.X += w;
+                s_layout.SizeMax.Y = Math.Max(s_layout.SizeMax.Y, h);
             }
         }
         internal static void AutoCaculateOffsetW(int w)
@@ -43,10 +51,29 @@ namespace RigelEditor.EGUI
             AutoCaculateOffset(s_layoutLineIndent,h);
         }
 
+        internal static void Frame(int width,int height)
+        {
+            s_layout.Offset = Vector2.Zero;
+            s_layout.Verticle = true;
+            s_layout.SizeMax = Vector2.Zero;
+            RigelEGUI.SetDepthBase(0);
+
+            s_layoutStack.Clear();
+            s_layoutStack.Push(s_layout);
+
+            s_areaStack.Clear();
+            s_area = new Vector4(0, 0, width, height);
+
+        }
+
 
         public static bool Button(string label)
         {
-            var ret = RigelEGUI.Button(new Vector4(s_layoutOffset, 50f, 20), label, RigelEGUIStyle.Current.ButtonColor, Vector4.One);
+            var rect = new Vector4(s_layout.Offset, 50f, 20);
+            rect.X += s_area.X;
+            rect.Y += s_area.Y;
+
+            var ret = RigelEGUI.Button(rect, label, RigelEGUIStyle.Current.ButtonColor, Vector4.One);
 
             AutoCaculateOffsetW(50);
 
@@ -55,80 +82,91 @@ namespace RigelEditor.EGUI
 
         public static void Text(string content)
         {
-            var width = RigelEGUI.DrawText(new Vector4(s_layoutOffset, 400, s_layoutLineHeight), content, Vector4.One);
+            var rect = new Vector4(s_layout.Offset, 400, s_layoutLineHeight);
+            rect.X += s_area.X;
+            rect.Y += s_area.Y;
+            var width = RigelEGUI.DrawText(rect, content, Vector4.One);
 
             AutoCaculateOffsetW(width);
         }
 
         public static void BeginHorizontal()
         {
-            s_layoutStackType.Push(false);
-            s_layoutStack.Push(s_layoutOffset);
+            s_layout.Verticle = false;
+            s_layoutStack.Push(s_layout);
 
-            s_layoutVertical = false;
-            s_layoutMax.Y = 0;
+            s_layout.SizeMax.Y = 0;
         }
 
         public static void EndHorizontal()
         {
-            s_layoutStackType.Pop();
-            s_layoutVertical = s_layoutStackType.Peek();
-            var lastOffset = s_layoutStack.Pop();
+            var playout = s_layoutStack.Pop();
+            s_layout.Verticle = s_layoutStack.Peek().Verticle;
 
-            var off = s_layoutOffset - lastOffset;
-            s_layoutMax.X = Math.Max(off.X, s_layoutMax.X);
+            var lastOffset = playout.Offset;
 
-            s_layoutOffset.Y += s_layoutMax.Y > s_layoutLineHeight ? s_layoutMax.Y : s_layoutLineHeight;
-            s_layoutOffset.X = lastOffset.X;
+            var off = s_layout.Offset - lastOffset;
+            s_layout.SizeMax.X = Math.Max(off.X, s_layout.SizeMax.X);
+            s_layout.Offset.Y += s_layout.SizeMax.Y > s_layoutLineHeight ? s_layout.SizeMax.Y : s_layoutLineHeight;
+            s_layout.Offset.X = lastOffset.X;
         }
 
         public static void BeginVertical()
         {
-            s_layoutStackType.Push(true);
-            s_layoutStack.Push(s_layoutOffset);
-            s_layoutVertical = true;
-            s_layoutMax.X = 0;
+            s_layout.Verticle = true;
+            s_layoutStack.Push(s_layout);
+            s_layout.SizeMax.X = 0;
         }
         public static void EndVertical()
         {
-            s_layoutStackType.Pop();
-            s_layoutVertical = s_layoutStackType.Peek();
-            var lastOffset = s_layoutStack.Pop();
+            var playout = s_layoutStack.Pop();
+            s_layout.Verticle = s_layoutStack.Peek().Verticle;
+            var lastOffset = playout.Offset;
 
-            var off = s_layoutOffset - lastOffset;
+            var off = s_layout.Offset - lastOffset;
 
-            s_layoutMax.Y = Math.Max(off.Y, s_layoutMax.Y);
+            s_layout.SizeMax.Y = Math.Max(off.Y, s_layout.SizeMax.Y);
 
-            s_layoutOffset.X += s_layoutMax.X > 5f ? s_layoutMax.X : 5f;
-            s_layoutOffset.Y = lastOffset.Y;
+            s_layout.Offset.X += s_layout.SizeMax.X > 5f ? s_layout.SizeMax.X : 5f;
+            s_layout.Offset.Y = lastOffset.Y;
         }
 
         public static void Space()
         {
-            s_layoutOffset.Y += s_layoutLineHeight;
+            s_layout.Offset.Y += s_layoutLineHeight;
         }
         public static void Space(int height)
         {
-            s_layoutOffset.Y += height;
+            s_layout.Offset.Y += height;
         }
 
         public static void Indent()
         {
-            s_layoutOffset.X += s_layoutLineIndent;
+            s_layout.Offset.X += s_layoutLineIndent;
         }
         public static void Indent(int width)
         {
-            s_layoutOffset.X += width;
+            s_layout.Offset.X += width;
         }
 
         public static void BeginArea(Vector4 rect)
         {
+            s_areaStack.Push(rect);
+            s_area = rect;
 
+            s_layoutStack.Push(s_layout);
+
+            s_layout.Verticle = true;
+            s_layout.SizeMax = Vector2.Zero;
+            s_layout.Offset = Vector2.Zero;
         }
 
         public static void EndArea()
         {
+            s_areaStack.Pop();
 
+            s_layoutStack.Pop();
+            s_layout = s_layoutStack.Peek();
         }
 
 
@@ -214,6 +252,21 @@ namespace RigelEditor.EGUI
             RigelEGUILayout.Text("AnotherLine");
 
             RigelEGUILayout.EndHorizontal();
+        }
+
+        internal static void LayoutAreaSample()
+        {
+            RigelEGUILayout.Button("Test1");
+            RigelEGUILayout.Button("Test2");
+
+            RigelEGUILayout.BeginArea(new Vector4(30, 30, 100, 100));
+
+            RigelEGUILayout.Button("Test Area");
+            RigelEGUILayout.EndArea();
+
+            RigelEGUILayout.Button("Test3");
+
+            
         }
     }
 }

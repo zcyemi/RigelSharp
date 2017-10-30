@@ -39,11 +39,7 @@ namespace RigelEditor.EGUI
             BufMainRect.Clear();
             BufMainText.Clear();
 
-            RigelEGUILayout.s_layoutOffset = Vector2.Zero;
-            RigelEGUILayout.s_layoutVertical = true;
-            RigelEGUI.SetDepthBase(0);
-            RigelEGUILayout.s_layoutStackType.Push(true);
-            RigelEGUILayout.s_layoutMax = Vector2.Zero;
+            RigelEGUILayout.Frame(ClientWidth,ClientHeight);
 
             GUIMainDrawMenuBar();
         }
@@ -69,6 +65,7 @@ namespace RigelEditor.EGUI
             RigelEGUILayoutTest.LayoutButtonTab();
             RigelEGUILayoutTest.LayoutTextSample1();
             RigelEGUILayoutTest.LayoutBasic();
+            RigelEGUILayoutTest.LayoutAreaSample();
 
             //status bar
             RigelEGUI.DrawRect(m_mainStatusBarRect, RigelEGUIStyle.Current.MainStatusBarColor);
