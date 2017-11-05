@@ -10,16 +10,14 @@ namespace RigelEditor.EGUI
 {
     public partial class RigelEGUICtx : IDisposable
     {
-        private RigelEGUIDockerManager m_dockerMgr;
-        private RigelEGUIMenu m_mainMenu;
+        private RigelEGUIDockerManager m_dockerMgr = null;
+        private RigelEGUIMenu m_mainMenu = null;
 
         private List<RigelEGUIVertex> m_bufMainRect = new List<RigelEGUIVertex>();
         private List<RigelEGUIVertex> m_bufMainText = new List<RigelEGUIVertex>();
 
         internal List<RigelEGUIVertex> BufMainRect { get { return m_bufMainRect; } }
         internal List<RigelEGUIVertex> BufMainText { get { return m_bufMainText; } }
-
-        private bool m_overlayDraw = false;
 
         private bool m_bufMainRectEmptyBlock = false;
         private bool m_bufMainTextEmptyBlock = false;
@@ -59,13 +57,25 @@ namespace RigelEditor.EGUI
         private void GUIMainDrawMenuBar()
         {
             //menu
-            RigelEGUI.DrawRect(new Vector4(0, 0, ClientWidth, 25), RigelEGUIStyle.Current.MainMenuBGColor);
+            //RigelEGUI.DrawRect(new Vector4(0, 0, ClientWidth, 25), RigelEGUIStyle.Current.MainMenuBGColor);
+
+            RigelEGUILayout.BeginMenuBar();
+
+            RigelEGUILayout.Button("Test");
+            RigelEGUILayout.Indent(1);
+            RigelEGUILayout.Button("Test2");
+
+            RigelEGUILayout.EndMenuBar();
+
+            RigelEGUILayout.BeginArea(new Vector4(100, 20, 100, 100));
+            RigelEGUI.DrawRect(new Vector4(0, 0, 100, 100),RigelColor.White);
+            RigelEGUILayout.EndArea();
 
 
-            RigelEGUILayoutTest.LayoutButtonTab();
-            RigelEGUILayoutTest.LayoutTextSample1();
-            RigelEGUILayoutTest.LayoutBasic();
-            RigelEGUILayoutTest.LayoutAreaSample();
+            //RigelEGUILayoutTest.LayoutButtonTab();
+            //RigelEGUILayoutTest.LayoutTextSample1();
+            //RigelEGUILayoutTest.LayoutBasic();
+            //RigelEGUILayoutTest.LayoutAreaSample();
 
             //status bar
             RigelEGUI.DrawRect(m_mainStatusBarRect, RigelEGUIStyle.Current.MainStatusBarColor);

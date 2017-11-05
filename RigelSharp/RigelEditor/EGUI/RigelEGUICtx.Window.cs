@@ -9,9 +9,9 @@ namespace RigelEditor.EGUI
 {
     public partial class RigelEGUICtx : IDisposable
     {
-        
-        
-        private List<RigelEGUIWindow> m_windows;
+
+
+        private List<RigelEGUIWindow> m_windows = null;
 
 
         private List<RigelEGUIVertex> m_bufferRect = new List<RigelEGUIVertex>();

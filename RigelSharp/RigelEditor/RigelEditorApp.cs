@@ -37,8 +37,8 @@ namespace RigelEditor
             m_EGUI = new RigelEGUICtx(m_windowForm,m_graphics);
 
             //test
-            var testwind = RigelEGUIWindow.GetWindow<RigelEditorAboutPage>();
-            var consolewin = RigelEGUIWindow.GetWindow<RigelEditorConsoleWindow>();
+            //var testwind = RigelEGUIWindow.GetWindow<RigelEditorAboutPage>();
+            //var consolewin = RigelEGUIWindow.GetWindow<RigelEditorConsoleWindow>();
         }
 
         public void EnterRunloop() {

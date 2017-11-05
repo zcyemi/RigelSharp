@@ -26,6 +26,10 @@ namespace RigelEditor.EGUI
             public bool Verticle;
             public Vector2 Offset;
             public Vector2 SizeMax;
+
+            public float DefaultHeight;
+            public float DefaultWidth;
+
         }
 
 
@@ -66,6 +70,25 @@ namespace RigelEditor.EGUI
 
         }
 
+
+        public static void BeginMenuBar()
+        {
+            var rect = new Vector4(0, 0, s_area.Z, 20);
+            BeginArea(rect);
+            RigelEGUI.DrawRect(rect, RigelEGUIStyle.Current.MainMenuBGColor);
+            BeginHorizontal();
+        }
+
+        public static void MenuItem()
+        {
+
+        }
+
+        public static void EndMenuBar()
+        {
+            EndHorizontal();
+            EndArea();
+        }
 
         public static bool Button(string label)
         {
@@ -168,6 +191,7 @@ namespace RigelEditor.EGUI
             s_layoutStack.Pop();
             s_layout = s_layoutStack.Peek();
         }
+
 
 
     }

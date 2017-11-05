@@ -88,33 +88,40 @@ namespace RigelEditor.EGUI
             ClientWidth = m_form.Width;
             ClientHeight = m_form.Height;
 
-            m_windows = new List<RigelEGUIWindow>();
+            //m_windows = new List<RigelEGUIWindow>();
 
-            m_mainMenu = new RigelEGUIMenu();
-            RefreshMainMenu();
+            //m_mainMenu = new RigelEGUIMenu();
+            //RefreshMainMenu();
 
-            m_dockerMgr = new RigelEGUIDockerManager();
+            //m_dockerMgr = new RigelEGUIDockerManager();
 
-            RigelEGUI.InternalResetContext(this);
+            //RigelEGUI.InternalResetContext(this);
+
+            GUIInternal.Init(this);
 
         }
         private void GUIRelease()
         {
-            m_windows.Clear();
-            m_mainMenu.ClearAllItems();
+            //m_windows.Clear();
+            //m_mainMenu.ClearAllItems();
+
+            GUIInternal.Release();
         }
         private void GUIUpdate(RigelEGUIEvent guievent)
         {
-            RigelUtility.Log("------------- New Frame -----------");
-            RigelEGUI.InternalFrameBegin(guievent);
 
-            GUIUpdateMainBegin(guievent);
-            GUIUpdateWindow(guievent);
-            GUIUpdateMainEnd(guievent);
+            GUIInternal.Update(guievent);
+
+            //RigelUtility.Log("------------- New Frame -----------");
+            //RigelEGUI.InternalFrameBegin(guievent);
+
+            //GUIUpdateMainBegin(guievent);
+            ////GUIUpdateWindow(guievent);
+            //GUIUpdateMainEnd(guievent);
 
 
-            //draw end
-            RigelEGUI.InternalFrameEnd();
+            ////draw end
+            //RigelEGUI.InternalFrameEnd();
 
         }
 

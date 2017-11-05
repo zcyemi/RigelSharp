@@ -71,6 +71,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EGUI\GUI.cs" />
+    <Compile Include="EGUI\GUIComponent.cs" />
+    <Compile Include="EGUI\GUIDrawStage.cs" />
+    <Compile Include="EGUI\GUIDrawStageMain.cs" />
+    <Compile Include="EGUI\GUIDrawStageOverlay.cs" />
+    <Compile Include="EGUI\GUIDrawStageWindows.cs" />
+    <Compile Include="EGUI\GUIInternal.cs" />
     <Compile Include="EGUI\RigelEGUICtx.Main.cs" />
     <Compile Include="EGUI\RigelEGUI.cs" />
     <Compile Include="EGUI\RigelEGUIBasic.cs" />

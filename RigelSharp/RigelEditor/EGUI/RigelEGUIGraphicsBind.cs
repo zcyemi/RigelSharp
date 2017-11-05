@@ -36,7 +36,7 @@ namespace RigelEditor.EGUI
         private static readonly string SHADER_FILE_PATH_RECT = "Shader/gui_rect.fx";
         private const int TEXTURE_FONT_SIZE = 128;
 
-        internal const float GUI_CLIP_PLANE_FAR = 100.0f;
+        internal const float GUI_CLIP_PLANE_FAR = 500.0f;
         internal const float GUI_CLIP_PLANE_NEAR = 0;
 
         //shared indices buffer
