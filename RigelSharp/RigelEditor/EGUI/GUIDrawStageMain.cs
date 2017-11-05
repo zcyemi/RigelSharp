@@ -16,8 +16,15 @@ namespace RigelEditor.EGUI
         private int m_lastBufferSizeRect = 0;
         private int m_lastBufferSizeText = 0;
 
+
+        private static GUIMenuList m_menuList;
         public GUIDrawStageMain(string stagename, int order = 0) : base(stagename, order)
         {
+            m_menuList = new GUIMenuList("File");
+            m_menuList.AddMenuItem("File/Test");
+            m_menuList.AddMenuItem("File/Test2");
+            m_menuList.AddMenuItem("Open/Sln");
+            m_menuList.AddMenuItem("Exit");
         }
 
         public override void Draw(RigelEGUIEvent guievent)
@@ -64,7 +71,7 @@ namespace RigelEditor.EGUI
         }
 
 
-        private static GUIMenuList m_menuList = new GUIMenuList("File");
+
 
         private void DrawContent()
         {

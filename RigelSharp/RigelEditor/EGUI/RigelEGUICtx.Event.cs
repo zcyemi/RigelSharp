@@ -852,6 +852,11 @@ namespace RigelEditor.EGUI
         {
             return (EventType & RigelEGUIEventType.MouseEventDrag) > 0;
         }
+
+        public bool IsMouseActiveEvent()
+        {
+            return (EventType & RigelEGUIEventType.MouseEventActive) > 0;
+        }
     }
 
     public enum RigelEGUIEventType :long

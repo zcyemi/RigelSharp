@@ -1,5 +1,6 @@
 ﻿using SharpDX;
 using System;
+using System.Collections.Generic;
 
 namespace RigelEditor.EGUI
 {
@@ -20,7 +21,7 @@ namespace RigelEditor.EGUI
         public int BufferTextCount { get { return BufferTextEnd - BufferTextStart; } }
 
         public bool InitDrawed = false;
-        public bool Distroy { get; protected set; }
+        public bool Distroy { get; internal set; }
 
         public void Show()
         {
@@ -28,6 +29,7 @@ namespace RigelEditor.EGUI
         }
 
         public abstract void Draw(RigelEGUIEvent guievent);
+
     }
 
     public class GUIMessageBox:IGUIComponent
@@ -107,11 +109,50 @@ namespace RigelEditor.EGUI
         }
     }
 
-    public class GUIMenuList : IGUIComponent
+
+    public class GUIMenuButton:IGUIMenuItem
+    {
+        public string Label { get; private set; }
+        public Action Method { get; private set; }
+
+
+        public GUIMenuButton(string label,Action method = null)
+        {
+            Label = label;
+            Method = method;
+        }
+
+        public void Invoke()
+        {
+            if (Method != null) Method.Invoke();
+        }
+
+        public bool Draw()
+        {
+            if (GUILayout.Button(Label))
+            {
+                Invoke();
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    public interface IGUIMenuItem
+    {
+        void Invoke();
+        bool Draw();
+    }
+
+    public class GUIMenuList : IGUIComponent,IGUIMenuItem
     {
         private string m_label;
         public string Label { get { return m_label; } }
         private Vector4 m_basePos;
+
+        public Dictionary<string,IGUIMenuItem> m_items = new Dictionary<string, IGUIMenuItem>();
+        private GUIMenuList m_parent;
 
         public GUIMenuList(string label)
         {
@@ -125,22 +166,95 @@ namespace RigelEditor.EGUI
             m_basePos.W = 200;
         }
 
+        public void AddMenuItem(string path,Action method = null)
+        {
+            List<string> spath = new List<string>(path.Split('/'));
+            spath.RemoveAll((a) => { return string.IsNullOrEmpty(a); });
+
+            GUIMenuList curlist = this;
+            for(int i = 0; i < spath.Count; i++)
+            {
+                string cpath = spath[i];
+                if(i == spath.Count - 1)
+                {
+                    if (curlist.m_items.ContainsKey(cpath))
+                    {
+                        RigelUtility.Log("[Error] add menuItem duplicate:" + path);
+                        break;
+                    }
+                    curlist.m_items.Add(cpath, new GUIMenuButton(cpath, method));
+                }
+                else
+                {
+                    if (curlist.m_items.ContainsKey(cpath))
+                    {
+                        var nlist = curlist.m_items[cpath] as GUIMenuList;
+                        if (nlist == null)
+                        {
+                            RigelUtility.Log("[Error] add menuItem incompatable:" + path);
+                            break;
+                        }
+
+                        curlist = nlist;
+                    }
+                    else
+                    {
+                        var nlist = new GUIMenuList(cpath);
+                        nlist.m_parent = curlist;
+                        m_items.Add(cpath, nlist);
+                        curlist = nlist;
+                    }
+
+                }
+            }
+        }
 
 
         public override void Draw(RigelEGUIEvent guievent)
         {
 
             GUILayout.BeginArea(m_basePos);
-            GUILayout.Button("btn1");
-            GUILayout.Button("btn2");
+
+            bool itemuse = false;
+            foreach(var item in m_items)
+            {
+                itemuse |=item.Value.Draw();
+            }
 
             GUILayout.EndArea();
 
-
-            if ((guievent.EventType & RigelEGUIEventType.MouseEventActive) != 0)
+            if (itemuse)
             {
                 Distroy = true;
             }
+            else
+            {
+                if (!guievent.Used && guievent.EventType == RigelEGUIEventType.MouseClick)
+                {
+                    if (m_parent != null) m_parent.Distroy = false;
+                    Distroy = true;
+                    
+                }
+            }
+        }
+
+        public void Invoke()
+        {
+            GUI.DrawComponent(this);
+        }
+
+        public bool Draw()
+        {
+            var pos = GUILayout.s_ctx.GetNextDrawPos();
+            if (GUILayout.Button(Label))
+            {
+                pos.X += GUILayout.s_ctx.currentLayout.LastDrawWidth +1;
+                InternalSetStartPos(pos);
+                Invoke();
+
+                return true;
+            }
+            return false;
         }
     }
 }

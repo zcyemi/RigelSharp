@@ -80,6 +80,9 @@ namespace RigelEditor.EGUI
         public bool Verticle;
         public Vector2 Offset;
         public Vector2 SizeMax;
+
+        public int LastDrawHeight;
+        public int LastDrawWidth;
     }
 
 
@@ -312,6 +315,7 @@ namespace RigelEditor.EGUI
         public static void DrawComponent(IGUIComponent component)
         {
             component.InitDrawed = false;
+            component.Distroy = false;
             Context.componentStack.Push(component);
             Event.Use();
         }
@@ -479,6 +483,9 @@ namespace RigelEditor.EGUI
                 layout.Offset.X += w + layoutOffX;
                 layout.SizeMax.Y = Math.Max(layout.SizeMax.Y, h);
             }
+            layout.LastDrawWidth = w;
+            layout.LastDrawHeight = h;
+
 
             s_ctx.currentLayout = layout;
         }
@@ -541,10 +548,11 @@ namespace RigelEditor.EGUI
 
         public static void DrawMenuList(GUIMenuList menulist)
         {
-
+            var pos = s_ctx.GetNextDrawPos();
             if (Button(menulist.Label))
             {
-                menulist.InternalSetStartPos(s_ctx.GetNextDrawPos());
+                pos.Y += s_ctx.currentLayout.LastDrawHeight+1;
+                menulist.InternalSetStartPos(pos);
                 GUI.DrawComponent(menulist);
             }
         }
