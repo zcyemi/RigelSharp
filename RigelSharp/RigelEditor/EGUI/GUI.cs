@@ -14,10 +14,24 @@ namespace RigelEditor.EGUI
         public Vector4 backgroundColor = RigelColor.RGBA(128, 128, 128, 255);
 
         public Stack<Vector4> groupStack = new Stack<Vector4>();
+        public Vector4 baseRect;
+        public Vector4 currentRect;
 
         public Stack<Vector4> areaStack = new Stack<Vector4>();
         public Stack<GUILayoutInfo> layoutStack = new Stack<GUILayoutInfo>();
+        public Vector4 currentArea;
+        public GUILayoutInfo currentLayout;
+        public Vector4 GetNextDrawPos()
+        {
+            var rect = currentArea;
+            rect.X += currentLayout.Offset.X;
+            rect.Y += currentLayout.Offset.Y;
 
+            return rect;
+        }
+
+
+        
 
         public float s_depthStep = 0.0001f;
 
@@ -27,13 +41,22 @@ namespace RigelEditor.EGUI
         public Stack<IGUIComponent> componentStack = new Stack<IGUIComponent>();
 
 
-        public void Frame(RigelEGUIEvent guievent)
+        public void Frame(RigelEGUIEvent guievent,int width,int height)
         {
             RigelUtility.Assert(groupStack.Count == 0);
             RigelUtility.Assert(areaStack.Count == 0);
             RigelUtility.Assert(layoutStack.Count == 0);
 
             GUI.Event = guievent;
+            baseRect = new Vector4(0, 0, width, height);
+            currentRect = baseRect;
+
+            //layout
+            currentLayout.Offset = Vector2.Zero;
+            currentLayout.SizeMax = Vector2.Zero;
+            currentLayout.Verticle = true;
+
+            currentArea = baseRect;
         }
 
     }
@@ -52,7 +75,7 @@ namespace RigelEditor.EGUI
         }
     }
 
-    public class GUILayoutInfo
+    public struct GUILayoutInfo
     {
         public bool Verticle;
         public Vector2 Offset;
@@ -60,10 +83,35 @@ namespace RigelEditor.EGUI
     }
 
 
+    public class GUIStackValue<T>
+    {
+        private Stack<T> m_stack = new Stack<T>();
+        public T Value { get; private set; }
+
+
+        public GUIStackValue(T defaultval) {
+            Value = defaultval;
+            m_stack.Push(Value);
+        }
+
+        public void Set(T v)
+        {
+            m_stack.Push(Value);
+            Value = v;
+        }
+        public void Restore()
+        {
+            Value = m_stack.Pop();
+        }
+    }
+
     public static class GUI
     {
         public static GUICtx s_ctx;
-        public static GUICtx Context { get { return s_ctx; } set { s_ctx = value; } }
+        public static GUICtx Context {
+            get { return s_ctx; }
+            set { s_ctx = value; GUILayout.s_ctx = s_ctx; }
+        }
         public static GUIDrawTarget DrawTarget { get; private set; }
 
         public static RigelEGUIEvent Event { get; set; }
@@ -72,17 +120,37 @@ namespace RigelEditor.EGUI
         internal static List<RigelEGUIVertex> BufferText { get { return DrawTarget.bufferText; } }
 
         private static float s_depthz;
-
         public static float Depth { get { return s_depthz; } }
 
-        public static void BeginGroup(Vector4 position,bool absulate = false)
+        public static void BeginGroup(Vector4 rect,bool absulate = false)
         {
+            var groupStack = s_ctx.groupStack;
+            if (absulate)
+            {
+                s_ctx.currentRect = rect;
+                groupStack.Push(rect);
+            }
+            else
+            {
+                Vector4 root = s_ctx.currentRect;
+                
+                rect.X = MathUtil.Clamp(rect.X, 0, root.Z);
+                rect.Y = MathUtil.Clamp(rect.Y, 0, root.W);
 
+                rect.Z = MathUtil.Clamp(rect.Z, 0, root.Z - rect.X);
+                rect.W = MathUtil.Clamp(rect.W, 0, root.W - rect.Y);
+
+                s_ctx.currentRect = rect;
+                groupStack.Push(rect);
+            }
         }
 
         public static void EndGroup()
         {
-
+            var groupStack = s_ctx.groupStack;
+            RigelUtility.Assert(groupStack.Count > 0);
+            groupStack.Pop();
+            s_ctx.currentRect = groupStack.Count == 0? s_ctx.baseRect: groupStack.Peek();
         }
 
         public static bool Button(Vector4 rect, string label)
@@ -97,6 +165,8 @@ namespace RigelEditor.EGUI
             if (Event.Used) return false;
             if (Event.EventType != RigelEGUIEventType.MouseClick) return false;
 
+            rect.X += s_ctx.currentRect.X;
+            rect.Y += s_ctx.currentRect.Y;
             if (RectContainsCheck(rect, Event.Pointer))
             {
                 Event.Use();
@@ -112,6 +182,7 @@ namespace RigelEditor.EGUI
 
         public static int DrawText(Vector4 rect, string content, Vector4 color)
         {
+            RectClip(ref rect, s_ctx.currentRect);
             var w = 0;
             foreach (var c in content)
             {
@@ -176,6 +247,9 @@ namespace RigelEditor.EGUI
 
         public static void DrawRect(Vector4 rect,Vector4 color)
         {
+            var valid = RectClip(ref rect, s_ctx.currentRect);
+            if (!valid) return;
+
             BufferRect.Add(new RigelEGUIVertex()
             {
                 Position = new Vector4(rect.X, rect.Y, s_depthz, 1),
@@ -234,18 +308,10 @@ namespace RigelEditor.EGUI
 
         }
 
-        public static void BeginToolBar(Vector4 rect)
-        {
-
-        }
-
-        public static void EndToolBar()
-        {
-
-        }
 
         public static void DrawComponent(IGUIComponent component)
         {
+            component.InitDrawed = false;
             Context.componentStack.Push(component);
             Event.Use();
         }
@@ -293,11 +359,201 @@ namespace RigelEditor.EGUI
         {
             s_depthz = depth;
         }
+
         #endregion
     }
 
     public static class GUILayout
     {
+        //reference to GUI.s_ctx
+        public static GUICtx s_ctx;
+
+
+        private static Stack<GUILayoutInfo> layoutStack { get { return s_ctx.layoutStack; } }
+
+        public static GUIStackValue<int> s_svLineHeight = new GUIStackValue<int>(25);
+        public static GUIStackValue<int> s_svLineIndent = new GUIStackValue<int>(5);
+        public static int layoutOffX = 1;
+        public static int layoutOffY = 1;
+
+        public static void BeginArea(Vector4 rect)
+        {
+
+            s_ctx.areaStack.Push(s_ctx.currentArea);
+            s_ctx.currentArea = rect;
+
+            var curlayout = s_ctx.currentLayout;
+            layoutStack.Push(curlayout);
+
+            curlayout.Verticle = true;
+            curlayout.SizeMax = Vector2.Zero;
+            curlayout.Offset = Vector2.Zero;
+
+            s_ctx.currentLayout = curlayout;
+        }
+
+        public static void EndArea()
+        {
+            s_ctx.currentArea = s_ctx.areaStack.Pop();
+            s_ctx.currentLayout = s_ctx.layoutStack.Pop();            
+        }
+
+        public static void BeginHorizontal()
+        {
+            s_ctx.currentLayout.Verticle = false;
+            s_ctx.layoutStack.Push(s_ctx.currentLayout);
+            s_ctx.currentLayout.SizeMax.Y = 0;
+        }
+
+        public static void EndHorizontal()
+        {
+            var playout = s_ctx.layoutStack.Pop();
+            if(layoutStack.Count == 0)
+            {
+                s_ctx.currentLayout.Verticle = true;
+            }
+            else
+            {
+                s_ctx.currentLayout.Verticle = layoutStack.Peek().Verticle;
+            }
+            
+
+            var lastOffset = playout.Offset;
+
+            var off = s_ctx.currentLayout.Offset - lastOffset;
+            s_ctx.currentLayout.SizeMax.X = Math.Max(off.X, s_ctx.currentLayout.SizeMax.X);
+            s_ctx.currentLayout.Offset.Y += s_ctx.currentLayout.SizeMax.Y > s_svLineHeight.Value ? s_ctx.currentLayout.SizeMax.Y : s_svLineHeight.Value;
+            s_ctx.currentLayout.Offset.X = lastOffset.X;
+        }
+
+        public static void BeginVertical()
+        {
+            s_ctx.currentLayout.Verticle = true;
+            layoutStack.Push(s_ctx.currentLayout);
+            s_ctx.currentLayout.SizeMax.X = 0;
+        }
+
+        public static void EndVertical()
+        {
+            var playout = layoutStack.Pop();
+            s_ctx.currentLayout.Verticle = layoutStack.Peek().Verticle;
+            var lastOffset = playout.Offset;
+
+            var off = s_ctx.currentLayout.Offset - lastOffset;
+
+            s_ctx.currentLayout.SizeMax.Y = Math.Max(off.Y, s_ctx.currentLayout.SizeMax.Y);
+
+            s_ctx.currentLayout.Offset.X += s_ctx.currentLayout.SizeMax.X > 5f ? s_ctx.currentLayout.SizeMax.X : 5f;
+            s_ctx.currentLayout.Offset.Y = lastOffset.Y;
+        }
+
+        public static void Space()
+        {
+            s_ctx.currentLayout.Offset.Y += s_svLineHeight.Value;
+        }
+        public static void Space(int height)
+        {
+            s_ctx.currentLayout.Offset.Y += height;
+        }
+
+        public static void Indent()
+        {
+            s_ctx.currentLayout.Offset.X += s_svLineIndent.Value;
+        }
+        public static void Indent(int width)
+        {
+            s_ctx.currentLayout.Offset.X += width;
+        }
+
+
+        internal static void AutoCaculateOffset(int w, int h)
+        {
+            var layout = s_ctx.currentLayout;
+            if (layout.Verticle)
+            {
+                layout.Offset.Y += h + layoutOffY;
+                layout.SizeMax.X = Math.Max(layout.SizeMax.X, w);
+            }
+            else
+            {
+                layout.Offset.X += w + layoutOffX;
+                layout.SizeMax.Y = Math.Max(layout.SizeMax.Y, h);
+            }
+
+            s_ctx.currentLayout = layout;
+        }
+        internal static void AutoCaculateOffsetW(int w)
+        {
+            AutoCaculateOffset(w, s_svLineHeight.Value);
+        }
+        internal static void AutoCaculateOffsetH(int h)
+        {
+            AutoCaculateOffset(s_svLineIndent.Value, h);
+        }
+
+        public static bool Button(string label)
+        {
+            var curarea = s_ctx.currentArea;
+            var rect = new Vector4(s_ctx.currentLayout.Offset, 50f, s_svLineHeight.Value);
+            rect.X += curarea.X;
+            rect.Y += curarea.Y;
+
+            var ret = GUI.Button(rect, label);
+            AutoCaculateOffsetW(50);
+
+            return ret;
+        }
+
+
+        public static void Text(string content)
+        {
+            var rect = new Vector4(s_ctx.currentLayout.Offset, 400, s_svLineHeight.Value);
+            rect.X += s_ctx.currentArea.X;
+            rect.Y += s_ctx.currentArea.Y;
+            var width = GUI.DrawText(rect, content, s_ctx.color);
+
+            AutoCaculateOffsetW(width);
+        }
+
+        public static void BeginToolBar(int height)
+        {
+            SetLineHeight(height);
+            var rect = new Vector4(0, 0, s_ctx.currentArea.Z, height);
+            GUI.DrawRect(rect, GUIStyle.Current.MainMenuBGColor);
+            BeginHorizontal();
+
+        }
+
+        public static void EndToolBar()
+        {
+            EndHorizontal();
+            RestoreLineHeight();
+        }
+
+        public static void SetLineHeight(int height)
+        {
+            s_svLineHeight.Set(height);
+        }
+        public static void RestoreLineHeight()
+        {
+            s_svLineHeight.Restore();
+        }
+
+        public static void DrawMenuList(GUIMenuList menulist)
+        {
+
+            if (Button(menulist.Label))
+            {
+                menulist.InternalSetStartPos(s_ctx.GetNextDrawPos());
+                GUI.DrawComponent(menulist);
+            }
+        }
+
+        public static void DrawRect(Vector4 rect,Vector4 color)
+        {
+            GUI.RectClip(ref rect, s_ctx.currentArea);
+            GUI.DrawRect(rect, color);
+        }
 
     }
 }

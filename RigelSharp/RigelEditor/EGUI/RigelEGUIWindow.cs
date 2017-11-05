@@ -72,9 +72,9 @@ namespace RigelEditor.EGUI
         void UpdateValues()
         {
             m_rectContent.X = 0;
-            m_rectContent.Y = RigelEGUIStyle.Current.WinHeaderHeight;
+            m_rectContent.Y = GUIStyle.Current.WinHeaderHeight;
             m_rectContent.Z = Size.X;
-            m_rectContent.W = Size.Y - RigelEGUIStyle.Current.WinHeaderHeight;
+            m_rectContent.W = Size.Y - GUIStyle.Current.WinHeaderHeight;
 
         }
 
@@ -87,11 +87,11 @@ namespace RigelEditor.EGUI
             RigelUtility.Log("draw window:" + WindowTitle + " " + m_focused);
             
             //background
-            RigelEGUI.DrawRect(new Vector4(0,0, Size.X, Size.Y), m_focused ? RigelEGUIStyle .Current.WinBGColorFocused: RigelEGUIStyle.Current.WinBGColor);
+            RigelEGUI.DrawRect(new Vector4(0,0, Size.X, Size.Y), m_focused ? GUIStyle .Current.WinBGColorFocused: GUIStyle.Current.WinBGColor);
             //header
-            RigelEGUI.DrawRect(new Vector4(0,0, Size.X, RigelEGUIStyle.Current.WinHeaderHeight), m_focused ? RigelEGUIStyle.Current.WinHeaderColorFocused : RigelEGUIStyle.Current.WinHeaderColor);
+            RigelEGUI.DrawRect(new Vector4(0,0, Size.X, GUIStyle.Current.WinHeaderHeight), m_focused ? GUIStyle.Current.WinHeaderColorFocused : GUIStyle.Current.WinHeaderColor);
             //title
-            RigelEGUI.DrawText(new Vector4(5,5, Size.X - 100, RigelEGUIStyle.Current.WinHeaderHeight), WindowTitle,RigelColor.White);
+            RigelEGUI.DrawText(new Vector4(5,5, Size.X - 100, GUIStyle.Current.WinHeaderHeight), WindowTitle,RigelColor.White);
 
             //content group
             RigelEGUI.BeginGroup(m_rectContent);
@@ -102,7 +102,7 @@ namespace RigelEditor.EGUI
             if (RigelEGUI.Event.Used) return;
             if(RigelEGUI.Event.EventType == RigelEGUIEventType.MouseDragEnter)
             {
-                if (RigelEGUI.RectContainsCheck(Position,new Vector2(Size.X,RigelEGUIStyle.Current.WinHeaderHeight), RigelEGUI.Event.Pointer))
+                if (RigelEGUI.RectContainsCheck(Position,new Vector2(Size.X,GUIStyle.Current.WinHeaderHeight), RigelEGUI.Event.Pointer))
                 {
                     m_onWindowMoveDrag = true;
                     RigelEGUI.Event.Use();

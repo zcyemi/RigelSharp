@@ -75,7 +75,7 @@ namespace RigelEditor.EGUI
         {
             var rect = new Vector4(0, 0, s_area.Z, 20);
             BeginArea(rect);
-            RigelEGUI.DrawRect(rect, RigelEGUIStyle.Current.MainMenuBGColor);
+            RigelEGUI.DrawRect(rect, GUIStyle.Current.MainMenuBGColor);
             BeginHorizontal();
         }
 
@@ -96,7 +96,7 @@ namespace RigelEditor.EGUI
             rect.X += s_area.X;
             rect.Y += s_area.Y;
 
-            var ret = RigelEGUI.Button(rect, label, RigelEGUIStyle.Current.ButtonColor, Vector4.One);
+            var ret = RigelEGUI.Button(rect, label, GUIStyle.Current.ButtonColor, Vector4.One);
 
             AutoCaculateOffsetW(50);
 

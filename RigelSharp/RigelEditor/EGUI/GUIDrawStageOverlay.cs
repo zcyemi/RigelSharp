@@ -37,6 +37,7 @@ namespace RigelEditor.EGUI
                 return;
             }
 
+
             //every draw the last one
             IGUIComponent curcomp = comp.Peek();
             if (curcomp.InitDrawed)
@@ -132,6 +133,7 @@ namespace RigelEditor.EGUI
                     m_drawTarget.bufferRect.RemoveRange(comp.BufferRectStart, comp.BufferRectCount);
                     m_drawTarget.bufferText.RemoveRange(comp.BufferTextStart, comp.BufferTextCount);
                     compstack.Pop();
+
                 }
                 else
                 {
@@ -139,7 +141,7 @@ namespace RigelEditor.EGUI
                 }
             }
 
-            
+
         }
     }
 }

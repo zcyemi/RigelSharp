@@ -31,18 +31,8 @@ namespace RigelEditor.EGUI
             m_drawTarget.bufferText.Clear();
 
 
-            GUI.DrawText(new Vector4(100, 100, 100, 20), "Test", RigelColor.White);
 
-            if (GUI.Button(new Vector4(0, 0, 100, 20), "ShowMessageBox"))
-            {
-                var msgbox = new GUIMessageBox("TestMsgBox", "test info",()=> {
-
-                    var newmsg = new GUIMessageBox("Hello", "lalala");
-                    newmsg.Show();
-                });
-                msgbox.Show();
-            }
-
+            DrawContent();
 
             m_needUpdateBuffer = true;
         }
@@ -71,6 +61,20 @@ namespace RigelEditor.EGUI
 
                 m_lastBufferSizeText = textCount;
             }
+        }
+
+
+        private static GUIMenuList m_menuList = new GUIMenuList("File");
+
+        private void DrawContent()
+        {
+            GUILayout.BeginToolBar(20);
+            GUILayout.DrawMenuList(m_menuList);
+            GUILayout.Button("bbb");
+            GUILayout.Text("HelloWorld");
+            GUILayout.Button("TestBtn");
+
+            GUILayout.EndToolBar();
         }
     }
 }

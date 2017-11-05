@@ -54,7 +54,7 @@ namespace RigelEditor.EGUI
 
         public override void Draw(RigelEGUIEvent guievent)
         {
-            //GUI.BeginGroup(new Vector4(200, 200, 500, 200), true);
+            GUI.BeginGroup(new Vector4(200, 200, 500, 200), true);
             var rect = new Vector4(0, 0, 500, 200);
             //background
             GUI.DrawRect(rect);
@@ -87,8 +87,7 @@ namespace RigelEditor.EGUI
                 Console.WriteLine(title + " cancel");
                 Distroy = true;
             }
-
-            //GUI.EndGroup();
+            GUI.EndGroup();
         }
 
         public override string ToString()
@@ -105,6 +104,43 @@ namespace RigelEditor.EGUI
         public override void Draw(RigelEGUIEvent guievent)
         {
 
+        }
+    }
+
+    public class GUIMenuList : IGUIComponent
+    {
+        private string m_label;
+        public string Label { get { return m_label; } }
+        private Vector4 m_basePos;
+
+        public GUIMenuList(string label)
+        {
+            m_label = label;
+        }
+
+        internal void InternalSetStartPos(Vector4 baseps)
+        {
+            m_basePos = baseps;
+            m_basePos.Z = 100;
+            m_basePos.W = 200;
+        }
+
+
+
+        public override void Draw(RigelEGUIEvent guievent)
+        {
+
+            GUILayout.BeginArea(m_basePos);
+            GUILayout.Button("btn1");
+            GUILayout.Button("btn2");
+
+            GUILayout.EndArea();
+
+
+            if ((guievent.EventType & RigelEGUIEventType.MouseEventActive) != 0)
+            {
+                Distroy = true;
+            }
         }
     }
 }

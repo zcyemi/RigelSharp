@@ -8,10 +8,10 @@ using SharpDX;
 
 namespace RigelEditor.EGUI
 {
-    public class RigelEGUIStyle
+    public class GUIStyle
     {
-        public static RigelEGUIStyle Current { get { return m_currentStyle; } }
-        private static RigelEGUIStyle m_currentStyle = new RigelEGUIStyle();
+        public static GUIStyle Current { get { return m_currentStyle; } }
+        private static GUIStyle m_currentStyle = new GUIStyle();
 
         public Vector4 WinBGColor = new Vector4(0.5f, 0.5f, 0.5f, 1.0f);
         public Vector4 WinBGColorFocused = new Vector4(0.6f, 0.6f, 0.6f, 1.0f);

@@ -78,6 +78,7 @@
     <Compile Include="EGUI\GUIDrawStageOverlay.cs" />
     <Compile Include="EGUI\GUIDrawStageWindows.cs" />
     <Compile Include="EGUI\GUIInternal.cs" />
+    <Compile Include="EGUI\GUITest.cs" />
     <Compile Include="EGUI\RigelEGUICtx.Main.cs" />
     <Compile Include="EGUI\RigelEGUI.cs" />
     <Compile Include="EGUI\RigelEGUIBasic.cs" />

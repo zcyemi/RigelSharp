@@ -27,7 +27,7 @@ namespace RigelEditor.EGUI
 
             s_drawStages = new List<GUIDrawStage>();
             s_drawStages.Add(new GUIDrawStageOverlay("Overlay", 1));
-            s_drawStages.Add(new GUIDrawStageMain("Main", 500));
+            s_drawStages.Add(new GUIDrawStageMain("Main", 499));
 
             s_drawStages.Sort((a, b) => { return a.Order.CompareTo(b.Order); });
         }
@@ -43,7 +43,7 @@ namespace RigelEditor.EGUI
         public static void Update(RigelEGUIEvent guievent)
         {
             //init frame
-            GUI.Context.Frame(guievent);
+            GUI.Context.Frame(guievent, s_eguictx.ClientWidth,s_eguictx.ClientHeight);
 
             foreach(var stage in s_drawStages)
             {

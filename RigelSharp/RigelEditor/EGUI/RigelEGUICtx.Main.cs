@@ -78,7 +78,7 @@ namespace RigelEditor.EGUI
             //RigelEGUILayoutTest.LayoutAreaSample();
 
             //status bar
-            RigelEGUI.DrawRect(m_mainStatusBarRect, RigelEGUIStyle.Current.MainStatusBarColor);
+            RigelEGUI.DrawRect(m_mainStatusBarRect, GUIStyle.Current.MainStatusBarColor);
         }
     }
 }
