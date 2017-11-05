@@ -76,16 +76,24 @@ namespace RigelEditor.EGUI
             if (GUI.Button(rect, buttonConfirm))
             {
                 if (m_callbackConfirm != null) m_callbackConfirm.Invoke();
+
+                Console.WriteLine(title + " confirm");
                 Distroy = true;
             }
             rect.X += 80;
             if (GUI.Button(rect, buttonCancel))
             {
                 if (m_callbackCancel != null) m_callbackCancel.Invoke();
+                Console.WriteLine(title + " cancel");
                 Distroy = true;
             }
 
             //GUI.EndGroup();
+        }
+
+        public override string ToString()
+        {
+            return "[MessageBox]" + title;
         }
     }
 

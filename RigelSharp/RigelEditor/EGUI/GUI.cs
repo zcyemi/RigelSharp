@@ -73,6 +73,8 @@ namespace RigelEditor.EGUI
 
         private static float s_depthz;
 
+        public static float Depth { get { return s_depthz; } }
+
         public static void BeginGroup(Vector4 position,bool absulate = false)
         {
 
@@ -286,6 +288,10 @@ namespace RigelEditor.EGUI
             if (point.X < rect.X || point.X > rect.X + rect.Z) return false;
             if (point.Y < rect.Y || point.Y > rect.Y + rect.W) return false;
             return true;
+        }
+        internal static void SetDepth(float depth)
+        {
+            s_depthz = depth;
         }
         #endregion
     }

@@ -32,7 +32,10 @@ namespace RigelEditor.EGUI
             //do draw
             m_needSyncBuffer = false;
             var comp = GUI.Context.componentStack;
-            if (comp.Count == 0) return;
+            if (comp.Count == 0)
+            {
+                return;
+            }
 
             //every draw the last one
             IGUIComponent curcomp = comp.Peek();
@@ -42,8 +45,25 @@ namespace RigelEditor.EGUI
                 m_drawTarget.bufferText.RemoveRange(curcomp.BufferTextStart, curcomp.BufferTextCount);
             }
 
-            curcomp.BufferRectStart = m_drawTarget.bufferRect.Count;
-            curcomp.BufferTextStart = m_drawTarget.bufferText.Count;
+            int rectCount = m_drawTarget.bufferRect.Count;
+            int textCount = m_drawTarget.bufferText.Count;
+            curcomp.BufferRectStart = rectCount;
+            curcomp.BufferTextStart = textCount;
+
+            //get relative depth;
+            if(comp.Count > 1)
+            {
+                float lastDepth = GUI.Depth;
+                if(m_drawTarget.bufferRect.Count > 0)
+                {
+                    lastDepth = Math.Min(lastDepth,m_drawTarget.bufferRect[rectCount - 1].Position.Z);
+                }
+                if(m_drawTarget.bufferText.Count > 0)
+                {
+                    lastDepth = Math.Min(lastDepth, m_drawTarget.bufferText[textCount - 1].Position.Z);
+                }
+                GUI.SetDepth(lastDepth);
+            }
 
             curcomp.Draw(guievent);
             guievent.Use();
@@ -57,10 +77,20 @@ namespace RigelEditor.EGUI
 
         public override void SyncBuffer(RigelEGUICtx eguictx)
         {
-            if (!m_needSyncBuffer) return;
-
-
             var bind = eguictx.GraphicsBind;
+
+            if (!m_needSyncBuffer)
+            {
+                if (GUI.Context.componentStack.Count == 0 && (m_lastBufferSizeText != 0 || m_lastBufferSizeRect != 0))
+                {
+                    m_lastBufferSizeText = 0;
+                    m_lastBufferSizeRect = 0;
+                    bind.NeedRebuildCommandList = true;
+
+                }
+                return;
+            }
+
             {
                 var rectCount = m_drawTarget.bufferRect.Count;
                 if(rectCount != 0)
@@ -92,13 +122,24 @@ namespace RigelEditor.EGUI
             }
 
             //remove bufferdata
-            var comp = GUI.Context.componentStack.Peek();
-            if (comp.Distroy)
+            var compstack = GUI.Context.componentStack;
+            while (true)
             {
-                m_drawTarget.bufferRect.RemoveRange(comp.BufferRectStart, comp.BufferRectCount);
-                m_drawTarget.bufferText.RemoveRange(comp.BufferTextStart, comp.BufferTextCount);
-                GUI.Context.componentStack.Pop();
+                if (compstack.Count == 0) break;
+                var comp = compstack.Peek();
+                if (comp.Distroy)
+                {
+                    m_drawTarget.bufferRect.RemoveRange(comp.BufferRectStart, comp.BufferRectCount);
+                    m_drawTarget.bufferText.RemoveRange(comp.BufferTextStart, comp.BufferTextCount);
+                    compstack.Pop();
+                }
+                else
+                {
+                    break;
+                }
             }
+
+            
         }
     }
 }
