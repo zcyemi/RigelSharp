@@ -17,7 +17,12 @@ namespace RigelEditor.EGUI
         private int m_lastBufferSizeText = 0;
 
 
-        private static GUIMenuList m_menuList;
+        private GUIMenuList m_menuList;
+
+        //dock
+        private GUIDockManager m_dockManager;
+        private Vector4 m_dockArea;
+
         public GUIDrawStageMain(string stagename, int order = 0) : base(stagename, order)
         {
             m_menuList = new GUIMenuList("File");
@@ -25,6 +30,8 @@ namespace RigelEditor.EGUI
             m_menuList.AddMenuItem("File/Test2");
             m_menuList.AddMenuItem("Open/Sln");
             m_menuList.AddMenuItem("Exit");
+
+            m_dockManager = new GUIDockManager();
         }
 
         public override void Draw(RigelEGUIEvent guievent)
@@ -36,7 +43,6 @@ namespace RigelEditor.EGUI
 
             m_drawTarget.bufferRect.Clear();
             m_drawTarget.bufferText.Clear();
-
 
 
             DrawContent();
@@ -80,8 +86,12 @@ namespace RigelEditor.EGUI
             GUILayout.Button("bbb");
             GUILayout.Text("HelloWorld");
             GUILayout.Button("TestBtn");
-
             GUILayout.EndToolBar();
+
+            m_dockArea = GUI.Context.currentArea;
+            m_dockArea.Y += 20;
+            m_dockArea.W -= 20;
+            m_dockManager.Update(m_dockArea);
         }
     }
 }
