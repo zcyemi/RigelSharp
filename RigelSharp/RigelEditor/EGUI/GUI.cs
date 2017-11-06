@@ -125,11 +125,14 @@ namespace RigelEditor.EGUI
         private static float s_depthz;
         public static float Depth { get { return s_depthz; } }
 
-        public static void BeginGroup(Vector4 rect,bool absulate = false)
+        public static void BeginGroup(Vector4 rect,Vector4? color = null, bool absulate = false)
         {
+           
+
             var groupStack = s_ctx.groupStack;
             if (absulate)
             {
+                if (color != null) DrawRect(rect, (Vector4)color,true);
                 s_ctx.currentRect = rect;
                 groupStack.Push(rect);
             }
@@ -143,6 +146,7 @@ namespace RigelEditor.EGUI
                 rect.Z = MathUtil.Clamp(rect.Z, 0, root.Z - rect.X);
                 rect.W = MathUtil.Clamp(rect.W, 0, root.W - rect.Y);
 
+                if (color != null) DrawRect(rect, (Vector4)color);
                 s_ctx.currentRect = rect;
                 groupStack.Push(rect);
             }
@@ -248,9 +252,9 @@ namespace RigelEditor.EGUI
             DrawRect(rect, Context.backgroundColor);
         }
 
-        public static void DrawRect(Vector4 rect,Vector4 color)
+        public static void DrawRect(Vector4 rect,Vector4 color,bool absulate = false)
         {
-            var valid = RectClip(ref rect, s_ctx.currentRect);
+            var valid = RectClip(ref rect, absulate? s_ctx.baseRect: s_ctx.currentRect);
             if (!valid) return;
 
             BufferRect.Add(new RigelEGUIVertex()
@@ -380,9 +384,12 @@ namespace RigelEditor.EGUI
         public static int layoutOffX = 1;
         public static int layoutOffY = 1;
 
-        public static void BeginArea(Vector4 rect)
+        public static void BeginArea(Vector4 rect,Vector4? color = null)
         {
-
+            if(color != null)
+            {
+                GUI.DrawRect(rect, (Vector4)color);
+            }
             s_ctx.areaStack.Push(s_ctx.currentArea);
             s_ctx.currentArea = rect;
 

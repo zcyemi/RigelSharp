@@ -81,17 +81,38 @@ namespace RigelEditor.EGUI
 
         private void DrawContent()
         {
-            GUILayout.BeginToolBar(20);
-            GUILayout.DrawMenuList(m_menuList);
-            GUILayout.Button("bbb");
-            GUILayout.Text("HelloWorld");
-            GUILayout.Button("TestBtn");
-            GUILayout.EndToolBar();
+            //GUILayout.BeginToolBar(20);
+            //GUILayout.DrawMenuList(m_menuList);
+            //GUILayout.Button("bbb");
+            //GUILayout.Text("HelloWorld");
+            //GUILayout.Button("TestBtn");
+            //GUILayout.EndToolBar();
 
-            m_dockArea = GUI.Context.currentArea;
-            m_dockArea.Y += 20;
-            m_dockArea.W -= 20;
-            m_dockManager.Update(m_dockArea);
+            //m_dockArea = GUI.Context.currentArea;
+            //m_dockArea.Y += 20;
+            //m_dockArea.W -= 20;
+            //m_dockManager.Update(m_dockArea);
+
+            var narea = GUI.Context.currentArea;
+            narea.Y = 20;
+            narea.W -= 20;
+
+            var ngroup = GUI.Context.currentRect;
+            ngroup.Y = 20;
+            ngroup.W -= 20;
+            GUI.BeginGroup(ngroup, RigelColor.Random());
+            GUILayout.BeginArea(narea);
+
+            GUILayout.Button("BtnArea");
+
+            //GUI.Button(new Vector4(100, 0, 100, 20), "BtnGroup");
+
+
+            GUILayout.EndArea();
+            GUI.EndGroup();
+
+            
+
         }
     }
 }

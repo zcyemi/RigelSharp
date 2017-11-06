@@ -56,7 +56,7 @@ namespace RigelEditor.EGUI
 
         public override void Draw(RigelEGUIEvent guievent)
         {
-            GUI.BeginGroup(new Vector4(200, 200, 500, 200), true);
+            GUI.BeginGroup(new Vector4(200, 200, 500, 200), null,true);
             var rect = new Vector4(0, 0, 500, 200);
             //background
             GUI.DrawRect(rect);

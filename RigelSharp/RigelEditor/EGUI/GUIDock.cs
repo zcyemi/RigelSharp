@@ -27,8 +27,8 @@ namespace RigelEditor.EGUI
             m_size = size;
 
             //GUI.BeginGroup(size);
-            //var rect = size;
-            //GUI.DrawRect(rect, m_color);
+            ////var rect = size;
+            ////GUI.DrawRect(rect, m_color);
 
             //GUILayout.Text("dock");
 
