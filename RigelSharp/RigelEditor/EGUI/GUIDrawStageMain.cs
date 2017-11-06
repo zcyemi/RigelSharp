@@ -21,7 +21,7 @@ namespace RigelEditor.EGUI
 
         //dock
         private GUIDockManager m_dockManager;
-        private Vector4 m_dockArea;
+        private Vector4 m_dockGroup;
 
         public GUIDrawStageMain(string stagename, int order = 0) : base(stagename, order)
         {
@@ -88,45 +88,10 @@ namespace RigelEditor.EGUI
             GUILayout.Button("TestBtn");
             GUILayout.EndToolBar();
 
-            //m_dockArea = GUI.Context.currentArea;
-            //m_dockArea.Y += 20;
-            //m_dockArea.W -= 20;
-            //m_dockManager.Update(m_dockArea);
-
-            var narea = GUI.Context.currentArea;
-            narea.Y = 20;
-            narea.W -= 20;
-
-            var ngroup = GUI.Context.currentRect;
-            ngroup.Y = 20;
-            ngroup.W -= 20;
-            GUI.BeginGroup(ngroup, RigelColor.Random());
-            GUILayout.BeginArea(narea);
-
-            GUILayout.Button("BtnArea");
-
-            GUI.Button(new Vector4(100, 0, 100, 20), "BtnGroup");
-
-            GUI.BeginGroup(new Vector4(100, 100, 100, 100), RigelColor.Random());
-
-            GUILayout.Button("BtnAra2");
-            GUI.Button(new Vector4(0, 0, 100, 20), "BtnGroup2");
-            GUI.EndGroup();
-
-            GUILayout.BeginArea(new Vector4(200, 100, 100, 200), RigelColor.Random());
-            GUILayout.BeginToolBar(20);
-            GUILayout.DrawMenuList(m_menuList);
-            GUILayout.Text("Thisisatoolbar");
-            GUILayout.EndToolBar();
-
-            GUILayout.EndArea();
-
-
-            GUILayout.EndArea();
-            GUI.EndGroup();
-
-            
-
+            m_dockGroup = GUI.Context.currentGroup;
+            m_dockGroup.Y = 20;
+            m_dockGroup.W -= 20;
+            m_dockManager.Update(m_dockGroup);
         }
     }
 }

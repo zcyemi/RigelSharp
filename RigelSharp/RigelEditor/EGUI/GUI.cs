@@ -13,12 +13,25 @@ namespace RigelEditor.EGUI
         public Vector4 color = RigelColor.White;
         public Vector4 backgroundColor = RigelColor.RGBA(128, 128, 128, 255);
 
+        /// <summary>
+        /// groupStack contains currentGroup
+        /// </summary>
         public Stack<Vector4> groupStack = new Stack<Vector4>();
         public Vector4 baseRect;
-        public Vector4 currentRect;
+        /// <summary>
+        /// relative to parent group
+        /// </summary>
+        public Vector4 currentGroup;
+        /// <summary>
+        /// relative to baseRect
+        /// </summary>
+        public Vector4 currentGroupAbsolute;
 
         public Stack<Vector4> areaStack = new Stack<Vector4>();
         public Stack<GUILayoutInfo> layoutStack = new Stack<GUILayoutInfo>();
+        /// <summary>
+        /// relative to baseRect
+        /// </summary>
         public Vector4 currentArea;
         public GUILayoutInfo currentLayout;
         public Vector4 GetNextDrawPos()
@@ -49,7 +62,8 @@ namespace RigelEditor.EGUI
 
             GUI.Event = guievent;
             baseRect = new Vector4(0, 0, width, height);
-            currentRect = baseRect;
+            currentGroup = baseRect;
+            currentGroupAbsolute = baseRect;
 
             //layout
             currentLayout.Offset = Vector2.Zero;
@@ -127,18 +141,17 @@ namespace RigelEditor.EGUI
 
         public static void BeginGroup(Vector4 rect,Vector4? color = null, bool absolute = false)
         {
-           
-
             var groupStack = s_ctx.groupStack;
             if (absolute)
             {
                 if (color != null) DrawRect(rect, (Vector4)color,true);
-                s_ctx.currentRect = rect;
+                s_ctx.currentGroup = rect;
+                s_ctx.currentGroupAbsolute = rect;
                 groupStack.Push(rect);
             }
             else
             {
-                Vector4 root = s_ctx.currentRect;
+                Vector4 root = s_ctx.currentGroup;
                 
                 rect.X = MathUtil.Clamp(rect.X, 0, root.Z);
                 rect.Y = MathUtil.Clamp(rect.Y, 0, root.W);
@@ -147,7 +160,15 @@ namespace RigelEditor.EGUI
                 rect.W = MathUtil.Clamp(rect.W, 0, root.W - rect.Y);
 
                 if (color != null) DrawRect(rect, (Vector4)color);
-                s_ctx.currentRect = rect;
+                s_ctx.currentGroup = rect;
+
+                var groupab = s_ctx.currentGroupAbsolute;
+                groupab.X += rect.X;
+                groupab.Y += rect.Y;
+                groupab.Z = rect.Z;
+                groupab.W = rect.W;
+                s_ctx.currentGroupAbsolute = groupab;
+
                 groupStack.Push(rect);
             }
         }
@@ -156,8 +177,16 @@ namespace RigelEditor.EGUI
         {
             var groupStack = s_ctx.groupStack;
             RigelUtility.Assert(groupStack.Count > 0);
-            groupStack.Pop();
-            s_ctx.currentRect = groupStack.Count == 0? s_ctx.baseRect: groupStack.Peek();
+            var curGroup = groupStack.Pop();
+            s_ctx.currentGroup = groupStack.Count == 0? s_ctx.baseRect: groupStack.Peek();
+
+            var groupab = s_ctx.currentGroupAbsolute;
+            groupab.X -= curGroup.X;
+            groupab.Y -= curGroup.Y;
+            groupab.Z = s_ctx.currentGroup.Z;
+            groupab.W = s_ctx.currentGroup.W;
+
+            s_ctx.currentGroupAbsolute = groupab;
         }
 
         public static bool Button(Vector4 rect, string label,bool absolute = false)
@@ -174,8 +203,8 @@ namespace RigelEditor.EGUI
 
             if (!absolute)
             {
-                rect.X += s_ctx.currentRect.X;
-                rect.Y += s_ctx.currentRect.Y;
+                rect.X += s_ctx.currentGroup.X;
+                rect.Y += s_ctx.currentGroup.Y;
             }
             
             if (GUIUtility.RectContainsCheck(rect, Event.Pointer))
@@ -193,7 +222,7 @@ namespace RigelEditor.EGUI
 
         public static int DrawText(Vector4 rect, string content, Vector4 color,bool absolute = false)
         {
-            GUIUtility.RectClip(ref rect, absolute? s_ctx.baseRect: s_ctx.currentRect);
+            GUIUtility.RectClip(ref rect, absolute? s_ctx.baseRect: s_ctx.currentGroupAbsolute);
             var w = 0;
             foreach (var c in content)
             {
@@ -258,7 +287,7 @@ namespace RigelEditor.EGUI
 
         public static void DrawRect(Vector4 rect,Vector4 color,bool absolute = false)
         {
-            var valid = GUIUtility.RectClip(ref rect, absolute? s_ctx.baseRect: s_ctx.currentRect);
+            var valid = GUIUtility.RectClip(ref rect, absolute? s_ctx.baseRect: s_ctx.currentGroupAbsolute);
             if (!valid) return;
 
             BufferRect.Add(new RigelEGUIVertex()

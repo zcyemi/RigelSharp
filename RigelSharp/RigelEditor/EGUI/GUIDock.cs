@@ -26,13 +26,16 @@ namespace RigelEditor.EGUI
         {
             m_size = size;
 
-            //GUI.BeginGroup(size);
-            ////var rect = size;
-            ////GUI.DrawRect(rect, m_color);
+            GUI.BeginGroup(size, RigelColor.Random());
+            GUI.Label(new Vector4(0, 0, 100, 20), "Group");
+            //GUILayout.BeginArea(GUI.Context.currentGroup, );
+            //var rect = size;
+            //GUI.DrawRect(rect, m_color);
 
             //GUILayout.Text("dock");
 
-            //GUI.EndGroup();
+            //GUILayout.EndArea();
+            GUI.EndGroup();
         }
     }
 
@@ -123,16 +126,11 @@ namespace RigelEditor.EGUI
             m_maingroup.AddDock(new GUIDock());
         }
 
-        public void Update(Vector4 arearect)
+        public void Update(Vector4 group)
         {
-            GUI.BeginGroup(arearect);
-            //GUILayout.BeginArea(arearect);
-            GUILayout.SetLineHeight(20);
+            GUI.BeginGroup(group,RigelColor.Random());
+            m_maingroup.Draw(group);
 
-            m_maingroup.Draw(arearect);
-
-            GUILayout.RestoreLineHeight();
-            //GUILayout.EndArea();
             GUI.EndGroup();
         }
     }
