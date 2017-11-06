@@ -125,12 +125,12 @@ namespace RigelEditor.EGUI
         private static float s_depthz;
         public static float Depth { get { return s_depthz; } }
 
-        public static void BeginGroup(Vector4 rect,Vector4? color = null, bool absulate = false)
+        public static void BeginGroup(Vector4 rect,Vector4? color = null, bool absolute = false)
         {
            
 
             var groupStack = s_ctx.groupStack;
-            if (absulate)
+            if (absolute)
             {
                 if (color != null) DrawRect(rect, (Vector4)color,true);
                 s_ctx.currentRect = rect;
@@ -160,21 +160,25 @@ namespace RigelEditor.EGUI
             s_ctx.currentRect = groupStack.Count == 0? s_ctx.baseRect: groupStack.Peek();
         }
 
-        public static bool Button(Vector4 rect, string label)
+        public static bool Button(Vector4 rect, string label,bool absolute = false)
         {
-            return Button(rect, label, Context.color, Context.backgroundColor);
+            return Button(rect, label, Context.color, Context.backgroundColor, absolute);
         }
 
-        public static bool Button(Vector4 rect,string label,Vector4 color,Vector4 texcolor)
+        public static bool Button(Vector4 rect,string label,Vector4 color,Vector4 texcolor,bool absolute = false)
         {
-            DrawRect(rect, color);
-            DrawText(rect, label, texcolor);
+            DrawRect(rect, color,absolute);
+            DrawText(rect, label, texcolor,absolute);
             if (Event.Used) return false;
             if (Event.EventType != RigelEGUIEventType.MouseClick) return false;
 
-            rect.X += s_ctx.currentRect.X;
-            rect.Y += s_ctx.currentRect.Y;
-            if (RectContainsCheck(rect, Event.Pointer))
+            if (!absolute)
+            {
+                rect.X += s_ctx.currentRect.X;
+                rect.Y += s_ctx.currentRect.Y;
+            }
+            
+            if (GUIUtility.RectContainsCheck(rect, Event.Pointer))
             {
                 Event.Use();
                 return true;
@@ -182,14 +186,14 @@ namespace RigelEditor.EGUI
             return false;
         }
 
-        public static void Label(Vector4 position,string text)
+        public static void Label(Vector4 position,string text,bool absolute = false)
         {
-            DrawText(position, text, Context.color);
+            DrawText(position, text, Context.color, absolute);
         }
 
-        public static int DrawText(Vector4 rect, string content, Vector4 color)
+        public static int DrawText(Vector4 rect, string content, Vector4 color,bool absolute = false)
         {
-            RectClip(ref rect, s_ctx.currentRect);
+            GUIUtility.RectClip(ref rect, absolute? s_ctx.baseRect: s_ctx.currentRect);
             var w = 0;
             foreach (var c in content)
             {
@@ -247,14 +251,14 @@ namespace RigelEditor.EGUI
             return value;
         }
 
-        public static void DrawRect(Vector4 rect)
+        public static void DrawRect(Vector4 rect,bool absolute = false)
         {
-            DrawRect(rect, Context.backgroundColor);
+            DrawRect(rect, Context.backgroundColor,absolute);
         }
 
-        public static void DrawRect(Vector4 rect,Vector4 color,bool absulate = false)
+        public static void DrawRect(Vector4 rect,Vector4 color,bool absolute = false)
         {
-            var valid = RectClip(ref rect, absulate? s_ctx.baseRect: s_ctx.currentRect);
+            var valid = GUIUtility.RectClip(ref rect, absolute? s_ctx.baseRect: s_ctx.currentRect);
             if (!valid) return;
 
             BufferRect.Add(new RigelEGUIVertex()
@@ -335,34 +339,6 @@ namespace RigelEditor.EGUI
             s_depthz -= Context.s_depthStep;
         }
 
-        internal static bool RectClip(ref Vector4 rect, Vector4 group)
-        {
-            rect.X = MathUtil.Clamp(rect.X, 0, group.Z);
-            rect.Y = MathUtil.Clamp(rect.Y, 0, group.W);
-
-            rect.Z = MathUtil.Clamp(rect.Z, 0, group.Z - rect.X);
-            rect.W = MathUtil.Clamp(rect.W, 0, group.W - rect.Y);
-
-            rect.X += group.X;
-            rect.Y += group.Y;
-
-            if (rect.Z < 1.0f || rect.W < 1.0f) return false;
-            return true;
-        }
-
-        internal static bool RectContainsCheck(Vector2 pos, Vector2 size, Vector2 point)
-        {
-            if (point.X < pos.X || point.X > pos.X + size.X) return false;
-            if (point.Y < pos.Y || point.Y > pos.Y + size.Y) return false;
-            return true;
-        }
-
-        internal static bool RectContainsCheck(Vector4 rect, Vector2 point)
-        {
-            if (point.X < rect.X || point.X > rect.X + rect.Z) return false;
-            if (point.Y < rect.Y || point.Y > rect.Y + rect.W) return false;
-            return true;
-        }
         internal static void SetDepth(float depth)
         {
             s_depthz = depth;
@@ -384,6 +360,11 @@ namespace RigelEditor.EGUI
         public static int layoutOffX = 1;
         public static int layoutOffY = 1;
 
+        /// <summary>
+        /// area always absolute to the baseRect
+        /// </summary>
+        /// <param name="rect"></param>
+        /// <param name="color"></param>
         public static void BeginArea(Vector4 rect,Vector4? color = null)
         {
             if(color != null)
@@ -509,10 +490,8 @@ namespace RigelEditor.EGUI
         {
             var curarea = s_ctx.currentArea;
             var rect = new Vector4(s_ctx.currentLayout.Offset, 50f, s_svLineHeight.Value);
-            rect.X += curarea.X;
-            rect.Y += curarea.Y;
-
-            var ret = GUI.Button(rect, label);
+            GUIUtility.RectClip(ref rect, curarea);
+            var ret = GUI.Button(rect, label,true);
             AutoCaculateOffsetW(50);
 
             return ret;
@@ -522,9 +501,9 @@ namespace RigelEditor.EGUI
         public static void Text(string content)
         {
             var rect = new Vector4(s_ctx.currentLayout.Offset, 400, s_svLineHeight.Value);
-            rect.X += s_ctx.currentArea.X;
-            rect.Y += s_ctx.currentArea.Y;
-            var width = GUI.DrawText(rect, content, s_ctx.color);
+            var curarea = s_ctx.currentArea;
+            GUIUtility.RectClip(ref rect, curarea);
+            var width = GUI.DrawText(rect, content, s_ctx.color,true);
 
             AutoCaculateOffsetW(width);
         }
@@ -532,8 +511,8 @@ namespace RigelEditor.EGUI
         public static void BeginToolBar(int height)
         {
             SetLineHeight(height);
-            var rect = new Vector4(0, 0, s_ctx.currentArea.Z, height);
-            GUI.DrawRect(rect, GUIStyle.Current.MainMenuBGColor);
+            var rect = new Vector4(s_ctx.currentLayout.Offset, s_ctx.currentArea.Z, height);
+            DrawRect(rect, GUIStyle.Current.MainMenuBGColor);
             BeginHorizontal();
 
         }
@@ -566,8 +545,8 @@ namespace RigelEditor.EGUI
 
         public static void DrawRect(Vector4 rect,Vector4 color)
         {
-            GUI.RectClip(ref rect, s_ctx.currentArea);
-            GUI.DrawRect(rect, color);
+            GUIUtility.RectClip(ref rect, s_ctx.currentArea);
+            GUI.DrawRect(rect, color,true);
         }
 
     }

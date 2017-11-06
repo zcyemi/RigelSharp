@@ -80,6 +80,7 @@
     <Compile Include="EGUI\GUIDrawStageWindows.cs" />
     <Compile Include="EGUI\GUIInternal.cs" />
     <Compile Include="EGUI\GUITest.cs" />
+    <Compile Include="EGUI\GUIUtility.cs" />
     <Compile Include="EGUI\GUIWindow.cs" />
     <Compile Include="EGUI\RigelEGUICtx.Main.cs" />
     <Compile Include="EGUI\RigelEGUI.cs" />

@@ -22,4 +22,42 @@ namespace RigelEditor.EGUI
         }
 
     }
+
+
+    public class GUITestLayout
+    {
+        public static void Sample_GroupMixedWithArea()
+        {
+            var narea = GUI.Context.currentArea;
+            narea.Y = 20;
+            narea.W -= 20;
+
+            var ngroup = GUI.Context.currentRect;
+            ngroup.Y = 20;
+            ngroup.W -= 20;
+            GUI.BeginGroup(ngroup, RigelColor.Random());
+            GUILayout.BeginArea(narea);
+
+            GUILayout.Button("BtnArea");
+
+            GUI.Button(new Vector4(100, 0, 100, 20), "BtnGroup");
+
+            GUI.BeginGroup(new Vector4(100, 100, 100, 100), RigelColor.Random());
+
+            GUILayout.Button("BtnAra2");
+            GUI.Button(new Vector4(0, 0, 100, 20), "BtnGroup2");
+            GUI.EndGroup();
+
+            GUILayout.BeginArea(new Vector4(200, 100, 100, 200), RigelColor.Random());
+            GUILayout.BeginToolBar(20);
+            GUILayout.Text("Thisisatoolbar");
+            GUILayout.EndToolBar();
+
+            GUILayout.EndArea();
+
+
+            GUILayout.EndArea();
+            GUI.EndGroup();
+        }
+    }
 }
