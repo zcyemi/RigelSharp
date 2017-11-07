@@ -13,28 +13,25 @@ namespace RigelEditor.EGUI
     {
         public Vector4 m_size = new Vector4(0,0,100, 100);
         public abstract void Draw(Vector4 rect);
+        public GUIDockGroup m_parent;
     }
 
     public class GUIDock : GUIDockBase
     {
         public object m_target;
-        public GUIDockGroup m_parent;
+        
 
         private Vector4 m_color = RigelColor.Random();
 
-        public override void Draw(Vector4 size)
+        public override void Draw(Vector4 rect)
         {
-            m_size = size;
+            m_size = rect;
 
-            GUI.BeginGroup(size, RigelColor.Random());
+            GUI.BeginGroup(rect);
+            var contentRect = new Vector4(1, 1, m_size.Z - 1, m_size.W - 1);
+            GUI.DrawRect(contentRect, GUIStyle.Current.DockBGColor);
+
             GUI.Label(new Vector4(0, 0, 100, 20), "Group");
-            //GUILayout.BeginArea(GUI.Context.currentGroup, );
-            //var rect = size;
-            //GUI.DrawRect(rect, m_color);
-
-            //GUILayout.Text("dock");
-
-            //GUILayout.EndArea();
             GUI.EndGroup();
         }
     }
@@ -58,7 +55,9 @@ namespace RigelEditor.EGUI
         public override void Draw(Vector4 size)
         {
             m_size = size;
+            GUI.BeginGroup(m_size);
             ReiszeChild();
+            GUI.EndGroup();
         }
 
         private void ReiszeChild()
@@ -106,9 +105,10 @@ namespace RigelEditor.EGUI
             }
         }
 
-        public void AddDock(GUIDock dock)
+        public void AddDock(GUIDockBase dock)
         {
             m_children.Add(dock);
+            dock.m_parent = this;
         }
 
     }
@@ -122,13 +122,22 @@ namespace RigelEditor.EGUI
         public GUIDockManager()
         {
             m_maingroup = new GUIDockGroup();
+
+            var group1 = new GUIDockGroup();
+            group1.m_orient = GUIDockGroup.GUIDockOrient.Vertical;
+            group1.AddDock(new GUIDock());
+            group1.AddDock(new GUIDock());
+            group1.AddDock(new GUIDock());
             m_maingroup.AddDock(new GUIDock());
+            m_maingroup.AddDock(group1);
             m_maingroup.AddDock(new GUIDock());
         }
 
         public void Update(Vector4 group)
         {
-            GUI.BeginGroup(group,RigelColor.Random());
+            GUI.BeginGroup(group,GUIStyle.Current.BorderColor);
+            group.X = 0;
+            group.Y = 0;
             m_maingroup.Draw(group);
 
             GUI.EndGroup();

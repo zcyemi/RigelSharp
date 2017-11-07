@@ -44,5 +44,16 @@ namespace RigelEditor.EGUI
             if (point.Y < rect.Y || point.Y > rect.Y + rect.W) return false;
             return true;
         }
+
+
+        public static Vector4 Padding(this Vector4 v,float offset)
+        {
+            v.X += offset;
+            v.Y += offset;
+            v.Z -= offset;
+            v.W -= offset;
+
+            return v;
+        }
     }
 }
