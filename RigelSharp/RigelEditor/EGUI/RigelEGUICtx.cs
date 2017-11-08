@@ -37,6 +37,7 @@ namespace RigelEditor.EGUI
 
         public RigelEGUICtx(RenderForm form,RigelGraphics graphics)
         {
+
             //basis
             m_form = form;
             m_graphicsBind = new RigelEGUIGraphicsBind(graphics);

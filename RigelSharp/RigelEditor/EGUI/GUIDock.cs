@@ -9,11 +9,38 @@ using SharpDX;
 namespace RigelEditor.EGUI
 {
 
-    public abstract class GUIDockBase
+    public abstract class GUIDockBase: IGUIDockObj
     {
         public Vector4 m_size = new Vector4(0,0,100, 100);
+        public Vector4 m_contentRect;
         public abstract void Draw(Vector4 rect);
         public GUIDockGroup m_parent;
+    }
+
+    public interface IGUIDockObj
+    {
+         void Draw(Vector4 rect);
+    }
+
+    public class GUIDockSeparator: IGUIDockObj
+    {
+        public GUIDockGroup m_parent;
+
+        private Vector4 m_rect;
+        public void Draw(Vector4 rect)
+        {
+            m_rect = rect;
+            GUI.DrawRect(rect, RigelColor.Red);
+
+            CheckDrag();
+        }
+
+        private void CheckDrag()
+        {
+            if (GUI.Event.Used) return;
+            var e = GUI.Event;
+
+        }
     }
 
     public class GUIDock : GUIDockBase
@@ -26,12 +53,19 @@ namespace RigelEditor.EGUI
         public override void Draw(Vector4 rect)
         {
             m_size = rect;
+            m_contentRect = m_size;
+            m_contentRect = m_contentRect.Padding(1);
 
-            GUI.BeginGroup(rect);
-            var contentRect = new Vector4(1, 1, m_size.Z - 1, m_size.W - 1);
-            GUI.DrawRect(contentRect, GUIStyle.Current.DockBGColor);
+            GUI.BeginGroup(m_contentRect, GUIStyle.Current.DockBGColor);
+            GUILayout.BeginArea(GUI.Context.currentGroupAbsolute);
 
             GUI.Label(new Vector4(0, 0, 100, 20), "Group");
+
+            GUILayout.Space(20);
+            GUILayout.Button("Test");
+
+
+            GUILayout.EndArea();
             GUI.EndGroup();
         }
     }
@@ -44,7 +78,7 @@ namespace RigelEditor.EGUI
             Vertical
         };
 
-        public List<GUIDockBase> m_children = new List<GUIDockBase>();
+        public List<IGUIDockObj> m_children = new List<IGUIDockObj>();
         public GUIDockOrient m_orient = GUIDockOrient.Horizontal;
 
         public GUIDockGroup()
@@ -66,13 +100,16 @@ namespace RigelEditor.EGUI
             float stepSize = 0;
             foreach(var c in m_children)
             {
+                if (c is GUIDockSeparator) continue;
+
+                var dock = c as GUIDockBase;
                 if(m_orient == GUIDockOrient.Horizontal)
                 {
-                    stotal += c.m_size.Z;
+                    stotal += dock.m_size.Z;
                 }
                 else
                 {
-                    stotal += c.m_size.W;
+                    stotal += dock.m_size.W;
                 }
             }
 
@@ -88,25 +125,61 @@ namespace RigelEditor.EGUI
                 stepSize = m_size.W / stotal;
             }
 
+            int count = 0;
+            int total = m_children.Count;
             foreach(var c in m_children)
             {
-                if (m_orient == GUIDockOrient.Horizontal)
+                if(c is GUIDockBase)
                 {
-                    crect.Z =c.m_size.Z * stepSize;
-                    c.Draw(crect);
-                    crect.X += c.m_size.Z;
+                    var dock = c as GUIDockBase;
+
+                    if (m_orient == GUIDockOrient.Horizontal)
+                    {
+                        crect.Z = dock.m_size.Z * stepSize;
+                        dock.Draw(crect);
+                        crect.X += dock.m_size.Z;
+                    }
+                    else
+                    {
+                        crect.W = dock.m_size.W * stepSize;
+                        dock.Draw(crect);
+                        crect.Y += dock.m_size.W;
+                    }
                 }
                 else
                 {
-                    crect.W = c.m_size.W * stepSize;
-                    c.Draw(crect);
-                    crect.Y += c.m_size.W;
+                    //seperator
+                    if (count < total - 1)
+                    {
+                        if (m_orient == GUIDockOrient.Horizontal)
+                        {
+                            crect.X -= 1;
+                            crect.Z = 2;
+                            c.Draw(crect);
+                            crect.X += 1;
+                        }
+                        else
+                        {
+                            crect.Y -= 1;
+                            crect.W = 2;
+                            c.Draw(crect);
+                            crect.Y += 1;
+                        }
+                    }
                 }
+
+                count++;
             }
         }
 
         public void AddDock(GUIDockBase dock)
         {
+            if(m_children.Count != 0)
+            {
+                var sep = new GUIDockSeparator();
+                sep.m_parent = this;
+                m_children.Add(sep);
+            }
             m_children.Add(dock);
             dock.m_parent = this;
         }
