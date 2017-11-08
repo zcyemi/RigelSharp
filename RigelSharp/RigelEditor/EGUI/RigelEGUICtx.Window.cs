@@ -175,9 +175,7 @@ namespace RigelEditor.EGUI
                 win.OnGUI();
                 InternalEndWindow();
             }
-
         }
-
 
         private void InternalBeginWindow(RigelEGUIWindow win)
         {
@@ -192,7 +190,6 @@ namespace RigelEditor.EGUI
             var curwin = RigelEGUI.CurrentWindow;
             RigelEGUI.InternalWindowEnd();
 
-
             //applytobuffer
             m_bufferRectEmptyBlock |= m_graphicsBind.BufferVertexRect.UpdateGUIWindowBuffer(ref curwin.BufferInfoRect, BufferRect);
             m_bufferTextEmptyBlock |= m_graphicsBind.BufferVertexText.UpdateGUIWindowBuffer(ref curwin.BufferInfoText, BufferText);
@@ -203,9 +200,6 @@ namespace RigelEditor.EGUI
 
             m_graphicsBind.NeedRebuildCommandList = true;
         }
-
-
-        
 
         private int GetMaxWindowOrder()
         {

@@ -12,6 +12,7 @@ namespace RigelEditor.EGUI
     public abstract class GUIDockBase: IGUIDockObj
     {
         public Vector4 m_size = new Vector4(0,0,100, 100);
+        public Vector4? m_sizeNext = null;
         public Vector4 m_contentRect;
         public abstract void Draw(Vector4 rect);
         public GUIDockGroup m_parent;
@@ -25,13 +26,25 @@ namespace RigelEditor.EGUI
     public class GUIDockSeparator: IGUIDockObj
     {
         public GUIDockGroup m_parent;
+        private bool m_ondrag = false;
 
         private Vector4 m_rect;
+        private Vector4 m_rectab;
         public void Draw(Vector4 rect)
         {
             m_rect = rect;
-            GUI.DrawRect(rect, RigelColor.Red);
-
+            m_rectab = GUI.GetRectAbsolute(m_rect);
+            if(m_parent.m_orient == GUIDockGroup.GUIDockOrient.Horizontal)
+            {
+                m_rectab.X -= 2;
+                m_rectab.Z += 4;
+            }
+            else
+            {
+                m_rectab.Y -= 2;
+                m_rectab.W += 4;
+            }
+            GUI.DrawRect(rect,GUIStyle.Current.DockSepColor);
             CheckDrag();
         }
 
@@ -39,6 +52,32 @@ namespace RigelEditor.EGUI
         {
             if (GUI.Event.Used) return;
             var e = GUI.Event;
+            if(e.EventType == RigelEGUIEventType.MouseDragEnter)
+            {
+                if (GUIUtility.RectContainsCheck(m_rectab, e.Pointer)){
+                    m_ondrag = true;
+                    e.Use();
+                    GUIInternal.SetCursor(m_parent.m_orient == GUIDockGroup.GUIDockOrient.Horizontal ? System.Windows.Forms.Cursors.VSplit : System.Windows.Forms.Cursors.HSplit);
+                }
+            }
+            else if (e.EventType == RigelEGUIEventType.MouseDragLeave)
+            {
+                if (m_ondrag)
+                {
+                    e.Use();
+                    m_ondrag = false;
+
+                    GUIInternal.SetCursor(System.Windows.Forms.Cursors.Default);
+                }
+            }
+            else if(e.EventType == RigelEGUIEventType.MouseDragUpdate)
+            {
+                if (m_ondrag)
+                {
+                    e.Use();
+                    m_parent.SeparatorMove(e.DragOffset, this);
+                }
+            }
 
         }
     }
@@ -72,6 +111,8 @@ namespace RigelEditor.EGUI
 
     public class GUIDockGroup : GUIDockBase
     {
+        private static float SizeMin = 30;
+
         public enum GUIDockOrient
         {
             Horizontal,
@@ -103,6 +144,11 @@ namespace RigelEditor.EGUI
                 if (c is GUIDockSeparator) continue;
 
                 var dock = c as GUIDockBase;
+                if(dock.m_sizeNext != null)
+                {
+                    dock.m_size = (Vector4)dock.m_sizeNext;
+                    dock.m_sizeNext = null;
+                }
                 if(m_orient == GUIDockOrient.Horizontal)
                 {
                     stotal += dock.m_size.Z;
@@ -182,6 +228,57 @@ namespace RigelEditor.EGUI
             }
             m_children.Add(dock);
             dock.m_parent = this;
+        }
+
+        public void SeparatorMove(Vector2 offset,GUIDockSeparator sep)
+        {
+            for(int i = 0; i < m_children.Count; i++)
+            {
+                if(m_children[i] == sep)
+                {
+                    var predock = m_children[i - 1] as GUIDockBase;
+                    var nextdock = m_children[i + 1] as GUIDockBase;
+
+                    var rect1 = predock.m_size;
+                    var rect2 = nextdock.m_size;
+                    if (m_orient == GUIDockOrient.Horizontal)
+                    {
+                        float off = offset.X;
+                        if(rect1.Z + off < GUIDockGroup.SizeMin)
+                        {
+                            off = GUIDockGroup.SizeMin - rect1.Z;
+                        }
+                        if (rect2.Z - off < GUIDockGroup.SizeMin)
+                        {
+                            off = rect2.Z - GUIDockGroup.SizeMin;
+                        }
+
+                        rect1.Z += off;
+                        rect2.Z -= off;
+
+                        predock.m_sizeNext = rect1;
+                        nextdock.m_sizeNext = rect2;
+                    }
+                    else
+                    {
+                        float off = offset.Y;
+                        if (rect1.W + off < GUIDockGroup.SizeMin)
+                        {
+                            off = GUIDockGroup.SizeMin - rect1.W;
+                        }
+                        if (rect2.W - off < GUIDockGroup.SizeMin)
+                        {
+                            off = rect2.W - GUIDockGroup.SizeMin;
+                        }
+
+                        rect1.W += off;
+                        rect2.W -= off;
+
+                        predock.m_sizeNext = rect1;
+                        nextdock.m_sizeNext = rect2;
+                    }
+                }
+            }
         }
 
     }

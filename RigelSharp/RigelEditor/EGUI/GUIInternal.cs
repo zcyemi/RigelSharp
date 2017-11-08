@@ -57,6 +57,10 @@ namespace RigelEditor.EGUI
             }
         }
 
-
+        public static void SetCursor(System.Windows.Forms.Cursor cursor)
+        {
+            if (s_eguictx == null) return;
+            s_eguictx.Form.Cursor = cursor;
+        }
     }
 }

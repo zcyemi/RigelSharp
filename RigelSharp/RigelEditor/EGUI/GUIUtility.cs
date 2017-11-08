@@ -52,7 +52,6 @@ namespace RigelEditor.EGUI
             v.Y += offset;
             v.Z -= offset;
             v.W -= offset;
-
             return v;
         }
     }

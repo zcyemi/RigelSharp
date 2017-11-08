@@ -373,6 +373,14 @@ namespace RigelEditor.EGUI
             s_depthz = depth;
         }
 
+        public static Vector4 GetRectAbsolute(Vector4 rect)
+        {
+            rect.X += Context.currentGroupAbsolute.X;
+            rect.Y += Context.currentGroupAbsolute.Y;
+
+            return rect;
+        }
+
         #endregion
     }
 

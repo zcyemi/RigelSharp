@@ -35,6 +35,8 @@ namespace RigelEditor.EGUI
         public int ClientWidth { get; private set; }
         public int ClientHeight { get; private set; }
 
+        public RenderForm Form { get { return m_form; } }
+
         public RigelEGUICtx(RenderForm form,RigelGraphics graphics)
         {
 
