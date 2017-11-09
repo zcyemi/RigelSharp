@@ -25,9 +25,13 @@ namespace RigelEditor.EGUI
         public Vector4 ButtonColor = new Vector4(0.7f, 0.7f, 0.7f, 1.0f);
 
         public Vector4 DockBGColor =RigelColor.RGBA(30, 30, 30,255);
-        public Vector4 DockSepColor = RigelColor.RGBA(70, 70, 80, 255);
+        public Vector4 DockContentColor = RigelColor.RGBA(50, 50, 50, 255);
+        public Vector4 DockSepColor = RigelColor.RGBA(30, 30, 30, 255);
         public Vector4 BorderColor = RigelColor.RGBA(63, 63, 70, 255);
 
-        
+        public Vector4 TabBtnColor = RigelColor.RGBA(30, 30, 30, 255);
+        public Vector4 TabBtnColorActive = RigelColor.RGBA(50, 50, 50, 255);
+
+
     }
 }

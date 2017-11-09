@@ -8,12 +8,16 @@ using SharpDX;
 
 namespace RigelEditor.EGUI
 {
+    public interface IGUIDockContent
+    {
+
+    }
 
     public abstract class GUIDockBase: IGUIDockObj
     {
         public Vector4 m_size = new Vector4(0,0,100, 100);
         public Vector4? m_sizeNext = null;
-        public Vector4 m_contentRect;
+        public Vector4 m_containerRect;
         public abstract void Draw(Vector4 rect);
         public GUIDockGroup m_parent;
     }
@@ -85,27 +89,61 @@ namespace RigelEditor.EGUI
     public class GUIDock : GUIDockBase
     {
         public object m_target;
-        
+        public List<IGUIDockContent> m_content = new List<IGUIDockContent>();
+        private IGUIDockContent m_focus = null;
 
-        private Vector4 m_color = RigelColor.Random();
+
+        private Vector4 m_contentRect;
 
         public override void Draw(Vector4 rect)
         {
             m_size = rect;
-            m_contentRect = m_size;
-            m_contentRect = m_contentRect.Padding(1);
+            m_containerRect = m_size;
+            m_containerRect = m_containerRect.Padding(1);
 
-            GUI.BeginGroup(m_contentRect, GUIStyle.Current.DockBGColor);
+            GUI.BeginGroup(m_containerRect, GUIStyle.Current.DockBGColor);
+
             GUILayout.BeginArea(GUI.Context.currentGroupAbsolute);
 
+            DrawTabBar();
+
+            m_contentRect = GUI.Context.currentGroup;
+            m_contentRect.X = 0;
+            m_contentRect.Y = 23;
+            m_contentRect.W -= 23;
+            GUI.BeginGroup(m_contentRect);
+            GUILayout.BeginArea(GUI.Context.currentGroupAbsolute,GUIStyle.Current.DockContentColor);
             GUI.Label(new Vector4(0, 0, 100, 20), "Group");
-
-            GUILayout.Space(20);
             GUILayout.Button("Test");
-
+            GUILayout.Text("66666");
 
             GUILayout.EndArea();
+
             GUI.EndGroup();
+            GUILayout.EndArea();
+            GUI.EndGroup();
+        }
+
+        private void DrawTabBar()
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.SetLineHeight(20);
+            GUILayout.Space(3);
+
+            if(m_content.Count == 0)
+            {
+                GUILayout.Button("None", GUIStyle.Current.TabBtnColor);
+            }
+            else
+            {
+                GUILayout.Button("Tab1", GUIStyle.Current.TabBtnColor);
+                GUILayout.Button("Tab2", GUIStyle.Current.TabBtnColorActive);
+                GUILayout.Button("Tab3", GUIStyle.Current.TabBtnColor);
+            }
+            
+
+            GUILayout.RestoreLineHeight();
+            GUILayout.EndHorizontal();
         }
     }
 
@@ -300,7 +338,6 @@ namespace RigelEditor.EGUI
             group1.AddDock(new GUIDock());
             m_maingroup.AddDock(new GUIDock());
             m_maingroup.AddDock(group1);
-            m_maingroup.AddDock(new GUIDock());
         }
 
         public void Update(Vector4 group)

@@ -873,8 +873,9 @@ namespace RigelEditor.EGUI
         MouseDragEnter      = 1 << 8,
         MouseDragLeave      = 1 << 9,
         MouseDragUpdate     = 1 << 10,
+        MouseMove           = 1 << 11,
 
-        Resize              = 1<< 11,
+        Resize              = 1<< 12,
 
         MouseEvent = MouseClick | MouseDoubleClick | MouseDown | MouseUp | MouseDragUpdate,
         MouseEventActive = MouseClick | MouseDoubleClick | MouseDown,
@@ -907,8 +908,15 @@ namespace RigelEditor.EGUI
             };
             m_form.MouseMove += (s, e) =>
             {
-                if (e.Button != System.Windows.Forms.MouseButtons.Left) return;
-                OnWindowEvent(new RigelEGUIEvent(RigelEGUIEventType.MouseDragUpdate, e));
+                if (e.Button == System.Windows.Forms.MouseButtons.Left)
+                {
+                    OnWindowEvent(new RigelEGUIEvent(RigelEGUIEventType.MouseDragUpdate, e));
+                }
+                else
+                {
+                    OnWindowEvent(new RigelEGUIEvent(RigelEGUIEventType.MouseMove, e));
+                }
+                
             };
             m_form.MouseDown += (s, e) =>
             {

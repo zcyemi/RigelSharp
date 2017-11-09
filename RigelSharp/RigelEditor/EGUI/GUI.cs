@@ -397,6 +397,7 @@ namespace RigelEditor.EGUI
         public static int layoutOffX = 1;
         public static int layoutOffY = 1;
 
+
         /// <summary>
         /// area always absolute to the baseRect
         /// </summary>
@@ -406,7 +407,7 @@ namespace RigelEditor.EGUI
         {
             if(color != null)
             {
-                GUI.DrawRect(rect, (Vector4)color);
+                GUI.DrawRect(rect, (Vector4)color,true);
             }
             s_ctx.areaStack.Push(s_ctx.currentArea);
             s_ctx.currentArea = rect;
@@ -429,6 +430,7 @@ namespace RigelEditor.EGUI
 
         public static void BeginHorizontal()
         {
+
             s_ctx.currentLayout.Verticle = false;
             s_ctx.layoutStack.Push(s_ctx.currentLayout);
             s_ctx.currentLayout.SizeMax.Y = 0;
@@ -529,6 +531,17 @@ namespace RigelEditor.EGUI
             var rect = new Vector4(s_ctx.currentLayout.Offset, 50f, s_svLineHeight.Value);
             GUIUtility.RectClip(ref rect, curarea);
             var ret = GUI.Button(rect, label,true);
+            AutoCaculateOffsetW(50);
+
+            return ret;
+        }
+
+        public static bool Button(string label,Vector4 color)
+        {
+            var curarea = s_ctx.currentArea;
+            var rect = new Vector4(s_ctx.currentLayout.Offset, 50f, s_svLineHeight.Value);
+            GUIUtility.RectClip(ref rect, curarea);
+            var ret = GUI.Button(rect, label,color,GUI.Context.color ,true);
             AutoCaculateOffsetW(50);
 
             return ret;
