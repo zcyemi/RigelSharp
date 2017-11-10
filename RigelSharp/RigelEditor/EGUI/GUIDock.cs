@@ -13,6 +13,7 @@ namespace RigelEditor.EGUI
 
     }
 
+
     public abstract class GUIDockBase: IGUIDockObj
     {
         public Vector4 m_size = new Vector4(0,0,100, 100);
@@ -130,15 +131,43 @@ namespace RigelEditor.EGUI
             GUILayout.SetLineHeight(20);
             GUILayout.Space(3);
 
-            if(m_content.Count == 0)
+            if (GUILayout.Button("+", GUIStyle.Current.TabBtnColor))
             {
-                GUILayout.Button("None", GUIStyle.Current.TabBtnColor);
+                var win = new GUIWindowTest1();
+                m_content.Add(win);
+
+                m_focus = win;
+            }
+
+            if (GUILayout.Button("-", GUIStyle.Current.TabBtnColor))
+            {
+                if(m_focus != null)
+                {
+                    m_content.Remove(m_focus);
+                    if (m_content.Count != 0) m_focus = m_content[0];
+                }
+            }
+
+            if (m_content.Count == 0)
+            {
+                GUILayout.Text("None");
             }
             else
             {
-                GUILayout.Button("Tab1", GUIStyle.Current.TabBtnColor);
-                GUILayout.Button("Tab2", GUIStyle.Current.TabBtnColorActive);
-                GUILayout.Button("Tab3", GUIStyle.Current.TabBtnColor);
+                foreach(var c in m_content)
+                {
+                    if(m_focus == c)
+                    {
+                        GUILayout.Button("Tab", GUIStyle.Current.TabBtnColorActive);
+                    }
+                    else
+                    {
+                        if(GUILayout.Button("Tab", GUIStyle.Current.TabBtnColor))
+                        {
+                            m_focus = c;
+                        }
+                    }
+                }
             }
             
 

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RigelEditor.EGUI
 {
-    public abstract class GUIWindow
+    public abstract class GUIWindow : IGUIDockContent
     {
 
         public abstract void OnGUI();
