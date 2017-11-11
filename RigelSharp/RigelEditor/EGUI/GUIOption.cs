@@ -6,16 +6,30 @@ using System.Threading.Tasks;
 
 namespace RigelEditor.EGUI
 {
+
+    public enum GUIOptionCheck : int
+    {
+        rectContains = 100,
+        textOverflow = 101,
+    }
+
     public class GUIOption
     {
-        internal enum GUIOptionType
+        internal enum GUIOptionType : int
         {
-            width,
-            height,
+            width = 1,
+            height = 2,
+            checkRectContains = 100,
+            checkTextOverflow = 101,
         }
 
         internal GUIOptionType type;
         internal Object value;
+
+        public bool Checked()
+        {
+            return (bool)value;
+        }
 
         private GUIOption(GUIOptionType t,Object v)
         {
@@ -26,6 +40,15 @@ namespace RigelEditor.EGUI
         public static GUIOption Width(int width)
         {
             return new GUIOption(GUIOptionType.width, width);
+        }
+
+        public static GUIOption Height(int height)
+        {
+            return new GUIOption(GUIOptionType.height, height);
+        }
+        public static GUIOption Check(GUIOptionCheck check,bool valuedefault = false)
+        {
+            return new GUIOption((GUIOptionType)check, false);
         }
     }
 }

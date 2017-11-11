@@ -8,9 +8,9 @@ using SharpDX;
 
 namespace RigelEditor.EGUI
 {
-    public interface IGUIDockContent
+    public class GUIDockContentBase
     {
-
+        internal GUIDragState InternalTabBtnDragState = new GUIDragState();
     }
 
 
@@ -90,8 +90,8 @@ namespace RigelEditor.EGUI
     public class GUIDock : GUIDockBase
     {
         public object m_target;
-        public List<IGUIDockContent> m_content = new List<IGUIDockContent>();
-        private IGUIDockContent m_focus = null;
+        public List<GUIDockContentBase> m_content = new List<GUIDockContentBase>();
+        private GUIDockContentBase m_focus = null;
 
 
         private Vector4 m_contentRect;
@@ -157,17 +157,7 @@ namespace RigelEditor.EGUI
                 foreach(var c in m_content)
                 {
                     GUILayout.Space(1);
-                    if (m_focus == c)
-                    {
-                        GUILayout.Button("Tab", GUIStyle.Current.TabBtnColorActive);
-                    }
-                    else
-                    {
-                        if(GUILayout.Button("Tab", GUIStyle.Current.TabBtnColor))
-                        {
-                            m_focus = c;
-                        }
-                    }
+                    DrawDockContentButton(c);
                     GUILayout.Space(-1);
                 }
             }
@@ -175,6 +165,20 @@ namespace RigelEditor.EGUI
 
             GUILayout.RestoreLineHeight();
             GUILayout.EndHorizontal();
+        }
+
+        private void DrawDockContentButton(GUIDockContentBase c)
+        {
+            var checkrc = GUIOption.Check(GUIOptionCheck.rectContains);
+            if (GUILayout.Button("Tab", m_focus == c? GUIStyle.Current.TabBtnColorActive: GUIStyle.Current.TabBtnColor, checkrc))
+            {
+                m_focus = c;
+            }
+
+            if (c.InternalTabBtnDragState.OnDrag(checkrc.Checked()))
+            {
+                GUI.DrawRect(new Vector4(100, 100, 20, 20), RigelColor.Red, true);
+            }
         }
     }
 

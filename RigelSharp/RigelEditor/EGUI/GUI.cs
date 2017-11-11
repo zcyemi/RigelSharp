@@ -189,14 +189,13 @@ namespace RigelEditor.EGUI
             s_ctx.currentGroupAbsolute = groupab;
         }
 
-        public static bool Button(Vector4 rect, string label,bool absolute = false)
+        public static bool Button(Vector4 rect, string label,bool absolute = false,params GUIOption[] options)
         {
-            return Button(rect, label, Context.color, Context.backgroundColor, absolute);
+            return Button(rect, label, Context.color, Context.backgroundColor, absolute,options);
         }
 
-        public static bool Button(Vector4 rect,string label,Vector4 color,Vector4 texcolor,bool absolute = false)
+        public static bool Button(Vector4 rect,string label,Vector4 color,Vector4 texcolor,bool absolute = false,params GUIOption[] options)
         {
-            
             if (!absolute)
             {
                 rect.X += s_ctx.currentGroup.X;
@@ -206,6 +205,13 @@ namespace RigelEditor.EGUI
             bool clicked = false;
             if (GUIUtility.RectContainsCheck(rect, Event.Pointer))
             {
+                if(options != null)
+                {
+                    var optCheckRC = options.FirstOrDefault((o) => { return o.type == GUIOption.GUIOptionType.checkRectContains; });
+                    if (optCheckRC != null) optCheckRC.value = true;
+                }
+                
+
                 if (!Event.Used && Event.EventType == RigelEGUIEventType.MouseClick) {
                     Event.Use();
                     clicked = true;
@@ -583,7 +589,7 @@ namespace RigelEditor.EGUI
             var curarea = s_ctx.currentArea;
             var rect = new Vector4(s_ctx.currentLayout.Offset, width, s_svLineHeight.Value);
             GUIUtility.RectClip(ref rect, curarea);
-            var ret = GUI.Button(rect, label,color,GUI.Context.color ,true);
+            var ret = GUI.Button(rect, label,color,GUI.Context.color ,true,options);
             AutoCaculateOffsetW(width);
 
             return ret;
@@ -641,5 +647,58 @@ namespace RigelEditor.EGUI
             GUI.DrawRect(rect, color,true);
         }
 
+    }
+
+    public class GUIDragState
+    {
+        private Vector2 m_offset;
+        private bool m_ondrag = false;
+        public Vector2 OffSet { get { return m_offset; } }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="rect">absolute rect</param>
+        /// <returns></returns>
+        public bool OnDrag(Vector4 rect)
+        {
+            if (GUI.Event.Used) return false;
+            bool constains = GUIUtility.RectContainsCheck(rect, GUI.Event.Pointer);
+            return OnDrag(constains);
+        }
+
+        public bool OnDrag(bool constainsCheck = true)
+        {
+            if (GUI.Event.Used) return false;
+
+            var e = GUI.Event;
+            if(e.EventType == RigelEGUIEventType.MouseDragEnter)
+            {
+                if (constainsCheck)
+                {
+                    m_ondrag = true;
+                    e.Use();
+                }
+            }
+            else if(e.EventType == RigelEGUIEventType.MouseDragLeave)
+            {
+                if (m_ondrag)
+                {
+                    e.Use();
+                    m_ondrag = false;
+                }
+            }
+            else if(e.EventType == RigelEGUIEventType.MouseDragUpdate)
+            {
+                if (m_ondrag)
+                {
+                    e.Use();
+                }
+                m_offset = e.DragOffset;
+                return true;
+            }
+
+            return false;
+        }
     }
 }
