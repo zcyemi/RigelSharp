@@ -30,8 +30,11 @@ namespace RigelEditor.EGUI
         public Vector4 BorderColor = RigelColor.RGBA(63, 63, 70, 255);
 
         public Vector4 TabBtnColor = RigelColor.RGBA(30, 30, 30, 255);
+        public Vector4 TabBtnColorS = RigelColor.RGBA(50, 50, 50, 255);
         public Vector4 TabBtnColorActive = RigelColor.RGBA(50, 50, 50, 255);
 
+        public Vector4 ColorActive = RigelColor.RGBA(28, 151, 234, 255);
+        public Vector4 ColorActiveD = RigelColor.RGBA(0, 122, 204, 255);
 
     }
 }

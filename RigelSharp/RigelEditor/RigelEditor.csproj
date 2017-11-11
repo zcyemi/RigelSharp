@@ -79,6 +79,7 @@
     <Compile Include="EGUI\GUIDrawStageOverlay.cs" />
     <Compile Include="EGUI\GUIDrawStageWindows.cs" />
     <Compile Include="EGUI\GUIInternal.cs" />
+    <Compile Include="EGUI\GUIOption.cs" />
     <Compile Include="EGUI\GUITest.cs" />
     <Compile Include="EGUI\GUIUtility.cs" />
     <Compile Include="EGUI\GUIWindow.cs" />

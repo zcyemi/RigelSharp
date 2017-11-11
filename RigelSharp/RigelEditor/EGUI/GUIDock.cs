@@ -129,9 +129,9 @@ namespace RigelEditor.EGUI
         {
             GUILayout.BeginHorizontal();
             GUILayout.SetLineHeight(20);
-            GUILayout.Space(3);
+            
 
-            if (GUILayout.Button("+", GUIStyle.Current.TabBtnColor))
+            if (GUILayout.Button("+", GUIStyle.Current.TabBtnColorS, GUIOption.Width(20)))
             {
                 var win = new GUIWindowTest1();
                 m_content.Add(win);
@@ -139,7 +139,7 @@ namespace RigelEditor.EGUI
                 m_focus = win;
             }
 
-            if (GUILayout.Button("-", GUIStyle.Current.TabBtnColor))
+            if (GUILayout.Button("-", GUIStyle.Current.TabBtnColorS, GUIOption.Width(20)))
             {
                 if(m_focus != null)
                 {
@@ -156,7 +156,8 @@ namespace RigelEditor.EGUI
             {
                 foreach(var c in m_content)
                 {
-                    if(m_focus == c)
+                    GUILayout.Space(1);
+                    if (m_focus == c)
                     {
                         GUILayout.Button("Tab", GUIStyle.Current.TabBtnColorActive);
                     }
@@ -167,6 +168,7 @@ namespace RigelEditor.EGUI
                             m_focus = c;
                         }
                     }
+                    GUILayout.Space(-1);
                 }
             }
             

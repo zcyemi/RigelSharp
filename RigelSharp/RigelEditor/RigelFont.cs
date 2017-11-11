@@ -77,6 +77,16 @@ namespace RigelEditor
             return m_glyphInfo[c];
         }
 
+        public int GetTextWidth(string str)
+        {
+            int width = 0;
+            foreach(var c in str)
+            {
+                width += GetGlyphInfo(c).AdvancedX;
+            }
+
+            return width;
+        }
         
 
         public string FontFilePath { get; private set; }

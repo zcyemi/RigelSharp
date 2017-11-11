@@ -196,23 +196,37 @@ namespace RigelEditor.EGUI
 
         public static bool Button(Vector4 rect,string label,Vector4 color,Vector4 texcolor,bool absolute = false)
         {
-            DrawRect(rect, color,absolute);
-            DrawText(rect, label, texcolor,absolute);
-            if (Event.Used) return false;
-            if (Event.EventType != RigelEGUIEventType.MouseClick) return false;
-
+            
             if (!absolute)
             {
                 rect.X += s_ctx.currentGroup.X;
                 rect.Y += s_ctx.currentGroup.Y;
             }
-            
+
+            bool clicked = false;
             if (GUIUtility.RectContainsCheck(rect, Event.Pointer))
             {
-                Event.Use();
-                return true;
+                if (!Event.Used && Event.EventType == RigelEGUIEventType.MouseClick) {
+                    Event.Use();
+                    clicked = true;
+                    
+                }
+                if(Event.Button == MouseButton.Left)
+                {
+                    DrawRect(rect, GUIStyle.Current.ColorActiveD, absolute);
+                }
+                else
+                {
+                    DrawRect(rect, GUIStyle.Current.ColorActive, absolute);
+                }
             }
-            return false;
+            else
+            {
+                DrawRect(rect, color, absolute);
+            }
+            DrawText(rect, label, texcolor, absolute);
+
+            return clicked;
         }
 
         public static void Label(Vector4 position,string text,bool absolute = false)
@@ -222,8 +236,18 @@ namespace RigelEditor.EGUI
 
         public static int DrawText(Vector4 rect, string content, Vector4 color,bool absolute = false)
         {
+            int pixelsize = (int)Context.Font.FontPixelSize;
+            rect.Y += rect.W > pixelsize ? (rect.W - pixelsize)/2 : 0;
+
             GUIUtility.RectClip(ref rect, absolute? s_ctx.baseRect: s_ctx.currentGroupAbsolute);
-            var w = 0;
+            int w = 0;
+
+            //centered
+            int textwidth = Context.Font.GetTextWidth(content);
+            w = rect.Z > textwidth ? (int)((rect.Z - textwidth) / 2) : 1;
+            rect.X += w;
+            
+
             foreach (var c in content)
             {
                 int xoff = DrawChar(rect, c, color);
@@ -525,24 +549,42 @@ namespace RigelEditor.EGUI
             AutoCaculateOffset(s_svLineIndent.Value, h);
         }
 
-        public static bool Button(string label)
+        public static bool Button(string label,params GUIOption[] options)
         {
+            int width = 50;
+            if(options != null)
+            {
+                foreach(var opt in options)
+                {
+                    if (opt.type == GUIOption.GUIOptionType.width) width = (int)opt.value;
+                }
+            }
+
             var curarea = s_ctx.currentArea;
-            var rect = new Vector4(s_ctx.currentLayout.Offset, 50f, s_svLineHeight.Value);
+            var rect = new Vector4(s_ctx.currentLayout.Offset, width, s_svLineHeight.Value);
             GUIUtility.RectClip(ref rect, curarea);
             var ret = GUI.Button(rect, label,true);
-            AutoCaculateOffsetW(50);
+            AutoCaculateOffsetW(width);
 
             return ret;
         }
 
-        public static bool Button(string label,Vector4 color)
+        public static bool Button(string label,Vector4 color,params GUIOption[] options)
         {
+            int width = 50;
+            if (options != null)
+            {
+                foreach (var opt in options)
+                {
+                    if (opt.type == GUIOption.GUIOptionType.width) width = (int)opt.value;
+                }
+            }
+
             var curarea = s_ctx.currentArea;
-            var rect = new Vector4(s_ctx.currentLayout.Offset, 50f, s_svLineHeight.Value);
+            var rect = new Vector4(s_ctx.currentLayout.Offset, width, s_svLineHeight.Value);
             GUIUtility.RectClip(ref rect, curarea);
             var ret = GUI.Button(rect, label,color,GUI.Context.color ,true);
-            AutoCaculateOffsetW(50);
+            AutoCaculateOffsetW(width);
 
             return ret;
         }
