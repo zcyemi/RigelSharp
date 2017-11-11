@@ -24,9 +24,9 @@ namespace RigelEditor.EGUI
     }
 
 
-    public abstract class GUIDockBase: IGUIDockObj
+    public abstract class GUIDockBase : IGUIDockObj
     {
-        public Vector4 m_size = new Vector4(0,0,100, 100);
+        public Vector4 m_size = new Vector4(0, 0, 100, 100);
         public Vector4? m_sizeNext = null;
         public Vector4 m_containerRect;
         public abstract void Draw(Vector4 rect);
@@ -35,10 +35,10 @@ namespace RigelEditor.EGUI
 
     public interface IGUIDockObj
     {
-         void Draw(Vector4 rect);
+        void Draw(Vector4 rect);
     }
 
-    public class GUIDockSeparator: IGUIDockObj
+    public class GUIDockSeparator : IGUIDockObj
     {
         public GUIDockGroup m_parent;
         private bool m_ondrag = false;
@@ -47,9 +47,10 @@ namespace RigelEditor.EGUI
         private Vector4 m_rectab;
         public void Draw(Vector4 rect)
         {
+
             m_rect = rect;
             m_rectab = GUI.GetRectAbsolute(m_rect);
-            if(m_parent.m_orient == GUIDockGroup.GUIDockOrient.Horizontal)
+            if (m_parent.m_orient == GUIDockGroup.GUIDockOrient.Horizontal)
             {
                 m_rectab.X -= 2;
                 m_rectab.Z += 4;
@@ -59,7 +60,7 @@ namespace RigelEditor.EGUI
                 m_rectab.Y -= 2;
                 m_rectab.W += 4;
             }
-            GUI.DrawRect(rect,GUIStyle.Current.DockSepColor);
+            GUI.DrawRect(rect, GUIStyle.Current.DockSepColor);
             CheckDrag();
         }
 
@@ -67,9 +68,10 @@ namespace RigelEditor.EGUI
         {
             if (GUI.Event.Used) return;
             var e = GUI.Event;
-            if(e.EventType == RigelEGUIEventType.MouseDragEnter)
+            if (e.EventType == RigelEGUIEventType.MouseDragEnter)
             {
-                if (GUIUtility.RectContainsCheck(m_rectab, e.Pointer)){
+                if (GUIUtility.RectContainsCheck(m_rectab, e.Pointer))
+                {
                     m_ondrag = true;
                     e.Use();
                     GUIInternal.SetCursor(m_parent.m_orient == GUIDockGroup.GUIDockOrient.Horizontal ? System.Windows.Forms.Cursors.VSplit : System.Windows.Forms.Cursors.HSplit);
@@ -85,7 +87,7 @@ namespace RigelEditor.EGUI
                     GUIInternal.SetCursor(System.Windows.Forms.Cursors.Default);
                 }
             }
-            else if(e.EventType == RigelEGUIEventType.MouseDragUpdate)
+            else if (e.EventType == RigelEGUIEventType.MouseDragUpdate)
             {
                 if (m_ondrag)
                 {
@@ -107,6 +109,10 @@ namespace RigelEditor.EGUI
         private Vector4 m_sizeab;
 
 
+        public GUIDock()
+        {
+        }
+
         public override void Draw(Vector4 rect)
         {
             m_size = rect;
@@ -114,16 +120,17 @@ namespace RigelEditor.EGUI
             m_containerRect = m_containerRect.Padding(1);
 
             GUI.BeginGroup(m_containerRect, GUIStyle.Current.DockBGColor);
-            GUILayout.BeginArea(GUI.Context.currentGroupAbsolute);
+            m_sizeab = GUI.Context.currentGroup.Absolute;
+            GUILayout.BeginArea(GUI.Context.currentGroup.Absolute);
 
             DrawTabBar();
 
-            m_contentRect = GUI.Context.currentGroup;
+            m_contentRect = GUI.Context.currentGroup.Rect;
             m_contentRect.X = 0;
             m_contentRect.Y = 23;
             m_contentRect.W -= 23;
             GUI.BeginGroup(m_contentRect);
-            GUILayout.BeginArea(GUI.Context.currentGroupAbsolute,GUIStyle.Current.DockContentColor);
+            GUILayout.BeginArea(GUI.Context.currentGroup.Absolute, GUIStyle.Current.DockContentColor);
             GUI.Label(new Vector4(0, 0, 100, 20), "Group");
             GUILayout.Button("Test");
             GUILayout.Text("66666");
@@ -140,6 +147,7 @@ namespace RigelEditor.EGUI
 
         public void AddDockContent(GUIDockContentBase content)
         {
+
             m_content.Add(content);
             m_focus = content;
         }
@@ -147,7 +155,7 @@ namespace RigelEditor.EGUI
         public void RemoveDockContent(GUIDockContentBase content)
         {
             m_content.Remove(content);
-            if(content == m_focus)
+            if (content == m_focus)
             {
                 if (m_content.Count != 0)
                 {
@@ -162,9 +170,16 @@ namespace RigelEditor.EGUI
 
         public GUIDockPlace DrawDockPlaces()
         {
-            GUI.BeginGroup(new Vector4(100, 100, 100, 100), RigelColor.Red);
+            m_sizeab.Z = 10;
+            m_sizeab.W = 10;
 
-            GUI.EndGroup();
+            var g = GUI.Context.currentGroup;
+
+            GUI.BeginGroup(m_sizeab, RigelColor.Random(), true);
+
+            GUI.EndGroup(true);
+
+
             return GUIDockPlace.none;
         }
 
@@ -177,7 +192,7 @@ namespace RigelEditor.EGUI
         {
             GUILayout.BeginHorizontal();
             GUILayout.SetLineHeight(20);
-            
+
 
             if (GUILayout.Button("+", GUIStyle.Current.TabBtnColorS, GUIOption.Width(20)))
             {
@@ -188,7 +203,7 @@ namespace RigelEditor.EGUI
 
             if (GUILayout.Button("-", GUIStyle.Current.TabBtnColorS, GUIOption.Width(20)))
             {
-                if(m_focus != null)
+                if (m_focus != null)
                 {
                     RemoveDockContent(m_focus);
                 }
@@ -200,14 +215,14 @@ namespace RigelEditor.EGUI
             }
             else
             {
-                foreach(var c in m_content)
+                foreach (var c in m_content)
                 {
                     GUILayout.Space(1);
                     DrawDockContentButton(c);
                     GUILayout.Space(-1);
                 }
             }
-            
+
 
             GUILayout.RestoreLineHeight();
             GUILayout.EndHorizontal();
@@ -216,7 +231,7 @@ namespace RigelEditor.EGUI
         private void DrawDockContentButton(GUIDockContentBase c)
         {
             var checkrc = GUIOption.Check(GUIOptionCheck.rectContains);
-            if (GUILayout.Button("Tab", m_focus == c? GUIStyle.Current.TabBtnColorActive: GUIStyle.Current.TabBtnColor, checkrc))
+            if (GUILayout.Button("Tab", m_focus == c ? GUIStyle.Current.TabBtnColorActive : GUIStyle.Current.TabBtnColor, checkrc))
             {
                 m_focus = c;
             }
@@ -231,6 +246,7 @@ namespace RigelEditor.EGUI
     public class GUIDockGroup : GUIDockBase
     {
         private static float SizeMin = 30;
+        private string m_debugName;
 
         public enum GUIDockOrient
         {
@@ -241,9 +257,10 @@ namespace RigelEditor.EGUI
         public List<IGUIDockObj> m_children = new List<IGUIDockObj>();
         public GUIDockOrient m_orient = GUIDockOrient.Horizontal;
 
-        public GUIDockGroup()
-        {
 
+        public GUIDockGroup(string debugname = null)
+        {
+            m_debugName = debugname;
         }
 
         public override void Draw(Vector4 size)
@@ -258,17 +275,17 @@ namespace RigelEditor.EGUI
         {
             float stotal = 0;
             float stepSize = 0;
-            foreach(var c in m_children)
+            foreach (var c in m_children)
             {
                 if (c is GUIDockSeparator) continue;
 
                 var dock = c as GUIDockBase;
-                if(dock.m_sizeNext != null)
+                if (dock.m_sizeNext != null)
                 {
                     dock.m_size = (Vector4)dock.m_sizeNext;
                     dock.m_sizeNext = null;
                 }
-                if(m_orient == GUIDockOrient.Horizontal)
+                if (m_orient == GUIDockOrient.Horizontal)
                 {
                     stotal += dock.m_size.Z;
                 }
@@ -279,7 +296,7 @@ namespace RigelEditor.EGUI
             }
 
             Vector4 crect = Vector4.Zero;
-            if(m_orient == GUIDockOrient.Horizontal)
+            if (m_orient == GUIDockOrient.Horizontal)
             {
                 crect.W = m_size.W;
                 stepSize = m_size.Z / stotal;
@@ -292,9 +309,9 @@ namespace RigelEditor.EGUI
 
             int count = 0;
             int total = m_children.Count;
-            foreach(var c in m_children)
+            foreach (var c in m_children)
             {
-                if(c is GUIDockBase)
+                if (c is GUIDockBase)
                 {
                     var dock = c as GUIDockBase;
 
@@ -339,7 +356,7 @@ namespace RigelEditor.EGUI
 
         public void AddDock(GUIDockBase dock)
         {
-            if(m_children.Count != 0)
+            if (m_children.Count != 0)
             {
                 var sep = new GUIDockSeparator();
                 sep.m_parent = this;
@@ -349,11 +366,11 @@ namespace RigelEditor.EGUI
             dock.m_parent = this;
         }
 
-        public void SeparatorMove(Vector2 offset,GUIDockSeparator sep)
+        public void SeparatorMove(Vector2 offset, GUIDockSeparator sep)
         {
-            for(int i = 0; i < m_children.Count; i++)
+            for (int i = 0; i < m_children.Count; i++)
             {
-                if(m_children[i] == sep)
+                if (m_children[i] == sep)
                 {
                     var predock = m_children[i - 1] as GUIDockBase;
                     var nextdock = m_children[i + 1] as GUIDockBase;
@@ -363,7 +380,7 @@ namespace RigelEditor.EGUI
                     if (m_orient == GUIDockOrient.Horizontal)
                     {
                         float off = offset.X;
-                        if(rect1.Z + off < GUIDockGroup.SizeMin)
+                        if (rect1.Z + off < GUIDockGroup.SizeMin)
                         {
                             off = GUIDockGroup.SizeMin - rect1.Z;
                         }
@@ -412,7 +429,7 @@ namespace RigelEditor.EGUI
         {
             m_maingroup = new GUIDockGroup();
 
-            var group1 = new GUIDockGroup();
+            var group1 = new GUIDockGroup("test");
             group1.m_orient = GUIDockGroup.GUIDockOrient.Vertical;
             group1.AddDock(new GUIDock());
             group1.AddDock(new GUIDock());
@@ -423,7 +440,7 @@ namespace RigelEditor.EGUI
 
         public void Update(Vector4 group)
         {
-            GUI.BeginGroup(group,GUIStyle.Current.BorderColor);
+            GUI.BeginGroup(group, GUIStyle.Current.BorderColor);
             group.X = 0;
             group.Y = 0;
             m_maingroup.Draw(group);

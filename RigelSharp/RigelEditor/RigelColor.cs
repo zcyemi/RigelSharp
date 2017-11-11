@@ -25,7 +25,7 @@ namespace RigelEditor
             return s_random.NextVector4(Vector4.Zero, Vector4.One);
         }
 
-        public static Vector4 RGBA(byte r,byte g,byte b,byte a)
+        public static Vector4 RGBA(byte r, byte g, byte b, byte a)
         {
             return new Vector4(r, g, b, a) / 255.0f;
         }

@@ -88,7 +88,7 @@ namespace RigelEditor.EGUI
             GUILayout.Button("TestBtn");
             GUILayout.EndToolBar();
 
-            m_dockGroup = GUI.Context.currentGroup;
+            m_dockGroup = GUI.Context.currentGroup.Rect;
             m_dockGroup.Y = 20;
             m_dockGroup.W -= 20;
             m_dockManager.Update(m_dockGroup);

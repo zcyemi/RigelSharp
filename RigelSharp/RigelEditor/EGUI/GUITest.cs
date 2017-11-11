@@ -32,7 +32,7 @@ namespace RigelEditor.EGUI
             narea.Y = 20;
             narea.W -= 20;
 
-            var ngroup = GUI.Context.currentGroup;
+            var ngroup = GUI.Context.currentGroup.Rect;
             ngroup.Y = 20;
             ngroup.W -= 20;
             GUI.BeginGroup(ngroup, RigelColor.Random());
