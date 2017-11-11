@@ -8,6 +8,16 @@ using SharpDX;
 
 namespace RigelEditor.EGUI
 {
+    public enum GUIDockPlace
+    {
+        none,
+        center,
+        left,
+        right,
+        top,
+        bottom,
+    }
+
     public class GUIDockContentBase
     {
         internal GUIDragState InternalTabBtnDragState = new GUIDragState();
@@ -93,8 +103,9 @@ namespace RigelEditor.EGUI
         public List<GUIDockContentBase> m_content = new List<GUIDockContentBase>();
         private GUIDockContentBase m_focus = null;
 
-
         private Vector4 m_contentRect;
+        private Vector4 m_sizeab;
+
 
         public override void Draw(Vector4 rect)
         {
@@ -103,7 +114,6 @@ namespace RigelEditor.EGUI
             m_containerRect = m_containerRect.Padding(1);
 
             GUI.BeginGroup(m_containerRect, GUIStyle.Current.DockBGColor);
-
             GUILayout.BeginArea(GUI.Context.currentGroupAbsolute);
 
             DrawTabBar();
@@ -123,6 +133,44 @@ namespace RigelEditor.EGUI
             GUI.EndGroup();
             GUILayout.EndArea();
             GUI.EndGroup();
+
+            DrawDockPlaces();
+
+        }
+
+        public void AddDockContent(GUIDockContentBase content)
+        {
+            m_content.Add(content);
+            m_focus = content;
+        }
+
+        public void RemoveDockContent(GUIDockContentBase content)
+        {
+            m_content.Remove(content);
+            if(content == m_focus)
+            {
+                if (m_content.Count != 0)
+                {
+                    m_focus = m_content[0];
+                }
+                else
+                {
+                    m_focus = null;
+                }
+            }
+        }
+
+        public GUIDockPlace DrawDockPlaces()
+        {
+            GUI.BeginGroup(new Vector4(100, 100, 100, 100), RigelColor.Red);
+
+            GUI.EndGroup();
+            return GUIDockPlace.none;
+        }
+
+        private void OnDockContentDrag(GUIDockContentBase content)
+        {
+
         }
 
         private void DrawTabBar()
@@ -134,17 +182,15 @@ namespace RigelEditor.EGUI
             if (GUILayout.Button("+", GUIStyle.Current.TabBtnColorS, GUIOption.Width(20)))
             {
                 var win = new GUIWindowTest1();
-                m_content.Add(win);
+                AddDockContent(win);
 
-                m_focus = win;
             }
 
             if (GUILayout.Button("-", GUIStyle.Current.TabBtnColorS, GUIOption.Width(20)))
             {
                 if(m_focus != null)
                 {
-                    m_content.Remove(m_focus);
-                    if (m_content.Count != 0) m_focus = m_content[0];
+                    RemoveDockContent(m_focus);
                 }
             }
 

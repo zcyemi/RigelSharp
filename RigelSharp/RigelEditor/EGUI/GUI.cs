@@ -173,20 +173,27 @@ namespace RigelEditor.EGUI
             }
         }
 
-        public static void EndGroup()
+        public static void EndGroup(bool absolute = false)
         {
             var groupStack = s_ctx.groupStack;
             RigelUtility.Assert(groupStack.Count > 0);
             var curGroup = groupStack.Pop();
             s_ctx.currentGroup = groupStack.Count == 0? s_ctx.baseRect: groupStack.Peek();
 
-            var groupab = s_ctx.currentGroupAbsolute;
-            groupab.X -= curGroup.X;
-            groupab.Y -= curGroup.Y;
-            groupab.Z = s_ctx.currentGroup.Z;
-            groupab.W = s_ctx.currentGroup.W;
+            if (absolute)
+            {
 
-            s_ctx.currentGroupAbsolute = groupab;
+            }
+            else
+            {
+                var groupab = s_ctx.currentGroupAbsolute;
+                groupab.X -= curGroup.X;
+                groupab.Y -= curGroup.Y;
+                groupab.Z = s_ctx.currentGroup.Z;
+                groupab.W = s_ctx.currentGroup.W;
+
+                s_ctx.currentGroupAbsolute = groupab;
+            }
         }
 
         public static bool Button(Vector4 rect, string label,bool absolute = false,params GUIOption[] options)

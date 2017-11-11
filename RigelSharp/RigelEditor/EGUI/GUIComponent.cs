@@ -109,6 +109,15 @@ namespace RigelEditor.EGUI
         }
     }
 
+    public class GUIOverlay: IGUIComponent
+    {
+
+        public override void Draw(RigelEGUIEvent guievent)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
 
     public class GUIMenuButton:IGUIMenuItem
     {
