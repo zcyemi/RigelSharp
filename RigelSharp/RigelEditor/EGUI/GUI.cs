@@ -51,7 +51,7 @@ namespace RigelEditor.EGUI
             return rect;
         }
 
-
+        public Stack<int> depthLayer = new Stack<int>();
 
 
         public float s_depthStep = 0.0001f;
@@ -67,6 +67,7 @@ namespace RigelEditor.EGUI
             RigelUtility.Assert(groupStack.Count == 0);
             RigelUtility.Assert(areaStack.Count == 0);
             RigelUtility.Assert(layoutStack.Count == 0);
+            RigelUtility.Assert(depthLayer.Count == 0);
 
             GUI.Event = guievent;
             baseRect = new Vector4(0, 0, width, height);
@@ -128,6 +129,11 @@ namespace RigelEditor.EGUI
         public void Restore()
         {
             Value = m_stack.Pop();
+        }
+
+        public T Peek()
+        {
+            return m_stack.Peek();
         }
     }
 
@@ -201,34 +207,6 @@ namespace RigelEditor.EGUI
             {
                 s_ctx.currentGroup = groupStack.Peek();
             }
-
-
-            //if (absolute)
-            //{
-            //    Vector4 ab = Vector4.Zero;
-            //    foreach(var g in groupStack)
-            //    {
-            //        ab.X += g.X;
-            //        ab.Y += g.Y;
-            //    }
-
-            //    ab.Z = s_ctx.currentGroup.Z;
-            //    ab.W = s_ctx.currentGroup.W;
-
-            //    s_ctx.currentGroupAbsolute = ab;
-            //}
-            //else
-            //{
-            //    var groupab = s_ctx.currentGroupAbsolute;
-            //    groupab.X -= curGroup.X;
-            //    groupab.Y -= curGroup.Y;
-            //    groupab.Z = s_ctx.currentGroup.Z;
-            //    groupab.W = s_ctx.currentGroup.W;
-
-            //    s_ctx.currentGroupAbsolute = groupab;
-            //}
-
-
         }
 
         public static bool Button(Vector4 rect, string label, bool absolute = false, params GUIOption[] options)
@@ -454,6 +432,27 @@ namespace RigelEditor.EGUI
             rect.Y += off.Y;
 
             return rect;
+        }
+
+        /// <summary>
+        /// depth layer from 1 - 9
+        /// </summary>
+        /// <param name="layer"></param>
+        public static void BeginDepthLayer(int layer)
+        {
+            if(layer < 1 || layer >9)
+            {
+                throw new Exception("GUI DepthLayer invalid (1-9)");
+            }
+
+            int layeroffset = layer -(s_ctx.depthLayer.Count == 0 ? 0 : s_ctx.depthLayer.Peek()) ;
+            s_depthz -= layeroffset * 0.1f;
+            s_ctx.depthLayer.Push(layer);
+        }
+        public static void EndDepthLayer()
+        {
+            int layeroffset = s_ctx.depthLayer.Pop() - (s_ctx.depthLayer.Count == 0 ? 0 : s_ctx.depthLayer.Peek());
+            s_depthz += layeroffset * 0.1f;
         }
 
         #endregion
@@ -694,11 +693,21 @@ namespace RigelEditor.EGUI
 
     }
 
+
+    public enum GUIDrawStateStage
+    {
+        Enter,
+        Exit,
+        Update,
+        None,
+    }
+
     public class GUIDragState
     {
         private Vector2 m_offset;
         private bool m_ondrag = false;
         public Vector2 OffSet { get { return m_offset; } }
+        public GUIDrawStateStage Stage { get; private set; } = GUIDrawStateStage.None;
 
         /// <summary>
         /// 
@@ -723,6 +732,9 @@ namespace RigelEditor.EGUI
                 {
                     m_ondrag = true;
                     e.Use();
+                    m_offset = Vector2.Zero;
+                    Stage = GUIDrawStateStage.Enter;
+                    return true;
                 }
             }
             else if (e.EventType == RigelEGUIEventType.MouseDragLeave)
@@ -731,6 +743,9 @@ namespace RigelEditor.EGUI
                 {
                     e.Use();
                     m_ondrag = false;
+                    m_offset = e.DragOffset;
+                    Stage = GUIDrawStateStage.Exit;
+                    return true;
                 }
             }
             else if (e.EventType == RigelEGUIEventType.MouseDragUpdate)
@@ -738,9 +753,15 @@ namespace RigelEditor.EGUI
                 if (m_ondrag)
                 {
                     e.Use();
+                    m_offset = e.DragOffset;
+                    Stage = GUIDrawStateStage.Update;
+                    return true;
                 }
-                m_offset = e.DragOffset;
-                return true;
+                
+            }
+            else
+            {
+                Stage = GUIDrawStateStage.None;
             }
 
             return false;

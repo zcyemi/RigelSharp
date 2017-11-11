@@ -108,9 +108,17 @@ namespace RigelEditor.EGUI
         private Vector4 m_contentRect;
         private Vector4 m_sizeab;
 
+        private GUIDockPlaceComponent m_guicompPlace;
 
-        public GUIDock()
+        public Vector4 SizeAbsolute { get { return m_sizeab; } }
+
+
+        private string m_debuginfo;
+
+
+        public GUIDock(string debuginfo = "")
         {
+            m_debuginfo = debuginfo;
         }
 
         public override void Draw(Vector4 rect)
@@ -141,8 +149,6 @@ namespace RigelEditor.EGUI
             GUILayout.EndArea();
             GUI.EndGroup();
 
-            DrawDockPlaces();
-
         }
 
         public void AddDockContent(GUIDockContentBase content)
@@ -166,26 +172,6 @@ namespace RigelEditor.EGUI
                     m_focus = null;
                 }
             }
-        }
-
-        public GUIDockPlace DrawDockPlaces()
-        {
-            m_sizeab.Z = 10;
-            m_sizeab.W = 10;
-
-            var g = GUI.Context.currentGroup;
-
-            GUI.BeginGroup(m_sizeab, RigelColor.Random(), true);
-
-            GUI.EndGroup(true);
-
-
-            return GUIDockPlace.none;
-        }
-
-        private void OnDockContentDrag(GUIDockContentBase content)
-        {
-
         }
 
         private void DrawTabBar()
@@ -238,7 +224,52 @@ namespace RigelEditor.EGUI
 
             if (c.InternalTabBtnDragState.OnDrag(checkrc.Checked()))
             {
-                GUI.DrawRect(new Vector4(100, 100, 20, 20), RigelColor.Red, true);
+                var root = m_parent;
+                while(root.m_parent != null)
+                {
+                    root = root.m_parent;
+                }
+
+                var matchedDock = root.CheckDockMatched(c);
+                if(matchedDock == null)
+                {
+                    //Console.WriteLine("no matched dock");
+                }
+                else
+                {
+                    matchedDock.OnDockContentDrag(c);
+                }
+            }
+        }
+
+        public void OnDockContentDrag(GUIDockContentBase content)
+        {
+            GUI.BeginGroup(m_sizeab, null, true);
+
+            GUI.BeginDepthLayer(1);
+            GUI.DrawRect(new Vector4(0, 0, 20, 20),RigelColor.Random());
+            GUI.EndDepthLayer();
+
+            GUI.EndGroup();
+        }
+
+        private class GUIDockPlaceComponent : IGUIComponent
+        {
+            private Vector4 m_rect;
+
+            public void Update(Vector4 rect)
+            {
+                m_rect = rect;
+            }
+
+            public override void Draw(RigelEGUIEvent guievent)
+            {
+                GUI.BeginGroup(m_rect, null, true);
+
+                GUI.BeginDepthLayer(1);
+                GUI.Button(new Vector4(100, 100, 20, 20), "=");
+                GUI.EndDepthLayer();
+                GUI.EndGroup();
             }
         }
     }
@@ -417,6 +448,29 @@ namespace RigelEditor.EGUI
             }
         }
 
+
+        public GUIDock CheckDockMatched(GUIDockContentBase content)
+        {
+            foreach(var d in m_children)
+            {
+                if(d is GUIDock)
+                {
+                    var dock = d as GUIDock;
+                    if (GUIUtility.RectContainsCheck(dock.SizeAbsolute, GUI.Event.Pointer))
+                    {
+                        return dock;
+                    }
+                }
+                else if(d is GUIDockGroup)
+                {
+                    var dock = (d as GUIDockGroup).CheckDockMatched(content);
+                    if (dock != null) return dock;
+                }
+            }
+
+            return null;
+        }
+
     }
 
 
@@ -444,7 +498,6 @@ namespace RigelEditor.EGUI
             group.X = 0;
             group.Y = 0;
             m_maingroup.Draw(group);
-
             GUI.EndGroup();
         }
     }
