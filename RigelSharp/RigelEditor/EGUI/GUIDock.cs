@@ -237,20 +237,110 @@ namespace RigelEditor.EGUI
                 }
                 else
                 {
-                    matchedDock.OnDockContentDrag(c);
+                    var dockplace = matchedDock.OnDockContentDrag(c);
+                    if(dockplace != GUIDockPlace.none)
+                    {
+                        SetDockPlace(c, matchedDock, dockplace);
+                    }
                 }
             }
         }
 
-        public void OnDockContentDrag(GUIDockContentBase content)
+        private static void SetDockPlace(GUIDockContentBase content,GUIDock targetdock,GUIDockPlace place)
+        {
+            
+        }
+
+        public GUIDockPlace OnDockContentDrag(GUIDockContentBase content)
         {
             GUI.BeginGroup(m_sizeab, null, true);
 
             GUI.BeginDepthLayer(1);
-            GUI.DrawRect(new Vector4(0, 0, 20, 20),RigelColor.Random());
+
+            float rsize = 40;
+
+            var center = m_sizeab.Size() * 0.5f;
+            var rectbasic = new Vector4(center - rsize*0.5f* Vector2.One, rsize, rsize);
+
+            bool activeChecked = false;
+
+            GUIDockPlace dockPlace = GUIDockPlace.none;
+
+
+            //center
+            if (!activeChecked && GUIUtility.RectContainsCheck(GUI.GetRectAbsolute(rectbasic), GUI.Event.Pointer))
+            {
+                GUI.DrawRect(rectbasic, GUIStyle.Current.ColorActive);
+                activeChecked = true;
+                dockPlace = GUIDockPlace.center;
+            }
+            else
+            {
+                GUI.DrawRect(rectbasic, GUIStyle.Current.ColorActiveD);
+            }
+
+            //left
+            var rect = rectbasic.Move(-35, 0).SetSize(30, rsize);
+            if (!activeChecked && GUIUtility.RectContainsCheck(GUI.GetRectAbsolute(rect), GUI.Event.Pointer))
+            {
+                GUI.DrawRect(rect, GUIStyle.Current.ColorActive);
+                activeChecked = true;
+                dockPlace = GUIDockPlace.left;
+            }
+            else
+            {
+                GUI.DrawRect(rect, GUIStyle.Current.ColorActiveD);
+            }
+
+            //right
+            rect = rectbasic.Move(45, 0).SetSize(30, rsize);
+            if (!activeChecked && GUIUtility.RectContainsCheck(GUI.GetRectAbsolute(rect), GUI.Event.Pointer))
+            {
+                GUI.DrawRect(rect, GUIStyle.Current.ColorActive);
+                activeChecked = true;
+                dockPlace = GUIDockPlace.right;
+            }
+            else
+            {
+                GUI.DrawRect(rect, GUIStyle.Current.ColorActiveD);
+            }
+
+            //top
+            rect = rectbasic.Move(0, -35).SetSize(rsize, 30);
+            if (!activeChecked && GUIUtility.RectContainsCheck(GUI.GetRectAbsolute(rect), GUI.Event.Pointer))
+            {
+                GUI.DrawRect(rect, GUIStyle.Current.ColorActive);
+                activeChecked = true;
+                dockPlace = GUIDockPlace.top;
+            }
+            else
+            {
+                GUI.DrawRect(rect, GUIStyle.Current.ColorActiveD);
+            }
+
+            //bottom
+            rect = rectbasic.Move(0, 45).SetSize(rsize, 30);
+            if (!activeChecked && GUIUtility.RectContainsCheck(GUI.GetRectAbsolute(rect), GUI.Event.Pointer))
+            {
+                GUI.DrawRect(rect, GUIStyle.Current.ColorActive);
+                activeChecked = true;
+                dockPlace = GUIDockPlace.bottom;
+            }
+            else
+            {
+                GUI.DrawRect(rect, GUIStyle.Current.ColorActiveD);
+            }
+
             GUI.EndDepthLayer();
 
             GUI.EndGroup();
+
+            if(content.InternalTabBtnDragState.Stage != GUIDrawStateStage.Exit)
+            {
+                return GUIDockPlace.none;
+            }
+
+            return dockPlace;
         }
 
         private class GUIDockPlaceComponent : IGUIComponent

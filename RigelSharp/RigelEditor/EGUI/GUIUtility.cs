@@ -54,5 +54,30 @@ namespace RigelEditor.EGUI
             v.W -= offset;
             return v;
         }
+
+        public static Vector4 Move(this Vector4 v,Vector2 off)
+        {
+            v.X += off.X;
+            v.Y += off.Y;
+            return v;
+        }
+        public static Vector4 Move(this Vector4 v, float offx,float offy)
+        {
+            v.X += offx;
+            v.Y += offy;
+            return v;
+        }
+        public static Vector4 SetSize(this Vector4 v, Vector2 size)
+        {
+            v.Z += size.X;
+            v.W += size.Y;
+            return v;
+        }
+        public static Vector4 SetSize(this Vector4 v, float szx, float szy)
+        {
+            v.Z = szx;
+            v.W = szy;
+            return v;
+        }
     }
 }

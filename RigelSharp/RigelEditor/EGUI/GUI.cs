@@ -332,15 +332,26 @@ namespace RigelEditor.EGUI
             return value;
         }
 
-        public static void DrawRect(Vector4 rect, bool absolute = false)
+        public static void DrawRect(Vector4 rect, bool absolute = false,params GUIOption[] options)
         {
-            DrawRect(rect, Context.backgroundColor, absolute);
+            DrawRect(rect, Context.backgroundColor, absolute,options);
         }
 
-        public static void DrawRect(Vector4 rect, Vector4 color, bool absolute = false)
+        public static void DrawRect(Vector4 rect, Vector4 color, bool absolute = false, params GUIOption[] options)
         {
-            var valid = GUIUtility.RectClip(ref rect, absolute ? s_ctx.baseRect : s_ctx.currentGroup.Absolute);
-            if (!valid) return;
+            if(options != null)
+            {
+                var noclip = options.FirstOrDefault((x) => { return x.type == GUIOption.GUIOptionType.noClip; });
+                if(noclip == null)
+                {
+                    var valid = GUIUtility.RectClip(ref rect, absolute ? s_ctx.baseRect : s_ctx.currentGroup.Absolute);
+                    if (!valid) return;
+                }
+                else
+                {
+                    rect = rect.Move(absolute ? s_ctx.baseRect.Pos() : s_ctx.currentGroup.Absolute.Pos());
+                }
+            }
 
             BufferRect.Add(new RigelEGUIVertex()
             {

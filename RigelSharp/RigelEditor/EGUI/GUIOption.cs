@@ -19,6 +19,7 @@ namespace RigelEditor.EGUI
         {
             width = 1,
             height = 2,
+            noClip = 3,
             checkRectContains = 100,
             checkTextOverflow = 101,
         }
@@ -41,6 +42,8 @@ namespace RigelEditor.EGUI
         {
             return new GUIOption(GUIOptionType.width, width);
         }
+
+        public static GUIOption NoClip = new GUIOption(GUIOptionType.noClip, null);
 
         public static GUIOption Height(int height)
         {
