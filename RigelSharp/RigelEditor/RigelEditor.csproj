@@ -96,6 +96,7 @@
     <Compile Include="EGUI\RigelEGUIMenu.cs" />
     <Compile Include="EGUI\GUIStyle.cs" />
     <Compile Include="EGUI\RigelEGUIWindow.cs" />
+    <Compile Include="EventSlot.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RigelColor.cs" />
     <Compile Include="RigelConfig.cs" />

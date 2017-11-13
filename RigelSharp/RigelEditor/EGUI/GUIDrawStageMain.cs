@@ -92,6 +92,7 @@ namespace RigelEditor.EGUI
             m_dockGroup.Y = 20;
             m_dockGroup.W -= 20;
             m_dockManager.Update(m_dockGroup);
+            m_dockManager.LateUpdate();
         }
     }
 }

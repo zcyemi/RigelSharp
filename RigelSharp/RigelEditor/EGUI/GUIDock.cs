@@ -30,12 +30,18 @@ namespace RigelEditor.EGUI
         public Vector4? m_sizeNext = null;
         public Vector4 m_containerRect;
         public abstract void Draw(Vector4 rect);
+
+        public virtual void LateUpdate()
+        {
+        }
+
         public GUIDockGroup m_parent;
     }
 
     public interface IGUIDockObj
     {
         void Draw(Vector4 rect);
+        void LateUpdate();
     }
 
     public class GUIDockSeparator : IGUIDockObj
@@ -62,6 +68,11 @@ namespace RigelEditor.EGUI
             }
             GUI.DrawRect(rect, GUIStyle.Current.DockSepColor);
             CheckDrag();
+        }
+
+        public void LateUpdate()
+        {
+
         }
 
         private void CheckDrag()
@@ -115,6 +126,8 @@ namespace RigelEditor.EGUI
 
         private string m_debuginfo;
 
+        private EventSlot<Action> m_slotDockPlace = new EventSlot<Action>();
+
 
         public GUIDock(string debuginfo = "")
         {
@@ -151,12 +164,18 @@ namespace RigelEditor.EGUI
 
         }
 
+        public override void LateUpdate()
+        {
+            m_slotDockPlace.InvokeOnce();
+        }
+
         public void AddDockContent(GUIDockContentBase content)
         {
 
             m_content.Add(content);
             m_focus = content;
         }
+
 
         public void RemoveDockContent(GUIDockContentBase content)
         {
@@ -240,15 +259,60 @@ namespace RigelEditor.EGUI
                     var dockplace = matchedDock.OnDockContentDrag(c);
                     if(dockplace != GUIDockPlace.none)
                     {
-                        SetDockPlace(c, matchedDock, dockplace);
+                        Console.WriteLine(">>" + dockplace);
+                        m_slotDockPlace+=()=> { SetDockPlace(c, matchedDock, dockplace); };
                     }
                 }
             }
         }
 
-        private static void SetDockPlace(GUIDockContentBase content,GUIDock targetdock,GUIDockPlace place)
+        private void SetDockPlace(GUIDockContentBase content,GUIDock targetdock,GUIDockPlace place)
         {
-            
+            if (place == GUIDockPlace.none) return;
+
+            if(targetdock == this)
+            {
+                
+            }
+            else
+            {
+                this.RemoveDockContent(content);
+
+                switch (place)
+                {
+                    case GUIDockPlace.center:
+                        targetdock.AddDockContent(content);
+                        break;
+                    case GUIDockPlace.left:
+                        if(targetdock.m_parent.m_orient == GUIDockGroup.GUIDockOrient.Horizontal)
+                        {
+                            var newdock = targetdock.m_parent.InsertDockBefore(targetdock);
+                            newdock.AddDockContent(content);
+                        }
+                        else
+                        {
+
+                        }
+
+                        break;
+                    case GUIDockPlace.right:
+                        if(targetdock.m_parent.m_orient == GUIDockGroup.GUIDockOrient.Horizontal)
+                        {
+                            var newdock = targetdock.m_parent.InsertDockAfter(targetdock);
+                            newdock.AddDockContent(content);
+                        }
+                        break;
+                }
+
+                this.m_parent.RefreshDock();
+            }
+        }
+
+
+
+        public bool ContainsContent(GUIDockContentBase content)
+        {
+            return m_content.Contains(content);
         }
 
         public GUIDockPlace OnDockContentDrag(GUIDockContentBase content)
@@ -368,6 +432,9 @@ namespace RigelEditor.EGUI
     {
         private static float SizeMin = 30;
         private string m_debugName;
+        private bool m_isroot = false;
+        
+        internal bool IsRoot { get { return m_isroot; } }
 
         public enum GUIDockOrient
         {
@@ -379,8 +446,9 @@ namespace RigelEditor.EGUI
         public GUIDockOrient m_orient = GUIDockOrient.Horizontal;
 
 
-        public GUIDockGroup(string debugname = null)
+        public GUIDockGroup(bool root = false,string debugname = null)
         {
+            m_isroot = root;
             m_debugName = debugname;
         }
 
@@ -391,6 +459,8 @@ namespace RigelEditor.EGUI
             ReiszeChild();
             GUI.EndGroup();
         }
+
+
 
         private void ReiszeChild()
         {
@@ -487,6 +557,45 @@ namespace RigelEditor.EGUI
             dock.m_parent = this;
         }
 
+        public GUIDock InsertDockBefore(GUIDockBase target)
+        {
+            int index = GetDockIndex(target);
+
+            var sep = new GUIDockSeparator();
+            sep.m_parent = this;
+            m_children.Insert(index, sep);
+
+            var dock = new GUIDock();
+            dock.m_parent = this;
+            m_children.Insert(index, dock);
+
+            return dock;
+        }
+
+        public GUIDock InsertDockAfter(GUIDockBase target)
+        {
+            int index = GetDockIndex(target);
+
+            var sep = new GUIDockSeparator();
+            sep.m_parent = this;
+            m_children.Insert(index+1, sep);
+
+            var dock = new GUIDock();
+            dock.m_parent = this;
+            m_children.Insert(index +2, dock);
+
+            return dock;
+        }
+
+        public int GetDockIndex(GUIDockBase dock)
+        {
+            for(int i = 0; i < m_children.Count; i++)
+            {
+                if (m_children[i] == dock) return i;
+            }
+            throw new Exception("Dock Not Found");
+        }
+
         public void SeparatorMove(Vector2 offset, GUIDockSeparator sep)
         {
             for (int i = 0; i < m_children.Count; i++)
@@ -561,6 +670,77 @@ namespace RigelEditor.EGUI
             return null;
         }
 
+        public void RefreshDock()
+        {
+            for(int i= m_children.Count -1; i>=0; i--)
+            {
+                var c = m_children[i];
+                if(c is GUIDock)
+                {
+                    var dock = c as GUIDock;
+                    if(dock.m_content.Count == 0)
+                    {
+                        m_children.Remove(c);
+                    }
+                }
+                else if(c is GUIDockGroup)
+                {
+                    var dockgroup = c as GUIDockGroup;
+                    if(dockgroup.m_children.Count == 0)
+                    {
+                        m_children.Remove(c);
+                    }
+                }
+
+            }
+
+            int dockCount = 0;
+
+            //remove seperator
+            bool lastSep = true;
+            for(int i = m_children.Count-1; i >= 0; i--)
+            {
+                var c = m_children[i];
+                if(c is GUIDockSeparator)
+                {
+                    if (lastSep)
+                    {
+                        m_children.RemoveAt(i);
+                    }
+                    lastSep = true;
+                }
+                else
+                {
+                    lastSep = false;
+                    dockCount++;
+                }
+            }
+
+            if(dockCount == 0)
+            {
+                m_children.Clear();
+                if (IsRoot)
+                {
+                    AddDock(new GUIDock());
+                }
+                else
+                {
+                    if(m_parent != null)
+                        m_parent.RefreshDock();
+                }
+            }
+        }
+
+        public override void LateUpdate()
+        {
+            for(int i = m_children.Count - 1; i >= 0; i--)
+            {
+                if(i < m_children.Count)
+                    m_children[i].LateUpdate();
+            }
+        }
+
+
     }
 
 
@@ -572,13 +752,12 @@ namespace RigelEditor.EGUI
         public GUIDockManager()
         {
             m_maingroup = new GUIDockGroup();
-
-            var group1 = new GUIDockGroup("test");
-            group1.m_orient = GUIDockGroup.GUIDockOrient.Vertical;
-            group1.AddDock(new GUIDock());
-            group1.AddDock(new GUIDock());
-            group1.AddDock(new GUIDock());
             m_maingroup.AddDock(new GUIDock());
+
+            var group1 = new GUIDockGroup();
+            group1.AddDock(new GUIDock());
+            group1.AddDock(new GUIDock());
+
             m_maingroup.AddDock(group1);
         }
 
@@ -589,6 +768,11 @@ namespace RigelEditor.EGUI
             group.Y = 0;
             m_maingroup.Draw(group);
             GUI.EndGroup();
+        }
+
+        public void LateUpdate()
+        {
+            m_maingroup.LateUpdate();
         }
     }
 }
