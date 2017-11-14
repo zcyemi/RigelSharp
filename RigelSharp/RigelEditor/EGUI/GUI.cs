@@ -676,7 +676,6 @@ namespace RigelEditor.EGUI
             if (adaptive)
             {
                 var adaptiveValue = GUIOption.AdaptiveValue();
-                
                 clicked = GUI.Button(rect, label, color, GUI.Context.Color, true, options.Append(adaptiveValue));
                 width = adaptiveValue.IntValue;
             }
