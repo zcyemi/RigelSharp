@@ -35,6 +35,7 @@ namespace RigelEditor.EGUI
 
         public Vector4 ColorActive = RigelColor.RGBA(28, 151, 234, 255);
         public Vector4 ColorActiveD = RigelColor.RGBA(0, 122, 204, 255);
+        public Vector4 ColorDisabled = RigelColor.RGBA(42, 42, 42, 255);
 
     }
 }

@@ -8,18 +8,10 @@ using SharpDX;
 
 namespace RigelEditor.EGUI
 {
-    public enum GUIDockPlace
-    {
-        none,
-        center,
-        left,
-        right,
-        top,
-        bottom,
-    }
 
     public class GUIDockContentBase
     {
+        public string Title { get; protected set; } = "Default";
         internal GUIDragState InternalTabBtnDragState = new GUIDragState();
     }
 

@@ -74,6 +74,7 @@
     <Compile Include="EGUI\GUI.cs" />
     <Compile Include="EGUI\GUIComponent.cs" />
     <Compile Include="EGUI\GUIDock.cs" />
+    <Compile Include="EGUI\GUIDockNode.cs" />
     <Compile Include="EGUI\GUIDrawStage.cs" />
     <Compile Include="EGUI\GUIDrawStageMain.cs" />
     <Compile Include="EGUI\GUIDrawStageOverlay.cs" />

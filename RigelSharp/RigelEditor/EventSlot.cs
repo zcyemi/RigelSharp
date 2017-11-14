@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 namespace RigelEditor
 {
 
-
     public class EventSlot<T>
     {
         private List<T> m_involist = new List<T>();

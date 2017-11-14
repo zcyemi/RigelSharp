@@ -23,6 +23,8 @@ namespace RigelEditor.EGUI
         private GUIDockManager m_dockManager;
         private Vector4 m_dockGroup;
 
+        private GUIDockMgr m_dockMgr;
+
         public GUIDrawStageMain(string stagename, int order = 0) : base(stagename, order)
         {
             m_menuList = new GUIMenuList("File");
@@ -32,6 +34,8 @@ namespace RigelEditor.EGUI
             m_menuList.AddMenuItem("Exit");
 
             m_dockManager = new GUIDockManager();
+
+            m_dockMgr = new GUIDockMgr();
         }
 
         public override void Draw(RigelEGUIEvent guievent)
@@ -91,8 +95,11 @@ namespace RigelEditor.EGUI
             m_dockGroup = GUI.Context.currentGroup.Rect;
             m_dockGroup.Y = 20;
             m_dockGroup.W -= 20;
-            m_dockManager.Update(m_dockGroup);
-            m_dockManager.LateUpdate();
+            //m_dockManager.Update(m_dockGroup);
+            //m_dockManager.LateUpdate();
+
+            m_dockMgr.Update(m_dockGroup);
+            m_dockMgr.LateUpdate();
         }
     }
 }
