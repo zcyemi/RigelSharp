@@ -62,12 +62,24 @@ namespace RigelEditor.EGUI
             m_parent = parent;
             m_content = new List<GUIDockContentBase>();
             m_content.Add(c);
+            m_contentFocus = c;
         }
 
         public GUIDockNode(GUIDockNode parent,List<GUIDockContentBase> cs)
         {
             m_parent = parent;
             m_content = cs;
+            if(m_contentFocus == null || !cs.Contains(m_contentFocus))
+            {
+                if(cs.Count > 0)
+                {
+                    m_contentFocus = m_content[0];
+                }
+                else
+                {
+                    m_contentFocus = null;
+                }
+            }
         }
 
         public void AddContent(GUIDockContentBase c)
@@ -145,10 +157,50 @@ namespace RigelEditor.EGUI
             }
             else
             {
+                bool horizontal = m_info.m_orient == GUIDockOrient.Horizontal;
 
+                float sl = horizontal ? m_nodeL.m_info.m_size.Z : m_nodeL.m_info.m_size.W;
+                float sr = horizontal ? m_nodeR.m_info.m_size.Z : m_nodeR.m_info.m_size.W;
+
+                float stepSize =0;
+
+                Vector4 crect = Vector4.Zero;
+                if (horizontal)
+                {
+                    crect.W = m_info.m_size.W;
+                    stepSize = m_info.m_size.Z / (sl + sr);
+                }
+                else
+                {
+                    crect.Z = m_info.m_size.Z;
+                    stepSize = m_info.m_size.W / (sl + sr);
+                }
+
+                if (horizontal)
+                {
+                    //nodeleft
+                    crect.Z = sl * stepSize;
+                    m_nodeL.Update(crect);
+                    crect.X += crect.Z;
+
+                    //noderight
+                    crect.Z = sr * stepSize;
+                    m_nodeR.Update(crect);
+                    crect.X += crect.Z;
+                }
+                else
+                {
+                    //nodeleft
+                    crect.W = sl * stepSize;
+                    m_nodeL.Update(crect);
+                    crect.Y += crect.W;
+
+                    //noderight
+                    crect.W = sr * stepSize;
+                    m_nodeR.Update(crect);
+                    crect.Y += crect.W;
+                }
             }
-
-
             GUI.EndGroup();
         }
 
@@ -161,15 +213,19 @@ namespace RigelEditor.EGUI
         {
             if (m_parent == null) return this;
             var p = m_parent;
+
+            int count = 0;
             while(p.m_parent != null)
             {
-                p = m_parent;
+                p = p.m_parent;
+                count++;
             }
             return p;
         }
 
         public GUIDockNode CheckDockNodeMatched()
         {
+
             if (IsContentNode())
             {
                 if (GUIUtility.RectContainsCheck(m_info.m_sizeab, GUI.Event.Pointer))
@@ -184,6 +240,8 @@ namespace RigelEditor.EGUI
             else
             {
                 var match = m_nodeL.CheckDockNodeMatched();
+                
+
                 if(match == null)
                 {
                     match = m_nodeR.CheckDockNodeMatched();
@@ -208,13 +266,27 @@ namespace RigelEditor.EGUI
 
         public void UpdateNode()
         {
+            if (IsContentNode())
+            {
+                if(m_content.Count == 0)
+                {
+                    if(m_parent != null)
+                    {
+                    }
+                }
+            }
+        }
 
+        public void CollapseNode(bool left)
+        {
         }
 
         #region Draw
         private void DrawDock()
         {
             m_info.m_containerRect = m_info.m_size.Padding(1);
+            m_info.m_containerRect.X = 0;
+            m_info.m_containerRect.Y = 0;
 
             GUI.BeginGroup(m_info.m_containerRect, GUIStyle.Current.DockBGColor);
             {
@@ -296,10 +368,8 @@ namespace RigelEditor.EGUI
 
                 var root = GetRoot();
 
-
-
                 var matchedDock = root.CheckDockNodeMatched();
-                if(matchedDock == null)
+                if (matchedDock == null)
                 {
 
                 }
@@ -475,8 +545,6 @@ namespace RigelEditor.EGUI
         }
         private void SetDockPlaceImpl(GUIDockPlace place, GUIDockContentBase content, GUIDockNode src, GUIDockNode dst)
         {
-            Console.WriteLine("aaa");
-
             //remove
             src.RemoveContent(content);
 
