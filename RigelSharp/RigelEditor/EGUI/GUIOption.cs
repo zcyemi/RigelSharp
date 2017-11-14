@@ -20,7 +20,10 @@ namespace RigelEditor.EGUI
             width = 1,
             height = 2,
             noClip = 3,
-            Adaptive = 4,
+
+            adaptive = 4,
+            adaptiveValue = 5,
+
             checkRectContains = 100,
             checkTextOverflow = 101,
         }
@@ -33,13 +36,21 @@ namespace RigelEditor.EGUI
             return (bool)value;
         }
 
+        public int IntValue { get { return (int)value; } }
+        public float FloatValue { get { return (float)value; } }
+
         private GUIOption(GUIOptionType t,Object v)
         {
             type = t;
             value = v;
         }
 
-        public static readonly GUIOption Adaptive = new GUIOption(GUIOptionType.Adaptive, null);
+        public static GUIOption AdaptiveValue()
+        {
+            return new GUIOption(GUIOptionType.adaptiveValue, null);
+        }
+
+        public static readonly GUIOption Adaptive = new GUIOption(GUIOptionType.adaptive, null);
         public static readonly GUIOption NoClip = new GUIOption(GUIOptionType.noClip, null);
 
         public static GUIOption Width(int width)
@@ -55,6 +66,16 @@ namespace RigelEditor.EGUI
         {
             return new GUIOption((GUIOptionType)check, false);
         }
-
     }
+
+    public static class GUIOptionExtension
+    {
+        public static GUIOption[] Append(this GUIOption[] opt,GUIOption newopt)
+        {
+            List<GUIOption> list = new List<GUIOption>(opt);
+            list.Add(newopt);
+            return list.ToArray();
+        }
+    }
+
 }

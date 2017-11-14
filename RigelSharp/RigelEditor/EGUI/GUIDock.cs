@@ -91,40 +91,6 @@ namespace RigelEditor.EGUI
             GUI.DrawRect(rect, mousecontain? GUIStyle.Current.ColorActive : GUIStyle.Current.DockSepColor);
         }
 
-
-        private void CheckDrag()
-        {
-            if (GUI.Event.Used) return;
-            var e = GUI.Event;
-            if (e.EventType == RigelEGUIEventType.MouseDragEnter)
-            {
-                if (GUIUtility.RectContainsCheck(m_rectab, e.Pointer))
-                {
-                    m_ondrag = true;
-                    e.Use();
-                    GUIInternal.SetCursor(m_parent.m_info.m_orient == GUIDockOrient.Horizontal ? System.Windows.Forms.Cursors.VSplit : System.Windows.Forms.Cursors.HSplit);
-                }
-            }
-            else if (e.EventType == RigelEGUIEventType.MouseDragLeave)
-            {
-                if (m_ondrag)
-                {
-                    e.Use();
-                    m_ondrag = false;
-
-                    GUIInternal.SetCursor(System.Windows.Forms.Cursors.Default);
-                }
-            }
-            else if (e.EventType == RigelEGUIEventType.MouseDragUpdate)
-            {
-                if (m_ondrag)
-                {
-                    e.Use();
-                    m_parent.SeparatorMove(e.DragOffset, this);
-                }
-            }
-
-        }
     }
 
     public class GUIDockNode

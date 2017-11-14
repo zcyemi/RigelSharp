@@ -85,7 +85,7 @@ namespace RigelEditor.EGUI
         {
             GUILayout.BeginToolBar(23);
             //GUILayout.DrawMenuList(m_menuList);
-            GUILayout.Button("bbb");
+            GUILayout.Button("bbb",GUIOption.Width(50));
             GUILayout.Text("HelloWorld");
             GUILayout.Text("ABCDEEEDASDWDS",GUIOption.Width(50));
             GUILayout.Button("TestBtn");
@@ -94,8 +94,6 @@ namespace RigelEditor.EGUI
             m_dockGroup = GUI.Context.currentGroup.Rect;
             m_dockGroup.Y = 23;
             m_dockGroup.W -= 23;
-            //m_dockManager.Update(m_dockGroup);
-            //m_dockManager.LateUpdate();
 
             m_dockMgr.Update(m_dockGroup);
             m_dockMgr.LateUpdate();
