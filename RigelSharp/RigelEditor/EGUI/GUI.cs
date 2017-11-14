@@ -226,6 +226,18 @@ namespace RigelEditor.EGUI
                 rect.Y += off.Y;
             }
 
+            GUIOption optAdaptiveValue = null;
+            if (options != null)
+            {
+                optAdaptiveValue = options.FirstOrDefault((o) => { return o.type == GUIOption.GUIOptionType.adaptiveValue; });
+                if(optAdaptiveValue != null)
+                {
+                    int textWidth = Context.Font.GetTextWidth(label);
+                    rect.Z = textWidth + 6;
+                    optAdaptiveValue.value = (int)rect.Z;
+                }
+            }
+
             bool clicked = false;
             if (GUIUtility.RectContainsCheck(rect, Event.Pointer))
             {
@@ -643,21 +655,38 @@ namespace RigelEditor.EGUI
         public static bool Button(string label, Vector4 color, params GUIOption[] options)
         {
             int width = 50;
+            bool adaptive = true;
             if (options != null)
             {
                 foreach (var opt in options)
                 {
-                    if (opt.type == GUIOption.GUIOptionType.width) width = (int)opt.value;
+                    if (opt.type == GUIOption.GUIOptionType.width)
+                    {
+                        width = (int)opt.value;
+                        adaptive = false;
+                    }
                 }
             }
 
             var curarea = s_ctx.currentArea;
             var rect = new Vector4(s_ctx.currentLayout.Offset, width, s_svLineHeight.Value);
             GUIUtility.RectClip(ref rect, curarea);
-            var ret = GUI.Button(rect, label, color, GUI.Context.Color, true, options);
+
+            bool clicked = false;
+            if (adaptive)
+            {
+                var adaptiveValue = GUIOption.AdaptiveValue();
+                clicked = GUI.Button(rect, label, color, GUI.Context.Color, true, adaptiveValue);
+                width = adaptiveValue.IntValue;
+            }
+            else
+            {
+                clicked = GUI.Button(rect, label, color, GUI.Context.Color, true, options);
+            }
+            
             AutoCaculateOffsetW(width);
 
-            return ret;
+            return clicked;
         }
 
 
