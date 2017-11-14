@@ -270,15 +270,61 @@ namespace RigelEditor.EGUI
             {
                 if(m_content.Count == 0)
                 {
-                    if(m_parent != null)
-                    {
-                    }
+                    if (m_parent == null) return;
+
+                    m_parent.CollapseNode(m_parent.m_nodeL == this);
+                }
+            }
+            else
+            {
+                m_nodeL.UpdateNode();
+                if(m_nodeR != null)
+                {
+                    m_nodeR.UpdateNode();
                 }
             }
         }
 
         public void CollapseNode(bool left)
         {
+            var nodeA = left ? m_nodeL : m_nodeR;
+            var nodeB = left ? m_nodeR : m_nodeL;
+
+            if (nodeB.IsContentNode())
+            {
+                m_content = nodeB.m_content;
+                m_contentFocus = nodeB.m_contentFocus;
+
+                nodeB.Clear();
+                nodeA.Clear();
+
+                m_nodeL = null;
+                m_nodeR = null;
+            }
+            else
+            {
+                m_nodeL = nodeB.m_nodeL;
+                m_nodeR = nodeB.m_nodeR;
+                m_nodeL.m_parent = this;
+                m_nodeR.m_parent = this;
+
+                nodeB.Clear();
+                nodeA.Clear();
+
+            }
+        }
+
+        public void Clear()
+        {
+            m_nodeL = null;
+            m_nodeR = null;
+
+            m_content = null;
+            m_contentFocus = null;
+            m_info = null;
+            m_parent = null;
+            m_mgr = null;
+            m_separator = null;
         }
 
         #region Draw
@@ -518,6 +564,9 @@ namespace RigelEditor.EGUI
     {
         private GUIDockNode m_root;
         private EventSlot<Action> m_slotDockPlace = new EventSlot<Action>();
+        private EventSlot<Action> m_slotUpdate = new EventSlot<Action>();
+
+        private bool m_dockChanged = false;
 
         public GUIDockMgr()
         {
@@ -536,7 +585,10 @@ namespace RigelEditor.EGUI
 
         public void LateUpdate()
         {
+            m_dockChanged = false;
             m_slotDockPlace.InvokeOnce();
+
+            if (m_dockChanged) m_root.UpdateNode();
         }
 
         public void SetDockPlace(GUIDockPlace place,GUIDockContentBase content,GUIDockNode src,GUIDockNode dst)
@@ -551,9 +603,7 @@ namespace RigelEditor.EGUI
             //append
             dst.AddContent(content, place);
 
-            //refresh
-            src.UpdateNode();
-            dst.UpdateNode();
+            m_dockChanged = true;
         }
 
     }
