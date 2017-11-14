@@ -222,7 +222,7 @@ namespace RigelEditor.EGUI
         public override void Draw(RigelEGUIEvent guievent)
         {
 
-            GUILayout.BeginArea(m_basePos);
+            GUILayout.BeginArea(m_basePos, GUIStyle.Current.TabBtnColorS);
 
             bool itemuse = false;
             foreach(var item in m_items)
@@ -255,12 +255,11 @@ namespace RigelEditor.EGUI
         public bool Draw()
         {
             var pos = GUILayout.s_ctx.GetNextDrawPos();
-            if (GUILayout.Button(Label))
+            if (GUILayout.Button(Label,GUIStyle.Current.TabBtnColorS))
             {
-                pos.X += GUILayout.s_ctx.currentLayout.LastDrawWidth +1;
+                pos.X += GUILayout.s_ctx.currentLayout.LastDrawWidth;
                 InternalSetStartPos(pos);
                 Invoke();
-
                 return true;
             }
             return false;

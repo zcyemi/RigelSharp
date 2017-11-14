@@ -16,8 +16,8 @@ namespace RigelEditor.EGUI
 
     public class GUICtx
     {
-        public Vector4 color = RigelColor.White;
-        public Vector4 backgroundColor = RigelColor.RGBA(128, 128, 128, 255);
+        public GUIStackValue<Vector4> Color = new GUIStackValue<Vector4>(GUIStyle.Current.Color);
+        public GUIStackValue<Vector4> BackgroundColor = new GUIStackValue<Vector4>(GUIStyle.Current.BackgroundColor);
 
         /// <summary>
         /// groupStack contains currentGroup
@@ -114,7 +114,6 @@ namespace RigelEditor.EGUI
         private Stack<T> m_stack = new Stack<T>();
         public T Value { get; private set; }
 
-
         public GUIStackValue(T defaultval)
         {
             Value = defaultval;
@@ -134,6 +133,10 @@ namespace RigelEditor.EGUI
         public T Peek()
         {
             return m_stack.Peek();
+        }
+
+        public static implicit operator T(GUIStackValue<T> v){
+            return v.Value;
         }
     }
 
@@ -211,7 +214,7 @@ namespace RigelEditor.EGUI
 
         public static bool Button(Vector4 rect, string label, bool absolute = false, params GUIOption[] options)
         {
-            return Button(rect, label, Context.color, Context.backgroundColor, absolute, options);
+            return Button(rect, label, Context.BackgroundColor, Context.Color, absolute, options);
         }
 
         public static bool Button(Vector4 rect, string label, Vector4 color, Vector4 texcolor, bool absolute = false, params GUIOption[] options)
@@ -259,11 +262,13 @@ namespace RigelEditor.EGUI
 
         public static void Label(Vector4 position, string text, bool absolute = false)
         {
-            DrawText(position, text, Context.color, absolute);
+            DrawText(position, text, Context.Color, absolute);
         }
 
-        public static int DrawText(Vector4 rect, string content, Vector4 color, bool absolute = false)
+        public static int DrawText(Vector4 rect, string content, Vector4 color, bool absolute = false,params GUIOption[] options)
         {
+            bool adaptive = options.FirstOrDefault((x) => { return x == GUIOption.Adaptive; }) != null;
+
             int pixelsize = (int)Context.Font.FontPixelSize;
             rect.Y += rect.W > pixelsize ? (rect.W - pixelsize) / 2 : 0;
 
@@ -271,17 +276,37 @@ namespace RigelEditor.EGUI
             int w = 0;
 
             //centered
-            int textwidth = Context.Font.GetTextWidth(content);
-            w = rect.Z > textwidth ? (int)((rect.Z - textwidth) / 2) : 1;
-            rect.X += w;
-
-
-            foreach (var c in content)
+            if (adaptive)
             {
-                int xoff = DrawChar(rect, c, color);
-                w += xoff;
-                rect.X += xoff;
-                if (w > rect.Z) break;
+                rect.X += 3;    //default offset;
+                w += 3;
+            }
+            else
+            {
+                int textwidth = Context.Font.GetTextWidth(content);
+                w = rect.Z > textwidth ? (int)((rect.Z - textwidth) / 2) : 3;
+                rect.X += w;
+            }
+
+            if (adaptive)
+            {
+                foreach (var c in content)
+                {
+                    int xoff = DrawChar(rect, c, color);
+                    w += xoff;
+                    rect.X += xoff;
+                }
+                w += 3;
+            }
+            else
+            {
+                foreach (var c in content)
+                {
+                    int xoff = DrawChar(rect, c, color);
+                    w += xoff;
+                    rect.X += xoff;
+                    if (w > rect.Z-3) break;
+                }
             }
 
             return w;
@@ -334,7 +359,7 @@ namespace RigelEditor.EGUI
 
         public static void DrawRect(Vector4 rect, bool absolute = false,params GUIOption[] options)
         {
-            DrawRect(rect, Context.backgroundColor, absolute,options);
+            DrawRect(rect, Context.BackgroundColor, absolute,options);
         }
 
         public static void DrawRect(Vector4 rect, Vector4 color, bool absolute = false, params GUIOption[] options)
@@ -408,7 +433,6 @@ namespace RigelEditor.EGUI
 
         public static void EndWindow()
         {
-
         }
 
 
@@ -465,6 +489,7 @@ namespace RigelEditor.EGUI
             int layeroffset = s_ctx.depthLayer.Pop() - (s_ctx.depthLayer.Count == 0 ? 0 : s_ctx.depthLayer.Peek());
             s_depthz += layeroffset * 0.1f;
         }
+
 
         #endregion
     }
@@ -612,22 +637,7 @@ namespace RigelEditor.EGUI
 
         public static bool Button(string label, params GUIOption[] options)
         {
-            int width = 50;
-            if (options != null)
-            {
-                foreach (var opt in options)
-                {
-                    if (opt.type == GUIOption.GUIOptionType.width) width = (int)opt.value;
-                }
-            }
-
-            var curarea = s_ctx.currentArea;
-            var rect = new Vector4(s_ctx.currentLayout.Offset, width, s_svLineHeight.Value);
-            GUIUtility.RectClip(ref rect, curarea);
-            var ret = GUI.Button(rect, label, true);
-            AutoCaculateOffsetW(width);
-
-            return ret;
+            return Button(label, GUI.Context.BackgroundColor.Value, options);
         }
 
         public static bool Button(string label, Vector4 color, params GUIOption[] options)
@@ -644,20 +654,31 @@ namespace RigelEditor.EGUI
             var curarea = s_ctx.currentArea;
             var rect = new Vector4(s_ctx.currentLayout.Offset, width, s_svLineHeight.Value);
             GUIUtility.RectClip(ref rect, curarea);
-            var ret = GUI.Button(rect, label, color, GUI.Context.color, true, options);
+            var ret = GUI.Button(rect, label, color, GUI.Context.Color, true, options);
             AutoCaculateOffsetW(width);
 
             return ret;
         }
 
 
-        public static void Text(string content)
+        public static void Text(string content,params GUIOption[] options)
         {
-            var rect = new Vector4(s_ctx.currentLayout.Offset, 400, s_svLineHeight.Value);
-            var curarea = s_ctx.currentArea;
-            GUIUtility.RectClip(ref rect, curarea);
-            var width = GUI.DrawText(rect, content, s_ctx.color, true);
+            var optwidth = options!= null? options.FirstOrDefault((x) => { return x.type == GUIOption.GUIOptionType.width; }) : null;
+            bool adaptive = optwidth == null;
 
+            var curarea = s_ctx.currentArea;
+            var rect = new Vector4(s_ctx.currentLayout.Offset, adaptive ? curarea.Z : (int)optwidth.value , s_svLineHeight.Value);
+            GUIUtility.RectClip(ref rect, curarea);
+            int width = 0;
+            if (adaptive)
+            {
+                width = GUI.DrawText(rect, content, s_ctx.Color, true, GUIOption.Adaptive);
+            }
+            else
+            {
+                width = GUI.DrawText(rect, content, s_ctx.Color, true);
+            }
+            
             AutoCaculateOffsetW(width);
         }
 

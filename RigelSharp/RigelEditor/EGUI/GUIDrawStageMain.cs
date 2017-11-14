@@ -83,16 +83,17 @@ namespace RigelEditor.EGUI
 
         private void DrawContent()
         {
-            GUILayout.BeginToolBar(20);
-            GUILayout.DrawMenuList(m_menuList);
+            GUILayout.BeginToolBar(23);
+            //GUILayout.DrawMenuList(m_menuList);
             GUILayout.Button("bbb");
             GUILayout.Text("HelloWorld");
+            GUILayout.Text("ABCDEEEDASDWDS",GUIOption.Width(50));
             GUILayout.Button("TestBtn");
             GUILayout.EndToolBar();
 
             m_dockGroup = GUI.Context.currentGroup.Rect;
-            m_dockGroup.Y = 20;
-            m_dockGroup.W -= 20;
+            m_dockGroup.Y = 23;
+            m_dockGroup.W -= 23;
             //m_dockManager.Update(m_dockGroup);
             //m_dockManager.LateUpdate();
 

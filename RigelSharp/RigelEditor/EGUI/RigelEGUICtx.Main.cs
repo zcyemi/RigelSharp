@@ -60,7 +60,6 @@ namespace RigelEditor.EGUI
             //RigelEGUI.DrawRect(new Vector4(0, 0, ClientWidth, 25), RigelEGUIStyle.Current.MainMenuBGColor);
 
             RigelEGUILayout.BeginMenuBar();
-
             RigelEGUILayout.Button("Test");
             RigelEGUILayout.Indent(1);
             RigelEGUILayout.Button("Test2");
