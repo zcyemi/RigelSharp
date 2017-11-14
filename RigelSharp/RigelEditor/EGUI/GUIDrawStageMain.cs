@@ -20,10 +20,10 @@ namespace RigelEditor.EGUI
         private GUIMenuList m_menuList;
 
         //dock
-        private GUIDockManager m_dockManager;
+        private GUIDockMgr m_dockMgr;
         private Vector4 m_dockGroup;
 
-        private GUIDockMgr m_dockMgr;
+        
 
         public GUIDrawStageMain(string stagename, int order = 0) : base(stagename, order)
         {
@@ -32,8 +32,6 @@ namespace RigelEditor.EGUI
             m_menuList.AddMenuItem("File/Test2");
             m_menuList.AddMenuItem("Open/Sln");
             m_menuList.AddMenuItem("Exit");
-
-            m_dockManager = new GUIDockManager();
 
             m_dockMgr = new GUIDockMgr();
         }
