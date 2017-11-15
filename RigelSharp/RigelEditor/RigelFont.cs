@@ -80,8 +80,13 @@ namespace RigelEditor
         public int GetTextWidth(string str)
         {
             int width = 0;
-            foreach(var c in str)
+            foreach(char c in str)
             {
+                if(c < 33)
+                {
+                    width += 6;
+                    continue;
+                }
                 width += GetGlyphInfo(c).AdvancedX;
             }
 

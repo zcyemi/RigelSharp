@@ -35,44 +35,43 @@ namespace RigelEditor.EGUI
             var rect = new Vector4(0,0, 500, 150).CenterPos(GUI.Context.baseRect.Size());
 
             GUILayout.BeginArea(rect,GUIStyle.Current.DockContentColor,GUIOption.Border(null));
-
-            rect.W = GUILayout.s_svLineHeight;
-            GUI.DrawRect(rect,GUIStyle.Current.ColorActiveD);
-            GUILayout.Text(title);
-            GUILayout.Text(info,GUIOption.Width(480));
-
-            var off = GUILayout.s_ctx.currentLayout.Offset;
-
-            GUILayout.Space(120 - off.Y);
-
-            bool hascancel = m_callbackCancel != null;
-            GUILayout.BeginHorizontal();
-
-            if (!hascancel)
             {
-                GUILayout.Indent(200);
-                if(GUILayout.Button(buttonConfirm, GUIOption.Width(100),GUIOption.Border()))
-                {
-                    if (m_callbackConfirm != null) m_callbackConfirm.Invoke();
-                    OnDistroy();
-                }
-            }
-            else
-            {
-                GUILayout.Indent(150);
-                if (GUILayout.Button(buttonConfirm, GUIOption.Width(100), GUIOption.Border()))
-                {
-                    if (m_callbackConfirm != null) m_callbackConfirm.Invoke();
-                    OnDistroy();
-                }
-                if (GUILayout.Button(buttonCancel, GUIOption.Width(100), GUIOption.Border()))
-                {
-                    if (m_callbackCancel != null) m_callbackCancel.Invoke();
-                    OnDistroy();
-                }
-            }
-            GUILayout.EndHorizontal();
+                rect.W = GUILayout.s_svLineHeight;
+                GUI.DrawRect(rect, GUIStyle.Current.ColorActiveD);
+                GUILayout.Text(title);
+                GUILayout.Text(info, GUIOption.Width(480));
 
+                var off = GUILayout.s_ctx.currentLayout.Offset;
+
+                GUILayout.Space(120 - off.Y);
+
+                bool hascancel = m_callbackCancel != null;
+                GUILayout.BeginHorizontal();
+                if (!hascancel)
+                {
+                    GUILayout.Indent(200);
+                    if (GUILayout.Button(buttonConfirm, GUIOption.Width(100), GUIOption.Border()))
+                    {
+                        if (m_callbackConfirm != null) m_callbackConfirm.Invoke();
+                        OnDistroy();
+                    }
+                }
+                else
+                {
+                    GUILayout.Indent(150);
+                    if (GUILayout.Button(buttonConfirm, GUIOption.Width(100), GUIOption.Border()))
+                    {
+                        if (m_callbackConfirm != null) m_callbackConfirm.Invoke();
+                        OnDistroy();
+                    }
+                    if (GUILayout.Button(buttonCancel, GUIOption.Width(100), GUIOption.Border()))
+                    {
+                        if (m_callbackCancel != null) m_callbackCancel.Invoke();
+                        OnDistroy();
+                    }
+                }
+                GUILayout.EndHorizontal();
+            }
             GUILayout.EndArea();
         }
 

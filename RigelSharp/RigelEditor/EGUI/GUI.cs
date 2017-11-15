@@ -66,6 +66,7 @@ namespace RigelEditor.EGUI
         {
             RigelUtility.Assert(groupStack.Count == 0);
             RigelUtility.Assert(areaStack.Count == 0);
+
             RigelUtility.Assert(layoutStack.Count == 0);
             RigelUtility.Assert(depthLayer.Count == 0);
 
