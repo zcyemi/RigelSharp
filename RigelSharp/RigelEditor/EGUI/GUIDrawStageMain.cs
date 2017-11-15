@@ -29,14 +29,15 @@ namespace RigelEditor.EGUI
         {
             m_menuList = new GUIMenuList("File");
             m_menuList.AddMenuItem("File/Test");
+            m_menuList.AddMenuItem("File/Test/xxx");
             m_menuList.AddMenuItem("File/Test2");
             m_menuList.AddMenuItem("Open/Sln");
-            m_menuList.AddMenuItem("Exit");
+            //m_menuList.AddMenuItem("Exit");
 
             m_dockMgr = new GUIDockMgr();
         }
 
-        public override void Draw(RigelEGUIEvent guievent)
+        public override void Draw(GUIEvent guievent)
         {
             base.Draw(guievent);
 
@@ -84,7 +85,7 @@ namespace RigelEditor.EGUI
         private void DrawContent()
         {
             GUILayout.BeginToolBar(23);
-            //GUILayout.DrawMenuList(m_menuList);
+            GUILayout.DrawMenuList(m_menuList);
             GUILayout.Button("bbb",GUIOption.Width(50));
             GUILayout.Text("HelloWorld");
             GUILayout.Text("ABCDEEEDASDWDS",GUIOption.Width(50));

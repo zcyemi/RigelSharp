@@ -28,7 +28,7 @@ namespace RigelEditor.EGUI
             GUI.DrawComponent(this);
         }
 
-        public abstract void Draw(RigelEGUIEvent guievent);
+        public abstract void Draw(GUIEvent guievent);
 
     }
 
@@ -54,7 +54,7 @@ namespace RigelEditor.EGUI
             buttonCancel = btncancel ?? buttonCancel;
         }
 
-        public override void Draw(RigelEGUIEvent guievent)
+        public override void Draw(GUIEvent guievent)
         {
             GUI.BeginGroup(new Vector4(200, 200, 500, 200), null,true);
             var rect = new Vector4(0, 0, 500, 200);
@@ -101,9 +101,9 @@ namespace RigelEditor.EGUI
     public class GUIDialog:IGUIComponent
     {
         public string title;
-        public Action<RigelEGUIEvent> ongui;
+        public Action<GUIEvent> ongui;
 
-        public override void Draw(RigelEGUIEvent guievent)
+        public override void Draw(GUIEvent guievent)
         {
 
         }
@@ -112,7 +112,7 @@ namespace RigelEditor.EGUI
     public class GUIOverlay: IGUIComponent
     {
 
-        public override void Draw(RigelEGUIEvent guievent)
+        public override void Draw(GUIEvent guievent)
         {
             throw new NotImplementedException();
         }
@@ -171,7 +171,7 @@ namespace RigelEditor.EGUI
         internal void InternalSetStartPos(Vector4 baseps)
         {
             m_basePos = baseps;
-            m_basePos.Z = 100;
+            m_basePos.Z = 102;
             m_basePos.W = 200;
         }
 
@@ -219,10 +219,10 @@ namespace RigelEditor.EGUI
         }
 
 
-        public override void Draw(RigelEGUIEvent guievent)
+        public override void Draw(GUIEvent guievent)
         {
 
-            GUILayout.BeginArea(m_basePos, GUIStyle.Current.TabBtnColorS);
+            GUILayout.BeginArea(m_basePos);
 
             bool itemuse = false;
             foreach(var item in m_items)
@@ -242,7 +242,6 @@ namespace RigelEditor.EGUI
                 {
                     if (m_parent != null) m_parent.Distroy = false;
                     Distroy = true;
-                    
                 }
             }
         }
@@ -255,7 +254,7 @@ namespace RigelEditor.EGUI
         public bool Draw()
         {
             var pos = GUILayout.s_ctx.GetNextDrawPos();
-            if (GUILayout.Button(Label,GUIStyle.Current.TabBtnColorS))
+            if (GUILayout.Button(Label,GUIStyle.Current.TabBtnColor,GUIOption.Width(100)))
             {
                 pos.X += GUILayout.s_ctx.currentLayout.LastDrawWidth;
                 InternalSetStartPos(pos);

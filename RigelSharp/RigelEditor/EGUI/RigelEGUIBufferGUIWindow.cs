@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace RigelEditor.EGUI
 {
-    internal class RigelEGUIBufferGUIWindow<T> : RigelEGUIBuffer<T> where T:struct
+    internal class RigelEGUIBufferGUIWindow<T> : RigelEGUIBuffer<T> where T : struct
     {
-        public RigelEGUIBufferGUIWindow(int buffersize = BUFFER_INIT_SIZE, int extendtimes = BUFFER_EXTEND_TIMES, Action<RigelEGUIBuffer<T>, int> extendGenerate = null):
+        public RigelEGUIBufferGUIWindow(int buffersize = BUFFER_INIT_SIZE, int extendtimes = BUFFER_EXTEND_TIMES, Action<RigelEGUIBuffer<T>, int> extendGenerate = null) :
             base(buffersize, extendtimes, extendGenerate)
         {
 
@@ -20,15 +20,15 @@ namespace RigelEditor.EGUI
         /// <param name="winbufferinfo"></param>
         /// <param name="newdata"></param>
         /// <returns>return true if buffer has empty block</returns>
-        public bool UpdateGUIWindowBuffer(ref RigelEGUIWindowBufferInfo winbufferinfo,List<T> newdata)
+        public bool UpdateGUIWindowBuffer(ref RigelEGUIWindowBufferInfo winbufferinfo, List<T> newdata)
         {
             int newdataCount = newdata.Count;
             if (newdataCount == 0) return false;
 
             bool emptyblock = false;
 
-            
-            if(winbufferinfo.Inited == false)
+
+            if (winbufferinfo.Inited == false)
             {
                 winbufferinfo.StartPos = BufferDataCount;
                 Array.Copy(
@@ -45,7 +45,7 @@ namespace RigelEditor.EGUI
             }
             else
             {
-                if(winbufferinfo.EndPos == BufferDataCount)
+                if (winbufferinfo.EndPos == BufferDataCount)
                 {
                     //buffer at end
                     Array.Copy(

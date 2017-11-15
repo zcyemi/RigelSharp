@@ -25,7 +25,7 @@ namespace RigelEditor.EGUI
 
         }
 
-        public override void Draw(RigelEGUIEvent guievent)
+        public override void Draw(GUIEvent guievent)
         {
             base.Draw(guievent);
 

@@ -25,7 +25,7 @@ namespace RigelEditor.EGUI
 
 
 
-        public virtual void Draw(RigelEGUIEvent guievent)
+        public virtual void Draw(GUIEvent guievent)
         {
             GUI.SetDrawTarget(m_drawTarget);
         }

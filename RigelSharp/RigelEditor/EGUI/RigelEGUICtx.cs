@@ -53,7 +53,7 @@ namespace RigelEditor.EGUI
 
         
 
-        private void OnWindowEvent(RigelEGUIEvent guievent)
+        private void OnWindowEvent(GUIEvent guievent)
         {
             if(guievent.EventType == RigelEGUIEventType.MouseDragUpdate)
             {
@@ -110,7 +110,7 @@ namespace RigelEditor.EGUI
 
             GUIInternal.Release();
         }
-        private void GUIUpdate(RigelEGUIEvent guievent)
+        private void GUIUpdate(GUIEvent guievent)
         {
 
             GUIInternal.Update(guievent);
@@ -135,42 +135,42 @@ namespace RigelEditor.EGUI
         }
 
         
-        internal T FindWindowOfType<T>() where T : RigelEGUIWindow,new()
-        {
-            foreach(var w in m_windows)
-            {
-                if(w is T)
-                {
-                    return w as T;
-                }
-            }
-            T win = new T();
-            m_windows.Add(win);
+        //internal T FindWindowOfType<T>() where T : RigelEGUIWindow,new()
+        //{
+        //    foreach(var w in m_windows)
+        //    {
+        //        if(w is T)
+        //        {
+        //            return w as T;
+        //        }
+        //    }
+        //    T win = new T();
+        //    m_windows.Add(win);
 
-            return win;
-        }
-        private void RefreshMainMenu()
-        {
-            var assembly = RigelReflectionHelper.AssemblyRigelEditor;
-            foreach (var type in assembly.GetTypes())
-            {
-                var methods = RigelReflectionHelper.GetMethodByAttribute<RigelEGUIMenuItemAttribute>(
-                    type,
-                    BindingFlags.Static |
-                    BindingFlags.Public |
-                    BindingFlags.NonPublic
-                );
+        //    return win;
+        //}
+        //private void RefreshMainMenu()
+        //{
+        //    var assembly = RigelReflectionHelper.AssemblyRigelEditor;
+        //    foreach (var type in assembly.GetTypes())
+        //    {
+        //        var methods = RigelReflectionHelper.GetMethodByAttribute<RigelEGUIMenuItemAttribute>(
+        //            type,
+        //            BindingFlags.Static |
+        //            BindingFlags.Public |
+        //            BindingFlags.NonPublic
+        //        );
 
-                foreach (var m in methods)
-                {
-                    var attr = Attribute.GetCustomAttribute(m, typeof(RigelEGUIMenuItemAttribute)) as RigelEGUIMenuItemAttribute;
-                    m_mainMenu.AddMenuItem(attr.Label, m);
-                }
+        //        foreach (var m in methods)
+        //        {
+        //            var attr = Attribute.GetCustomAttribute(m, typeof(RigelEGUIMenuItemAttribute)) as RigelEGUIMenuItemAttribute;
+        //            m_mainMenu.AddMenuItem(attr.Label, m);
+        //        }
 
-            }
-            RigelUtility.Log("EGUI mainMenu item count:" + m_mainMenu.ItemNodes.Count());
+        //    }
+        //    RigelUtility.Log("EGUI mainMenu item count:" + m_mainMenu.ItemNodes.Count());
 
-        }
+        //}
 
     }
 

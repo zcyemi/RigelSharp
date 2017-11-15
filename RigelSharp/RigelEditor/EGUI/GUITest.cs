@@ -10,7 +10,7 @@ namespace RigelEditor.EGUI
 {
     public class GUITestComponent : IGUIComponent
     {
-        public override void Draw(RigelEGUIEvent guievent)
+        public override void Draw(GUIEvent guievent)
         {
             GUILayout.BeginArea(new Vector4(50, 50, 400, 300));
             GUILayout.Button("Button1");

@@ -62,7 +62,7 @@ namespace RigelEditor.EGUI
         public Stack<IGUIComponent> componentStack = new Stack<IGUIComponent>();
 
 
-        public void Frame(RigelEGUIEvent guievent, int width, int height)
+        public void Frame(GUIEvent guievent, int width, int height)
         {
             RigelUtility.Assert(groupStack.Count == 0);
             RigelUtility.Assert(areaStack.Count == 0);
@@ -150,7 +150,7 @@ namespace RigelEditor.EGUI
         }
         public static GUIDrawTarget DrawTarget { get; private set; }
 
-        public static RigelEGUIEvent Event { get; set; }
+        public static GUIEvent Event { get; set; }
 
         internal static List<RigelEGUIVertex> BufferRect { get { return DrawTarget.bufferRect; } }
         internal static List<RigelEGUIVertex> BufferText { get { return DrawTarget.bufferText; } }

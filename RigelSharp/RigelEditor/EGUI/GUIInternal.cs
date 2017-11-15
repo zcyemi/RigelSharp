@@ -40,7 +40,7 @@ namespace RigelEditor.EGUI
 
         }
 
-        public static void Update(RigelEGUIEvent guievent)
+        public static void Update(GUIEvent guievent)
         {
             //init frame
             GUI.Context.Frame(guievent, s_eguictx.ClientWidth,s_eguictx.ClientHeight);
