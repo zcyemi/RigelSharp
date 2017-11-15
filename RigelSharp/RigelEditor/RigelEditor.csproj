@@ -74,11 +74,14 @@
     <Compile Include="EGUI\GUI.cs" />
     <Compile Include="EGUI\GUIComponent.cs" />
     <Compile Include="EGUI\GUIDock.cs" />
+    <Compile Include="EGUI\GUIDrag.cs" />
     <Compile Include="EGUI\GUIDrawStage.cs" />
     <Compile Include="EGUI\GUIDrawStageMain.cs" />
     <Compile Include="EGUI\GUIDrawStageOverlay.cs" />
     <Compile Include="EGUI\GUIDrawStageWindows.cs" />
     <Compile Include="EGUI\GUIInternal.cs" />
+    <Compile Include="EGUI\GUILayout.cs" />
+    <Compile Include="EGUI\GUIMessageBox.cs" />
     <Compile Include="EGUI\GUIOption.cs" />
     <Compile Include="EGUI\GUITest.cs" />
     <Compile Include="EGUI\GUIUtility.cs" />

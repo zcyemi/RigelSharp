@@ -89,7 +89,7 @@ namespace RigelEditor.EGUI
             GUILayout.Button("bbb",GUIOption.Width(50));
             GUILayout.Text("HelloWorld");
             GUILayout.Text("ABCDEEEDASDWDS",GUIOption.Width(50));
-            GUILayout.Button("TestBtn");
+            if (GUILayout.Button("GUITest")) m_dockMgr.AddNewContent(new GUITestContent());
             GUILayout.EndToolBar();
 
             m_dockGroup = GUI.Context.currentGroup.Rect;

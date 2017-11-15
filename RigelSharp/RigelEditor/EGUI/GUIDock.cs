@@ -36,6 +36,11 @@ namespace RigelEditor.EGUI
         {
 
         }
+
+        public virtual void OnGUI()
+        {
+
+        }
     }
 
     public class GUIDockInfo
@@ -156,13 +161,31 @@ namespace RigelEditor.EGUI
                 if (m_separator == null) m_separator = new GUIDockSeparator(this);
             }
         }
-        public void AddContent(GUIDockContentBase c)
+        public bool AddContent(GUIDockContentBase c,bool strictmode = true)
         {
-            if (m_nodeL != null || m_nodeR != null) throw new Exception();
+            if (strictmode)
+            {
+                if (m_nodeL != null || m_nodeR != null) throw new Exception();
+            }
+            else
+            {
+                if (!IsContentNode())
+                {
+                    bool added =  m_nodeL.AddContent(c, strictmode);
+                    if (!added)
+                    {
+                        added = m_nodeR.AddContent(c, strictmode);
+                    }
+                    return added;
+                }
+            }
+            
 
             if (m_content == null) m_content = new List<GUIDockContentBase>();
             m_content.Add(c);
             m_contentFocus = c;
+
+            return true;
         }
         public void AddContent(GUIDockContentBase c,GUIDockPlace place)
         {
@@ -491,7 +514,7 @@ namespace RigelEditor.EGUI
                         GUILayout.BeginArea(GUI.Context.currentGroup.Absolute, GUIStyle.Current.DockContentColor);
                         {
                             //test draw
-                            GUILayout.Button("TestDraw");
+                            if (m_contentFocus != null) m_contentFocus.OnGUI();
                         }
                         GUILayout.EndArea();
                     }
@@ -529,9 +552,9 @@ namespace RigelEditor.EGUI
                     {
                         foreach (var c in m_content)
                         {
-                            GUILayout.Space(3);
+                            GUILayout.Space(2);
                             DrawTabBarContentBtn(c);
-                            GUILayout.Space(-3);
+                            GUILayout.Space(-2);
                         }
                     }
                 }
@@ -688,7 +711,7 @@ namespace RigelEditor.EGUI
             }
             GUI.EndGroup();
 
-            if (content.InternalTabBtnDragState.Stage != GUIDrawStateStage.Exit)
+            if (content.InternalTabBtnDragState.Stage != GUIDragStateStage.Exit)
             {
                 return GUIDockPlace.none;
             }
@@ -720,7 +743,6 @@ namespace RigelEditor.EGUI
             m_root.Update(group);
             GUI.EndGroup();
         }
-
         public void LateUpdate()
         {
             m_dockChanged = false;
@@ -742,6 +764,11 @@ namespace RigelEditor.EGUI
             dst.AddContent(content, place);
 
             m_dockChanged = true;
+        }
+
+        public void AddNewContent(GUIDockContentBase content)
+        {
+            m_root.AddContent(content, false);
         }
 
     }

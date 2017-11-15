@@ -60,4 +60,37 @@ namespace RigelEditor.EGUI
             GUI.EndGroup();
         }
     }
+
+
+    public class GUITestContent: GUIDockContentBase
+    {
+
+        public GUITestContent()
+        {
+            Title = "GUITest";
+        }
+
+
+        public override void OnGUI()
+        {
+            GUILayout.Text("GUITest Component");
+            GUILayout.BeginHorizontal();
+            GUILayout.Text("MessageBox");
+            if (GUILayout.Button("ShowMessageBox"))
+            {
+                var msgbox = new GUIMessageBox("MsgBox", "TestInfo", () => { Console.WriteLine("Click Confirm");},null,"Confirm","Cancel");
+                GUI.DrawComponent(msgbox);
+            }
+            GUILayout.EndHorizontal();
+
+            GUILayout.Line(1,null);
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Text("MenuBar");
+            GUI.DrawBorder(GUILayout.s_ctx.currentLayout.LastRect,1,RigelColor.Red);
+
+            GUILayout.BeginVertical();
+
+        }
+    }
 }
