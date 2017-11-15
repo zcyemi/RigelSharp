@@ -28,6 +28,11 @@ namespace RigelEditor.EGUI
             GUI.DrawComponent(this);
         }
 
+        public void OnDistroy()
+        {
+            Distroy = true;
+        }
+
         public abstract void Draw(GUIEvent guievent);
 
     }

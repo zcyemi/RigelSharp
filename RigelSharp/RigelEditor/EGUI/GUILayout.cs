@@ -41,12 +41,22 @@ namespace RigelEditor.EGUI
         /// </summary>
         /// <param name="rect"></param>
         /// <param name="color"></param>
-        public static void BeginArea(Vector4 rect, Vector4? color = null)
+        public static void BeginArea(Vector4 rect, Vector4? color = null,params GUIOption[] options)
         {
             if (color != null)
             {
                 GUI.DrawRect(rect, (Vector4)color, true);
             }
+
+            if(options != null)
+            {
+                var optborder = options.FirstOrDefault((x) => { return x.type == GUIOption.GUIOptionType.border; });
+                if(optborder != null)
+                {
+                    GUI.DrawBorder(rect, 1, optborder.Vector4Value, true);
+                }
+            }
+
             s_ctx.areaStack.Push(s_ctx.currentArea);
             s_ctx.currentArea = rect;
 
@@ -120,7 +130,7 @@ namespace RigelEditor.EGUI
         {
             s_ctx.currentLayout.Offset.Y += s_svLineHeight.Value;
         }
-        public static void Space(int height)
+        public static void Space(float height)
         {
             s_ctx.currentLayout.Offset.Y += height;
         }

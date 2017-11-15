@@ -19,7 +19,7 @@ namespace RigelEditor.EGUI
         private Action m_callbackCancel;
 
 
-        public GUIMessageBox(string title, string info, Action cbconfirm = null, Action cbcancel = null, string btnconfirm = null, string btncancel = null)
+        public GUIMessageBox(string title, string info, Action cbconfirm, Action cbcancel = null, string btnconfirm = null, string btncancel = null)
         {
             this.title = title ?? this.title;
             this.info = info ?? this.info;
@@ -32,40 +32,48 @@ namespace RigelEditor.EGUI
 
         public override void Draw(GUIEvent guievent)
         {
-            GUI.BeginGroup(new Vector4(200, 200, 500, 200), null, true);
-            var rect = new Vector4(0, 0, 500, 200);
-            //background
-            GUI.DrawRect(rect);
-            //header
-            rect.W = 25;
-            GUI.DrawRect(rect);
-            GUI.Label(rect, title);
+            var rect = new Vector4(0,0, 500, 150).CenterPos(GUI.Context.baseRect.Size());
 
-            //info
-            rect.W = 125;
-            rect.Y = 25;
-            GUI.Label(rect, info);
+            GUILayout.BeginArea(rect,GUIStyle.Current.DockContentColor,GUIOption.Border(null));
 
-            //buttons
-            rect.Y += 125;
-            rect.W = 25;
-            rect.X = 300;
-            rect.Z = 70;
-            if (GUI.Button(rect, buttonConfirm))
+            rect.W = GUILayout.s_svLineHeight;
+            GUI.DrawRect(rect,GUIStyle.Current.ColorActiveD);
+            GUILayout.Text(title);
+            GUILayout.Text(info,GUIOption.Width(480));
+
+            var off = GUILayout.s_ctx.currentLayout.Offset;
+
+            GUILayout.Space(120 - off.Y);
+
+            bool hascancel = m_callbackCancel != null;
+            GUILayout.BeginHorizontal();
+
+            if (!hascancel)
             {
-                if (m_callbackConfirm != null) m_callbackConfirm.Invoke();
-
-                Console.WriteLine(title + " confirm");
-                Distroy = true;
+                GUILayout.Indent(200);
+                if(GUILayout.Button(buttonConfirm, GUIOption.Width(100),GUIOption.Border()))
+                {
+                    if (m_callbackConfirm != null) m_callbackConfirm.Invoke();
+                    OnDistroy();
+                }
             }
-            rect.X += 80;
-            if (GUI.Button(rect, buttonCancel))
+            else
             {
-                if (m_callbackCancel != null) m_callbackCancel.Invoke();
-                Console.WriteLine(title + " cancel");
-                Distroy = true;
+                GUILayout.Indent(150);
+                if (GUILayout.Button(buttonConfirm, GUIOption.Width(100), GUIOption.Border()))
+                {
+                    if (m_callbackConfirm != null) m_callbackConfirm.Invoke();
+                    OnDistroy();
+                }
+                if (GUILayout.Button(buttonCancel, GUIOption.Width(100), GUIOption.Border()))
+                {
+                    if (m_callbackCancel != null) m_callbackCancel.Invoke();
+                    OnDistroy();
+                }
             }
-            GUI.EndGroup();
+            GUILayout.EndHorizontal();
+
+            GUILayout.EndArea();
         }
 
         public override string ToString()

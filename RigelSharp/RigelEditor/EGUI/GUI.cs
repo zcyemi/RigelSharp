@@ -254,7 +254,7 @@ namespace RigelEditor.EGUI
             {
                 DrawRect(rect, color, absolute);
             }
-            DrawText(rect, label, texcolor, absolute);
+            DrawText(rect, label, texcolor, absolute,options);
 
             return clicked;
         }
@@ -357,8 +357,17 @@ namespace RigelEditor.EGUI
         {
             DrawRect(rect, Context.BackgroundColor, absolute,options);
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="rect"></param>
+        /// <param name="color"></param>
+        /// <param name="absolute"></param>
+        /// <param name="options">border noClip</param>
         public static void DrawRect(Vector4 rect, Vector4 color, bool absolute = false, params GUIOption[] options)
         {
+            GUIOption optBorder = null;
             if(options != null)
             {
                 var noclip = options.FirstOrDefault((x) => { return x.type == GUIOption.GUIOptionType.noClip; });
@@ -371,6 +380,8 @@ namespace RigelEditor.EGUI
                 {
                     rect = rect.Move(absolute ? s_ctx.baseRect.Pos() : s_ctx.currentGroup.Absolute.Pos());
                 }
+
+                optBorder = options.FirstOrDefault((x) => { return x.type == GUIOption.GUIOptionType.border; });
             }
 
             BufferRect.Add(new RigelEGUIVertex()
@@ -397,6 +408,11 @@ namespace RigelEditor.EGUI
                 Color = color,
                 UV = Vector2.Zero
             });
+
+            if (optBorder != null)
+            {
+                DrawBorder(rect, 1, (Vector4)optBorder.value, true);
+            }
 
             DepthIncrease();
         }

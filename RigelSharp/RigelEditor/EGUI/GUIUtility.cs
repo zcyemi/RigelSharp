@@ -50,8 +50,8 @@ namespace RigelEditor.EGUI
         {
             v.X += offset;
             v.Y += offset;
-            v.Z -= offset;
-            v.W -= offset;
+            v.Z -= offset *2;
+            v.W -= offset *2;
             return v;
         }
 
@@ -61,6 +61,16 @@ namespace RigelEditor.EGUI
             v.Y += off.Y;
             return v;
         }
+
+        public static Vector4 CenterPos(this Vector4 v,Vector2 size)
+        {
+            size = (size - v.Size()) * 0.5f;
+            v.X += size.X;
+            v.Y += size.Y;
+
+            return v;
+        }
+
         public static Vector4 Move(this Vector4 v, float offx,float offy)
         {
             v.X += offx;

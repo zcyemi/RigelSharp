@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using SharpDX;
+
 namespace RigelEditor.EGUI
 {
 
@@ -24,6 +26,8 @@ namespace RigelEditor.EGUI
             adaptive = 4,
             adaptiveValue = 5,
 
+            border = 6,
+
             checkRectContains = 100,
             checkTextOverflow = 101,
         }
@@ -38,6 +42,7 @@ namespace RigelEditor.EGUI
 
         public int IntValue { get { return (int)value; } }
         public float FloatValue { get { return (float)value; } }
+        public Vector4 Vector4Value { get { return (Vector4)value; } }
 
         private GUIOption(GUIOptionType t,Object v)
         {
@@ -52,6 +57,14 @@ namespace RigelEditor.EGUI
 
         public static readonly GUIOption Adaptive = new GUIOption(GUIOptionType.adaptive, null);
         public static readonly GUIOption NoClip = new GUIOption(GUIOptionType.noClip, null);
+        public static GUIOption Border(Vector4? color)
+        {
+            return new GUIOption(GUIOptionType.border, color ?? GUIStyle.Current.ColorActiveD);
+        }
+        public static GUIOption Border()
+        {
+            return new GUIOption(GUIOptionType.border, GUIStyle.Current.ColorActiveD);
+        }
 
         public static GUIOption Width(int width)
         {
