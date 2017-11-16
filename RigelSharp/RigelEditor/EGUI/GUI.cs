@@ -8,127 +8,7 @@ using SharpDX;
 
 namespace RigelEditor.EGUI
 {
-    public struct GUIGroupInfo
-    {
-        public Vector4 Rect;
-        public Vector4 Absolute;
-    }
 
-    public class GUICtx
-    {
-        public GUIStackValue<Vector4> Color = new GUIStackValue<Vector4>(GUIStyle.Current.Color);
-        public GUIStackValue<Vector4> BackgroundColor = new GUIStackValue<Vector4>(GUIStyle.Current.BackgroundColor);
-
-        /// <summary>
-        /// groupStack contains currentGroup
-        /// </summary>
-        //public Stack<Vector4> groupStack = new Stack<Vector4>();
-        public Stack<GUIGroupInfo> groupStack = new Stack<GUIGroupInfo>();
-        public GUIGroupInfo currentGroup;
-        public Vector4 baseRect;
-        ///// <summary>
-        ///// relative to parent group
-        ///// </summary>
-        //public Vector4 currentGroup;
-        ///// <summary>
-        ///// relative to baseRect
-        ///// </summary>
-        //public Vector4 currentGroupAbsolute;
-
-        public Stack<Vector4> areaStack = new Stack<Vector4>();
-        public Stack<GUILayoutInfo> layoutStack = new Stack<GUILayoutInfo>();
-        /// <summary>
-        /// relative to baseRect
-        /// </summary>
-        public Vector4 currentArea;
-        public GUILayoutInfo currentLayout;
-        public Vector4 GetNextDrawPos()
-        {
-            var rect = currentArea;
-            rect.X += currentLayout.Offset.X;
-            rect.Y += currentLayout.Offset.Y;
-
-            return rect;
-        }
-
-        public Stack<int> depthLayer = new Stack<int>();
-
-
-        public float s_depthStep = 0.0001f;
-
-        public RigelFont Font { get; set; }
-
-        //component
-        public Stack<IGUIComponent> componentStack = new Stack<IGUIComponent>();
-
-
-        public void Frame(GUIEvent guievent, int width, int height)
-        {
-            RigelUtility.Assert(groupStack.Count == 0);
-            RigelUtility.Assert(areaStack.Count == 0);
-
-            RigelUtility.Assert(layoutStack.Count == 0);
-            RigelUtility.Assert(depthLayer.Count == 0);
-
-            GUI.Event = guievent;
-            baseRect = new Vector4(0, 0, width, height);
-            currentGroup.Rect = baseRect;
-            currentGroup.Absolute = baseRect;
-
-            //layout
-            currentLayout.Offset = Vector2.Zero;
-            currentLayout.SizeMax = Vector2.Zero;
-            currentLayout.Verticle = true;
-
-            currentArea = baseRect;
-        }
-
-    }
-
-    public class GUIDrawTarget
-    {
-        public List<RigelEGUIVertex> bufferRect;
-        public List<RigelEGUIVertex> bufferText;
-        public float depth;
-
-        public GUIDrawTarget(float depth)
-        {
-            this.depth = depth;
-            bufferRect = new List<RigelEGUIVertex>();
-            bufferText = new List<RigelEGUIVertex>();
-        }
-    }
-
-    public class GUIStackValue<T>
-    {
-        private Stack<T> m_stack = new Stack<T>();
-        public T Value { get; private set; }
-
-        public GUIStackValue(T defaultval)
-        {
-            Value = defaultval;
-            m_stack.Push(Value);
-        }
-
-        public void Set(T v)
-        {
-            m_stack.Push(Value);
-            Value = v;
-        }
-        public void Restore()
-        {
-            Value = m_stack.Pop();
-        }
-
-        public T Peek()
-        {
-            return m_stack.Peek();
-        }
-
-        public static implicit operator T(GUIStackValue<T> v){
-            return v.Value;
-        }
-    }
 
     public static class GUI
     {
@@ -218,7 +98,7 @@ namespace RigelEditor.EGUI
             if (options != null)
             {
                 optAdaptiveValue = options.FirstOrDefault((o) => { return o.type == GUIOption.GUIOptionType.adaptiveValue; });
-                if(optAdaptiveValue != null)
+                if (optAdaptiveValue != null)
                 {
                     int textWidth = Context.Font.GetTextWidth(label);
                     rect.Z = textWidth + 6;
@@ -242,7 +122,12 @@ namespace RigelEditor.EGUI
                     clicked = true;
 
                 }
-                if (Event.Button == MouseButton.Left)
+
+                if (Event.Used && !clicked)
+                {
+                    DrawRect(rect, color, absolute);
+                }
+                else if (Event.Button == MouseButton.Left)
                 {
                     DrawRect(rect, GUIStyle.Current.ColorActiveD, absolute);
                 }
@@ -255,7 +140,7 @@ namespace RigelEditor.EGUI
             {
                 DrawRect(rect, color, absolute);
             }
-            DrawText(rect, label, texcolor, absolute,options);
+            DrawText(rect, label, texcolor, absolute, options);
 
             return clicked;
         }
@@ -264,14 +149,15 @@ namespace RigelEditor.EGUI
         {
             DrawText(position, text, Context.Color, absolute);
         }
-        public static int DrawText(Vector4 rect, string content, Vector4 color, bool absolute = false,params GUIOption[] options)
+        public static int DrawText(Vector4 rect, string content, Vector4 color, bool absolute = false, params GUIOption[] options)
         {
             bool adaptive = options.FirstOrDefault((x) => { return x == GUIOption.Adaptive; }) != null;
 
             int pixelsize = (int)Context.Font.FontPixelSize;
             rect.Y += rect.W > pixelsize ? (rect.W - pixelsize) / 2 : 0;
 
-            GUIUtility.RectClip(ref rect, absolute ? s_ctx.baseRect : s_ctx.currentGroup.Absolute);
+            bool valid = GUIUtility.RectClip(ref rect, absolute ? s_ctx.baseRect : s_ctx.currentGroup.Absolute);
+            if (!valid) return 0;
             int w = 0;
 
             //centered
@@ -304,7 +190,7 @@ namespace RigelEditor.EGUI
                     int xoff = DrawChar(rect, c, color);
                     w += xoff;
                     rect.X += xoff;
-                    if (w > rect.Z-3) break;
+                    if (w > rect.Z - 3) break;
                 }
             }
             return w;
@@ -354,9 +240,9 @@ namespace RigelEditor.EGUI
             return value;
         }
 
-        public static void DrawRect(Vector4 rect, bool absolute = false,params GUIOption[] options)
+        public static void DrawRect(Vector4 rect, bool absolute = false, params GUIOption[] options)
         {
-            DrawRect(rect, Context.BackgroundColor, absolute,options);
+            DrawRect(rect, Context.BackgroundColor, absolute, options);
         }
 
         /// <summary>
@@ -369,10 +255,10 @@ namespace RigelEditor.EGUI
         public static void DrawRect(Vector4 rect, Vector4 color, bool absolute = false, params GUIOption[] options)
         {
             GUIOption optBorder = null;
-            if(options != null)
+            if (options != null)
             {
                 var noclip = options.FirstOrDefault((x) => { return x.type == GUIOption.GUIOptionType.noClip; });
-                if(noclip == null)
+                if (noclip == null)
                 {
                     var valid = GUIUtility.RectClip(ref rect, absolute ? s_ctx.baseRect : s_ctx.currentGroup.Absolute);
                     if (!valid) return;
@@ -422,7 +308,7 @@ namespace RigelEditor.EGUI
 
         }
 
-        public static void DrawBorder(Vector4 rect,int thickness,Vector4? color,bool absolute = false)
+        public static void DrawBorder(Vector4 rect, int thickness, Vector4? color, bool absolute = false)
         {
             var p0 = rect.Pos();
             var p2 = p0 + rect.Size();
@@ -435,17 +321,17 @@ namespace RigelEditor.EGUI
             DrawLineAxisAligned(p0, p3, thickness, color, absolute);
         }
 
-        public static void DrawLine(Vector2 startp,Vector2 endp,int thickness,bool absolute = false)
+        public static void DrawLine(Vector2 startp, Vector2 endp, int thickness, bool absolute = false)
         {
 
         }
 
-        public static void DrawLineAxisAligned(Vector2 startp, Vector2 endp, int thickness, Vector4? color,bool absolute = false)
+        public static void DrawLineAxisAligned(Vector2 startp, Vector2 endp, int thickness, Vector4? color, bool absolute = false)
         {
             var rect = new Vector4(startp, endp.X - startp.X, endp.Y - startp.Y);
 
             float thickhalf = thickness / 2.0f;
-            if(rect.Z > rect.W)
+            if (rect.Z > rect.W)
             {
                 rect.W = thickness;
                 rect.Z += thickhalf;
@@ -460,7 +346,7 @@ namespace RigelEditor.EGUI
             rect.Y -= thickhalf;
             if (color != null)
             {
-                DrawRect(rect,(Vector4)color, absolute);
+                DrawRect(rect, (Vector4)color, absolute);
             }
             else
             {
@@ -501,6 +387,17 @@ namespace RigelEditor.EGUI
             Event.Use();
         }
 
+
+        #region ObjectPool
+
+        public static GUIObjScrollBar GetScrollBar(Vector4 rect)
+        {
+            return Context.poolSrollbar.Get(GUIUtilityInternal.GetHash(rect, GUIObjectType.ScrollBar));
+        }
+
+        #endregion
+
+
         #region utility
         internal static void SetDrawTarget(GUIDrawTarget target)
         {
@@ -532,12 +429,12 @@ namespace RigelEditor.EGUI
         /// <param name="layer"></param>
         public static void BeginDepthLayer(int layer)
         {
-            if(layer < 1 || layer >9)
+            if (layer < 1 || layer > 9)
             {
                 throw new Exception("GUI DepthLayer invalid (1-9)");
             }
 
-            int layeroffset = layer -(s_ctx.depthLayer.Count == 0 ? 0 : s_ctx.depthLayer.Peek()) ;
+            int layeroffset = layer - (s_ctx.depthLayer.Count == 0 ? 0 : s_ctx.depthLayer.Peek());
             s_depthz -= layeroffset * 0.1f;
             s_ctx.depthLayer.Push(layer);
         }

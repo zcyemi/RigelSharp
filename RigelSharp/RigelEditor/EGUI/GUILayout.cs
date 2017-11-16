@@ -30,10 +30,18 @@ namespace RigelEditor.EGUI
 
         private static Stack<GUILayoutInfo> layoutStack { get { return s_ctx.layoutStack; } }
 
-        public static GUIStackValue<int> s_svLineHeight = new GUIStackValue<int>(25);
+        public static GUIStackValue<int> s_svLineHeight = new GUIStackValue<int>(23);
         public static GUIStackValue<int> s_svLineIndent = new GUIStackValue<int>(5);
         public static int layoutOffX = 1;
         public static int layoutOffY = 1;
+
+        public static Vector2 SizeRemain
+        {
+            get
+            {
+                return s_ctx.currentArea.Size() - s_ctx.currentLayout.Offset;
+            }
+        }
 
 
         /// <summary>
@@ -303,6 +311,23 @@ namespace RigelEditor.EGUI
 
         }
 
+        public static Vector2 BeginScrollView(Vector2 pos)
+        {
+            var sizeremain = SizeRemain;
+            var rect = new Vector4(s_ctx.currentLayout.Offset, sizeremain.X, sizeremain.Y);
+
+            var rectab = GetRectAbsolute(rect);
+            var scrollbar = GUI.GetScrollBar(rectab);
+
+            DrawRect(rect,scrollbar.Color);
+            return pos;
+        }
+
+        public static void EndScrollView()
+        {
+
+        }
+
         public static void SetLineHeight(int height)
         {
             s_svLineHeight.Set(height);
@@ -329,5 +354,15 @@ namespace RigelEditor.EGUI
             GUI.DrawRect(rect, color, true);
         }
 
+
+        #region Utility
+        public static Vector4 GetRectAbsolute(Vector4 rect)
+        {
+            var off = s_ctx.currentArea.Pos();
+            rect.X += off.X;
+            rect.Y += off.Y;
+            return rect;
+        }
+        #endregion
     }
 }

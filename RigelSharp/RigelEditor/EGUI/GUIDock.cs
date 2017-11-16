@@ -86,14 +86,13 @@ namespace RigelEditor.EGUI
             }
 
             var mousecontain = GUIUtility.RectContainsCheck(m_rectab, GUI.Event.Pointer);
-
             if (m_dragstate.OnDrag(mousecontain))
             {
                 m_parent.SeparatorMove(GUI.Event.DragOffset, this);
                 mousecontain = true;
             }
 
-            GUI.DrawRect(rect, mousecontain? GUIStyle.Current.ColorActive : GUIStyle.Current.DockSepColor);
+            GUI.DrawRect(rect, (mousecontain && !GUI.Event.Used) ? GUIStyle.Current.ColorActive : GUIStyle.Current.DockSepColor);
         }
 
     }

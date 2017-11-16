@@ -69,8 +69,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Alg\HashFunction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RgWindow.cs" />
+    <Compile Include="RigelAPI.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

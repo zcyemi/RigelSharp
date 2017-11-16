@@ -67,6 +67,7 @@ namespace RigelEditor.EGUI
     {
         private bool m_collapsegroup1 = false;
         private bool m_collapsegroup2 = false;
+        private Vector2 m_scrollViewPos = Vector2.Zero;
 
         public GUITestContent()
         {
@@ -113,7 +114,7 @@ namespace RigelEditor.EGUI
                 GUILayout.Button("Expended", GUIOption.Expended);
                 GUILayout.BeginHorizontal();
                 GUILayout.Button("Grid 0.5", GUIOption.Grid(0.5f));
-                GUILayout.Button("Grid 0.5", GUIOption.Grid(0.25f));
+                GUILayout.Button("Grid 0.25", GUIOption.Grid(0.25f));
 
                 GUILayout.EndHorizontal();
             }
@@ -134,8 +135,18 @@ namespace RigelEditor.EGUI
                 }
 
                 var t = GUI.Depth;
-
                 GUILayout.EndCollapseGroup();
+            }
+
+            {
+                //ScrollView
+
+                GUILayout.Indent(30);
+
+                m_scrollViewPos = GUILayout.BeginScrollView(m_scrollViewPos);
+
+
+                GUILayout.EndScrollView();
             }
 
         }
