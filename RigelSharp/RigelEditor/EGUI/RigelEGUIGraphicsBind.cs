@@ -42,6 +42,8 @@ namespace RigelEditor.EGUI
         //shared indices buffer
         private RigelEGUIBuffer<int> m_bufferDataIndices;
 
+        public RigelEGUIBuffer<int> BufferIndices { get { return m_bufferDataIndices; } }
+
         //window buffer
         private RigelEGUIBufferGUIWindow<RigelEGUIVertex> m_bufferDataRect;
         private RigelEGUIBufferGUIWindow<RigelEGUIVertex> m_bufferDataText;
@@ -199,7 +201,7 @@ namespace RigelEditor.EGUI
                 0
             );
             //textbuffer main
-            m_bufferMainText = new RigelEGUIBuffer<RigelEGUIVertex>(256);
+            m_bufferMainText = new RigelEGUIBuffer<RigelEGUIVertex>(512);
             m_gVertBufferMainText = new Buffer(m_graphics.Device, vbufferdescText);
             m_gVertBufferMainTextBinding = new VertexBufferBinding(
                 m_gVertBufferMainText,
@@ -239,6 +241,8 @@ namespace RigelEditor.EGUI
                     b.BufferData[i6+4] = i4+3;
                     b.BufferData[i6+5] = i4+2;
                 }
+
+                Console.WriteLine("exten:" + b.BufferSize);
 
                 b.IncreaseBufferDataCount(b.BufferSize - pos);
             });
@@ -393,6 +397,19 @@ namespace RigelEditor.EGUI
                     0
                 );
                 m_bufferMainRect.SetResizeDone();
+            }
+
+            //indices buffer
+            if (m_bufferDataIndices.BufferResized)
+            {
+                var desc = m_gIndicesBuffer.Description;
+                if(m_gIndicesBuffer != null)
+                {
+                    m_gIndicesBuffer.Dispose();
+                }
+                desc.SizeInBytes = m_bufferDataIndices.BufferSizeInByte;
+                m_gIndicesBuffer = new Buffer(m_graphics.Device, desc);
+                m_bufferDataIndices.SetResizeDone();
             }
 
             //buffer data update

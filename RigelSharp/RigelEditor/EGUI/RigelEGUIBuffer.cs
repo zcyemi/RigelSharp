@@ -46,6 +46,7 @@ namespace RigelEditor.EGUI
         {
             if (BufferSize < size)
             {
+
                 int extendpos = BufferSize;
 
                 int newsize = BufferSize * m_bufferExtendTimes;
@@ -81,6 +82,7 @@ namespace RigelEditor.EGUI
         /// </summary>
         public void SetResizeDone()
         {
+            Console.WriteLine("set resize buffer done!");
             BufferResized = false;
         }
 

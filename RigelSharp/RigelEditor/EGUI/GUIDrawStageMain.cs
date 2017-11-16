@@ -70,12 +70,18 @@ namespace RigelEditor.EGUI
 
             {
                 var textCount = m_drawTarget.bufferText.Count;
+
                 if (textCount != m_lastBufferSizeText) bind.NeedRebuildCommandList = true;
                 bind.BufferMainText.CheckAndExtendsWithSize(textCount);
                 m_drawTarget.bufferText.CopyTo(bind.BufferMainText.BufferData);
                 bind.BufferMainText.InternalSetBufferDataCount(textCount);
 
                 m_lastBufferSizeText = textCount;
+                
+            }
+
+            {
+                bind.BufferIndices.CheckAndExtendsWithSize(Math.Max(m_lastBufferSizeRect, m_lastBufferSizeText) / 4 * 6);
             }
         }
 

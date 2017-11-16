@@ -73,9 +73,11 @@ namespace RigelEditor.EGUI
             Title = "GUITest";
         }
 
-
         public override void OnGUI()
         {
+
+            GUILayout.Text(GUI.DrawTarget.bufferText.Count.ToString());
+            GUILayout.Line(2,null);
 
             GUILayout.Text("GUITest Component");
 
@@ -130,6 +132,9 @@ namespace RigelEditor.EGUI
                 {
                     GUILayout.Button("button in collapse group2.");
                 }
+
+                var t = GUI.Depth;
+
                 GUILayout.EndCollapseGroup();
             }
 
