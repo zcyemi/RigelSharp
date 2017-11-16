@@ -27,6 +27,8 @@ namespace RigelEditor.EGUI
             adaptiveValue = 5,
 
             border = 6,
+            expended = 7,
+            grid =  8,
 
             checkRectContains = 100,
             checkTextOverflow = 101,
@@ -55,8 +57,15 @@ namespace RigelEditor.EGUI
             return new GUIOption(GUIOptionType.adaptiveValue, null);
         }
 
+        public static readonly GUIOption Expended = new GUIOption(GUIOptionType.expended, null);
         public static readonly GUIOption Adaptive = new GUIOption(GUIOptionType.adaptive, null);
         public static readonly GUIOption NoClip = new GUIOption(GUIOptionType.noClip, null);
+
+        public static GUIOption Grid(float percentage = 1.0f)
+        {
+            return new GUIOption(GUIOptionType.grid, percentage);
+        }
+
         public static GUIOption Border(Vector4? color)
         {
             return new GUIOption(GUIOptionType.border, color ?? GUIStyle.Current.ColorActiveD);
@@ -70,7 +79,6 @@ namespace RigelEditor.EGUI
         {
             return new GUIOption(GUIOptionType.width, width);
         }
-
         public static GUIOption Height(int height)
         {
             return new GUIOption(GUIOptionType.height, height);

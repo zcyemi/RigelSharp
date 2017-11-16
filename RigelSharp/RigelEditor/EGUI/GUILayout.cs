@@ -194,6 +194,16 @@ namespace RigelEditor.EGUI
                         width = (int)opt.value;
                         adaptive = false;
                     }
+                    else if(opt.type == GUIOption.GUIOptionType.expended)
+                    {
+                        width = (int)(s_ctx.currentArea.Z - s_ctx.currentLayout.Offset.X);
+                        adaptive = false;
+                    }
+                    else if (opt.type == GUIOption.GUIOptionType.grid)
+                    {
+                        width = (int)(s_ctx.currentArea.Z * opt.FloatValue);
+                        adaptive = false;
+                    }
                 }
             }
 
@@ -270,6 +280,27 @@ namespace RigelEditor.EGUI
         {
             EndHorizontal();
             RestoreLineHeight();
+        }
+
+        public static bool BeginCollapseGroup(string label,bool open)
+        {
+            if(Button(label, GUIOption.Expended))
+            {
+                open = !open;
+            }
+            return open;
+        }
+
+        public static bool BeginCollapseGroup(string label, ref bool open)
+        {
+            GUILayout.Space(1);
+            open = BeginCollapseGroup(label,open);
+            return open;
+        }
+
+        public static void EndCollapseGroup()
+        {
+
         }
 
         public static void SetLineHeight(int height)

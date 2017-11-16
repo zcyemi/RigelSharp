@@ -56,6 +56,7 @@ namespace RigelEditor.EGUI
             GUILayout.EndArea();
 
 
+
             GUILayout.EndArea();
             GUI.EndGroup();
         }
@@ -64,6 +65,8 @@ namespace RigelEditor.EGUI
 
     public class GUITestContent: GUIDockContentBase
     {
+        private bool m_collapsegroup1 = false;
+        private bool m_collapsegroup2 = false;
 
         public GUITestContent()
         {
@@ -102,7 +105,33 @@ namespace RigelEditor.EGUI
 
                 GUILayout.EndHorizontal();
             }
-            
+
+            {
+                //Options
+                GUILayout.Button("Expended", GUIOption.Expended);
+                GUILayout.BeginHorizontal();
+                GUILayout.Button("Grid 0.5", GUIOption.Grid(0.5f));
+                GUILayout.Button("Grid 0.5", GUIOption.Grid(0.25f));
+
+                GUILayout.EndHorizontal();
+            }
+
+
+            {
+                //CollapseGroup
+                if(GUILayout.BeginCollapseGroup("CollapseGroup-1",ref m_collapsegroup1))
+                {
+                    GUILayout.Text("text in collapse group.");
+                }
+                GUILayout.EndCollapseGroup();
+
+                m_collapsegroup2 = GUILayout.BeginCollapseGroup("CollapseGroup-2", ref m_collapsegroup2);
+                if (m_collapsegroup2)
+                {
+                    GUILayout.Button("button in collapse group2.");
+                }
+                GUILayout.EndCollapseGroup();
+            }
 
         }
     }
