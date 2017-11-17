@@ -141,10 +141,12 @@ namespace RigelEditor.EGUI
             {
                 //ScrollView
 
-                GUILayout.Indent(30);
-
                 m_scrollViewPos = GUILayout.BeginScrollView(m_scrollViewPos);
 
+
+                GUILayout.Button("Test Button");
+
+                GUILayout.Text("Test Text");
 
                 GUILayout.EndScrollView();
             }

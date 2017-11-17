@@ -315,17 +315,22 @@ namespace RigelEditor.EGUI
         {
             var sizeremain = SizeRemain;
             var rect = new Vector4(s_ctx.currentLayout.Offset, sizeremain.X, sizeremain.Y);
-
             var rectab = GetRectAbsolute(rect);
-            var scrollbar = GUI.GetScrollBar(rectab);
-
-            DrawRect(rect,scrollbar.Color);
+            var scrollView = GUI.GetScrollView(rectab);
+            DrawRect(rect, scrollView.Color);
+            BeginArea(rectab, null,GUIOption.Border());
+            
             return pos;
         }
 
         public static void EndScrollView()
         {
+            var rect = s_ctx.currentArea;
+            var sv = GUI.GetScrollView(rect);
 
+            //do
+
+            EndArea();
         }
 
         public static void SetLineHeight(int height)

@@ -390,7 +390,7 @@ namespace RigelEditor.EGUI
 
         #region ObjectPool
 
-        public static GUIObjScrollBar GetScrollBar(Vector4 rect)
+        public static GUIObjScrollView GetScrollView(Vector4 rect)
         {
             return Context.poolSrollbar.Get(GUIUtilityInternal.GetHash(rect, GUIObjectType.ScrollBar));
         }

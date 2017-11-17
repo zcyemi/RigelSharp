@@ -59,7 +59,7 @@ namespace RigelEditor.EGUI
 
 
         //objpool
-        internal GUIObjPool<GUIObjScrollBar> poolSrollbar = new GUIObjPool<GUIObjScrollBar>();
+        internal GUIObjPool<GUIObjScrollView> poolSrollbar = new GUIObjPool<GUIObjScrollView>();
 
         public void Frame(GUIEvent guievent, int width, int height)
         {
@@ -168,14 +168,17 @@ namespace RigelEditor.EGUI
         }
     }
 
-    public class GUIObjBase
+    public abstract class GUIObjBase
     {
         public bool Checked = false;
+
+        public abstract void Reset();
     }
 
     internal class GUIObjPool<T> where T: GUIObjBase,new ()
     {
         public Dictionary<long, T> m_objects = new Dictionary<long, T>(8);
+        private Stack<T> m_pool = new Stack<T>();
 
 
         public T Get(long hash)
@@ -188,10 +191,21 @@ namespace RigelEditor.EGUI
             }
             else
             {
-                var obj = new T();
+                T obj = null;
+
+                if(m_pool.Count == 0)
+                {
+                    obj = new T();
+                }
+                else
+                {
+                    obj = m_pool.Pop();
+                }
                 m_objects.Add(hash, obj);
                 obj.Checked = true;
                 return obj;
+
+
             }
         }
 
@@ -203,20 +217,30 @@ namespace RigelEditor.EGUI
 
             foreach (var k in keys)
             {
-                if (!m_objects[k].Checked)
+                var obj = m_objects[k];
+
+                if (!obj.Checked)
                 {
                     m_objects.Remove(k);
+                    obj.Reset();
+                    m_pool.Push(obj);
                     continue;
                 }
-                m_objects[k].Checked = false;
+                obj.Checked = false;
             }
         }
 
     }
 
-    public class GUIObjScrollBar : GUIObjBase
+    public class GUIObjScrollView : GUIObjBase
     {
         public Vector4 Color = RigelColor.Random();
+
+        public override void Reset()
+        {
+            Checked = false;
+            Color = RigelColor.Random();
+        }
     }
 
 
