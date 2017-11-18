@@ -61,6 +61,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -70,12 +71,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Alg\HashFunction.cs" />
+    <Compile Include="EventSlot.cs" />
+    <Compile Include="Helper\ReflectionHelper.cs" />
+    <Compile Include="ImageData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RgWindow.cs" />
     <Compile Include="RigelAPI.cs" />
+    <Compile Include="FontInfo.cs" />
+    <Compile Include="RigelColor.cs" />
+    <Compile Include="Helper\Utility.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Rendering\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

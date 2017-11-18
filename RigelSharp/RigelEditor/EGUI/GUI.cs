@@ -67,7 +67,7 @@ namespace RigelEditor.EGUI
         public static void EndGroup(bool absolute = false)
         {
             var groupStack = s_ctx.groupStack;
-            RigelUtility.Assert(groupStack.Count > 0);
+            EditorUtility.Assert(groupStack.Count > 0);
             var curGroup = groupStack.Pop();
 
             if (groupStack.Count == 0)

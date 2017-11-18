@@ -16,6 +16,7 @@ using Buffer = SharpDX.Direct3D11.Buffer;
 using Device = SharpDX.Direct3D11.Device;
 
 using RigelEditor;
+using RigelCore;
 
 namespace RigelEditor.EGUI
 {
@@ -60,7 +61,7 @@ namespace RigelEditor.EGUI
         private bool m_guiparamsChanged = true;
 
 
-        private RigelGraphics m_graphics = null;
+        private EditorGraphicsManager m_graphics = null;
 
         private VertexShader m_gShaderVertex = null;
         private PixelShader m_gShaderPixelFont = null;
@@ -99,7 +100,7 @@ namespace RigelEditor.EGUI
         internal bool NeedRebuildCommandList = false;
 
 
-        public RigelEGUIGraphicsBind(RigelGraphics graphics)
+        public RigelEGUIGraphicsBind(EditorGraphicsManager graphics)
         {
             m_graphics = graphics;
 
@@ -212,7 +213,7 @@ namespace RigelEditor.EGUI
             //const buffer
             var cbufferdesc = new BufferDescription()
             {
-                SizeInBytes = RigelUtility.SizeOf<Matrix>(),
+                SizeInBytes = EditorUtility.SizeOf<Matrix>(),
                 BindFlags = BindFlags.ConstantBuffer,
                 Usage = ResourceUsage.Default,
                 CpuAccessFlags = CpuAccessFlags.None,
@@ -269,11 +270,11 @@ namespace RigelEditor.EGUI
             m_guiparamsChanged = true;
         }
 
-        public void CrateFontTexture(RigelFont font)
+        public void CrateFontTexture(FontInfo font)
         {
             if (m_gFontTexture != null) throw new Exception("font texture2d already created");
 
-            using (RigelImageData img = new RigelImageData(TEXTURE_FONT_SIZE, TEXTURE_FONT_SIZE))
+            using (ImageData img = new ImageData(TEXTURE_FONT_SIZE, TEXTURE_FONT_SIZE))
             {
                 font.GenerateFontTexture(img);
                 var desc = new Texture2DDescription()
@@ -328,7 +329,7 @@ namespace RigelEditor.EGUI
 
             //draw window rect
             m_gDeferredContext.InputAssembler.SetVertexBuffers(0, m_gVertBufferWindowRectBinding);
-            RigelUtility.Log("buffer data count:" + m_bufferDataRect.BufferDataCount);
+            EditorUtility.Log("buffer data count:" + m_bufferDataRect.BufferDataCount);
             int indexedCount = m_bufferDataRect.BufferDataCount / 2 * 3;
             m_gDeferredContext.DrawIndexed(indexedCount, 0, 0);
        
@@ -353,7 +354,7 @@ namespace RigelEditor.EGUI
 
         }
 
-        public void Render(RigelGraphics graphics)
+        public void Render(EditorGraphicsManager graphics)
         {
             if (m_graphics != graphics) throw new Exception("RigelGraphics not match!");
 
@@ -445,7 +446,7 @@ namespace RigelEditor.EGUI
 
                 m_bufferDataRect.SetDirty(false);
 
-                RigelUtility.Log("update vertexbuffer rect data");
+                EditorUtility.Log("update vertexbuffer rect data");
             }
 
             if (m_bufferDataText.Dirty)
@@ -459,7 +460,7 @@ namespace RigelEditor.EGUI
 
                 m_bufferDataRect.SetDirty(false);
 
-                RigelUtility.Log("update vertexbuffer text data");
+                EditorUtility.Log("update vertexbuffer text data");
             }
 
             if (m_bufferDataIndices.Dirty)
@@ -474,7 +475,7 @@ namespace RigelEditor.EGUI
                 pinnedptr.Free();
 
                 m_bufferDataIndices.SetDirty(false);
-                RigelUtility.Log("update indicesbuffer data");
+                EditorUtility.Log("update indicesbuffer data");
             }
 
             if (graphics.NeedRebuildCommandList || NeedRebuildCommandList)
@@ -489,8 +490,6 @@ namespace RigelEditor.EGUI
             }
 
             graphics.ImmediateContext.ExecuteCommandList(m_gCommandlist,false);
-
-
         }
 
         public void Dispose()

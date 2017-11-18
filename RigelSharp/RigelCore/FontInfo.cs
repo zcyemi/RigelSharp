@@ -7,10 +7,12 @@ using System.Threading.Tasks;
 using SharpFont;
 using SharpDX;
 
-namespace RigelEditor
+using RigelCore;
+
+namespace RigelCore
 {
 
-    public class RigelGlyphInfo
+    public class GlyphInfo
     {
         public int PixelWidth;
         public int PixelHeight;
@@ -49,11 +51,11 @@ namespace RigelEditor
 
     }
 
-    public class RigelFont : IDisposable
+    public class FontInfo : IDisposable
     {
         private static Library s_ftLibrary;
 
-        static RigelFont()
+        static FontInfo()
         {
             s_ftLibrary = new Library();
         }
@@ -72,7 +74,7 @@ namespace RigelEditor
             
         }
 
-        public RigelGlyphInfo GetGlyphInfo(uint c)
+        public GlyphInfo GetGlyphInfo(uint c)
         {
             return m_glyphInfo[c];
         }
@@ -99,11 +101,11 @@ namespace RigelEditor
         public uint FontPixelSize { get; private set; }
         private int m_textureSize;
         private float m_glyphUV;
-        private RigelGlyphInfo[] m_glyphInfo = new RigelGlyphInfo[128];
+        private GlyphInfo[] m_glyphInfo = new GlyphInfo[128];
 
         private int m_ascender;
 
-        public RigelFont(string fontpath, uint pixelsize = 13)
+        public FontInfo(string fontpath, uint pixelsize = 13)
         {
             FontFilePath = fontpath;
             FontPixelSize = pixelsize;
@@ -116,7 +118,7 @@ namespace RigelEditor
 
 
 
-        public void GenerateFontTexture(RigelImageData img)
+        public void GenerateFontTexture(ImageData img)
         {
 
             m_textureSize = img.Width;
@@ -133,7 +135,7 @@ namespace RigelEditor
 
                 var bitmap = m_ftface.Glyph.Bitmap;
 
-                m_glyphInfo[c] = new RigelGlyphInfo()
+                m_glyphInfo[c] = new GlyphInfo()
                 {
                     AdvancedX = m_ftface.Glyph.Advance.X.Value >> 6,
                     LineOffsetY = m_ascender - m_ftface.Glyph.BitmapTop,
@@ -157,7 +159,7 @@ namespace RigelEditor
             }
         }
 
-        public void DrawGlyphToImage(uint c,RigelImageData img,int posx,int posy)
+        public void DrawGlyphToImage(uint c,ImageData img,int posx,int posy)
         {
             m_ftface.LoadChar(c, LoadFlags.Render, LoadTarget.Normal);
             var bitmap = m_ftface.Glyph.Bitmap;

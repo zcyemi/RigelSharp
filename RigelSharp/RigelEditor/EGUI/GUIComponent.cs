@@ -129,7 +129,7 @@ namespace RigelEditor.EGUI
                 {
                     if (curlist.m_items.ContainsKey(cpath))
                     {
-                        RigelUtility.Log("[Error] add menuItem duplicate:" + path);
+                        EditorUtility.Log("[Error] add menuItem duplicate:" + path);
                         break;
                     }
                     curlist.m_items.Add(cpath, new GUIMenuButton(cpath, method));
@@ -141,7 +141,7 @@ namespace RigelEditor.EGUI
                         var nlist = curlist.m_items[cpath] as GUIMenuList;
                         if (nlist == null)
                         {
-                            RigelUtility.Log("[Error] add menuItem incompatable:" + path);
+                            EditorUtility.Log("[Error] add menuItem incompatable:" + path);
                             break;
                         }
 

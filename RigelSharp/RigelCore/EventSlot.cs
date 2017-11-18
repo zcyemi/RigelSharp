@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RigelEditor
+namespace RigelCore
 {
 
     public class EventSlot<T>

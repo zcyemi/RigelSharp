@@ -11,7 +11,7 @@ using SharpDX;
 
 namespace RigelEditor
 {
-    public static class RigelUtility
+    public static class EditorUtility
     {
         public static void Dispose(ref IDisposable disposable)
         {
@@ -35,32 +35,8 @@ namespace RigelEditor
 
         public static void Assert(bool condition, string message = null, RigelAssertLevel level = RigelAssertLevel.Fatel)
         {
-            if(level >= RigelConfig.AssertLevel)
+            if(level >= EditorConfig.AssertLevel)
                 Debug.Assert(condition, message);
-        }
-    }
-
-    public static class RigelReflectionHelper
-    {
-        public static Assembly AssemblyRigelEditor;
-
-        static RigelReflectionHelper()
-        {
-            AssemblyRigelEditor = Assembly.GetAssembly(typeof(RigelEditorApp));
-        }
-
-        public static List<MethodInfo> GetMethodByAttribute<T>(Type t,BindingFlags binding) where T : Attribute
-        {
-            List<MethodInfo> methods = new List<MethodInfo>();
-            foreach (var m in t.GetMethods(binding))
-            {
-                if (Attribute.IsDefined(m, typeof(T)))
-                {
-                    methods.Add(m);
-                }
-            }
-            
-            return methods;
         }
     }
 

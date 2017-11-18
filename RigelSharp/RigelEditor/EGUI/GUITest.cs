@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using SharpDX;
+using RigelCore;
 
 namespace RigelEditor.EGUI
 {
@@ -65,8 +66,6 @@ namespace RigelEditor.EGUI
 
     public class GUITestContent : GUIDockContentBase
     {
-        private bool m_collapsegroup1 = false;
-        private bool m_collapsegroup2 = false;
         private Vector2 m_scrollViewPos = Vector2.Zero;
 
         private bool m_sampleGUIOption= false;

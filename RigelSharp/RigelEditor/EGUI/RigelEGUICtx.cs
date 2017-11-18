@@ -16,6 +16,7 @@ using Buffer = SharpDX.Direct3D11.Buffer;
 using Device = SharpDX.Direct3D11.Device;
 
 using RigelEditor;
+using RigelCore;
 
 namespace RigelEditor.EGUI
 {
@@ -26,24 +27,24 @@ namespace RigelEditor.EGUI
     {
         private RenderForm m_form;
         private RigelEGUIGraphicsBind m_graphicsBind = null;
-        private RigelFont m_font = null;
+        private FontInfo m_font = null;
         private bool m_lastFrameDrag = false;
         private Vector2 m_LastPointerDrag;
 
         internal RigelEGUIGraphicsBind GraphicsBind { get { return m_graphicsBind; } }
-        internal RigelFont Font { get { return m_font; } }
+        internal FontInfo Font { get { return m_font; } }
         public int ClientWidth { get; private set; }
         public int ClientHeight { get; private set; }
 
         public RenderForm Form { get { return m_form; } }
 
-        public RigelEGUICtx(RenderForm form,RigelGraphics graphics)
+        public RigelEGUICtx(RenderForm form,EditorGraphicsManager graphics)
         {
 
             //basis
             m_form = form;
             m_graphicsBind = new RigelEGUIGraphicsBind(graphics);
-            m_font = new RigelFont("arial.ttf");
+            m_font = new FontInfo("arial.ttf");
             m_graphicsBind.CrateFontTexture(m_font);
 
             GUIInit();
@@ -81,7 +82,7 @@ namespace RigelEditor.EGUI
 
         }
 
-        public void Render(RigelGraphics graphics)
+        public void Render(EditorGraphicsManager graphics)
         {
             m_graphicsBind.Render(graphics);
         }

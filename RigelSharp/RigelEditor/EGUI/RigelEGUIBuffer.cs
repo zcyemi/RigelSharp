@@ -13,7 +13,7 @@ namespace RigelEditor.EGUI
 
         public int BufferSize { get { return BufferData.Length; } }
         public int BufferSizeInByte { get { return BufferSize * ItemSizeInByte; } }
-        public int ItemSizeInByte { get { return RigelUtility.SizeOf<T>(); } }
+        public int ItemSizeInByte { get { return EditorUtility.SizeOf<T>(); } }
         public bool BufferResized { get; private set; }
 
         private int m_bufferExtendTimes = BUFFER_EXTEND_TIMES;

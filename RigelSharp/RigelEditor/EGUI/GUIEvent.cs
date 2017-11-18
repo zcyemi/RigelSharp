@@ -937,11 +937,11 @@ namespace RigelEditor.EGUI
             };
             m_form.DragEnter += (s, e) =>
             {
-                RigelUtility.Log("event drag enter");
+                EditorUtility.Log("event drag enter");
             };
             m_form.DragDrop += (s, e) =>
             {
-                RigelUtility.Log("event drag drop");
+                EditorUtility.Log("event drag drop");
             };
         }
     }

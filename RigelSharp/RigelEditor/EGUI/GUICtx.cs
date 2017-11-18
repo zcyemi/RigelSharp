@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.IO;
 
 using SharpDX;
+using RigelCore;
 
 namespace RigelEditor.EGUI
 {
@@ -52,7 +53,7 @@ namespace RigelEditor.EGUI
 
         public float s_depthStep = 0.0001f;
 
-        public RigelFont Font { get; set; }
+        public FontInfo Font { get; set; }
 
         //component
         public Stack<IGUIComponent> componentStack = new Stack<IGUIComponent>();
@@ -63,11 +64,11 @@ namespace RigelEditor.EGUI
 
         public void Frame(GUIEvent guievent, int width, int height)
         {
-            RigelUtility.Assert(groupStack.Count == 0);
-            RigelUtility.Assert(areaStack.Count == 0);
+            EditorUtility.Assert(groupStack.Count == 0);
+            EditorUtility.Assert(areaStack.Count == 0);
 
-            RigelUtility.Assert(layoutStack.Count == 0);
-            RigelUtility.Assert(depthLayer.Count == 0);
+            EditorUtility.Assert(layoutStack.Count == 0);
+            EditorUtility.Assert(depthLayer.Count == 0);
 
             GUI.Event = guievent;
             baseRect = new Vector4(0, 0, width, height);

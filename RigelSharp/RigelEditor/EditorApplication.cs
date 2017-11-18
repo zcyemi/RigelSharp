@@ -22,7 +22,7 @@ namespace RigelEditor
     {
 
         private RenderForm m_windowForm;
-        private RigelGraphics m_graphics;
+        private EditorGraphicsManager m_graphics;
         private RigelEGUICtx m_EGUI;
 
 
@@ -31,7 +31,7 @@ namespace RigelEditor
             m_windowForm = new RenderForm("Rigel");
             m_windowForm.AllowUserResizing = true;
 
-            m_graphics = new RigelGraphics();
+            m_graphics = new EditorGraphicsManager();
             m_graphics.CreateWithSwapChain(m_windowForm);
 
             m_EGUI = new RigelEGUICtx(m_windowForm,m_graphics);

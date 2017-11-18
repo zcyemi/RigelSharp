@@ -12,7 +12,7 @@ namespace RigelEditor
         Fatel = 2,
     }
 
-    public static class RigelConfig
+    public static class EditorConfig
     {
         public static RigelAssertLevel AssertLevel = RigelAssertLevel.Exception;
     }

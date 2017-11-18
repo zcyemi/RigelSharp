@@ -7,42 +7,42 @@ using System.Threading.Tasks;
 using System.Drawing.Imaging;
 using System.Drawing;
 
-namespace RigelEditor
+namespace RigelCore
 {
-    public enum RigelImageDataDepth
+    public enum ImageDataDepth
     {
         Depth32 = 4,
         Depth24 = 3,
     };
 
-    public class RigelImageData:IDisposable
+    public class ImageData : IDisposable
     {
         public int Width { get; private set; }
         public int Height { get; private set; }
 
         public byte[] Data { get; private set; }
-        public RigelImageDataDepth Depth { get; private set; }
+        public ImageDataDepth Depth { get; private set; }
         public int DataSize { get { return Data.Length; } }
         public int PixelSize { get { return (int)Depth; } }
         public int Pitch { get { return Width * PixelSize; } }
 
 
-        public RigelImageData(int width,int height, RigelImageDataDepth depth = RigelImageDataDepth.Depth32)
+        public ImageData(int width, int height, ImageDataDepth depth = ImageDataDepth.Depth32)
         {
             Width = width;
             Height = height;
             Depth = depth;
-            Data = new byte[width * height *(int)depth];
+            Data = new byte[width * height * (int)depth];
         }
 
         public void Dispose()
         {
-            
+
         }
 
         public PixelFormat GetPixelFormat()
         {
-            if(Depth == RigelImageDataDepth.Depth32)
+            if (Depth == ImageDataDepth.Depth32)
             {
                 return PixelFormat.Format32bppArgb;
             }
@@ -52,10 +52,10 @@ namespace RigelEditor
             }
         }
 
-        public void SaveToFile(string filepath,ImageFormat imgfmt)
+        public void SaveToFile(string filepath, ImageFormat imgfmt)
         {
-            Bitmap bmp = new Bitmap(Width, Height,GetPixelFormat());
-            
+            Bitmap bmp = new Bitmap(Width, Height, GetPixelFormat());
+
             var bmpdata = bmp.LockBits(new Rectangle(0, 0, Width, Height), ImageLockMode.WriteOnly, GetPixelFormat());
 
             Console.WriteLine(Data.Length);

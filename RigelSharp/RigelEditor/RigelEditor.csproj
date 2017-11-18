@@ -95,17 +95,14 @@
     <Compile Include="EGUI\RigelEGUIGraphicsBind.cs" />
     <Compile Include="EGUI\GUIStyle.cs" />
     <Compile Include="EGUI\RigelEGUIWindow.cs" />
-    <Compile Include="EventSlot.cs" />
+    <Compile Include="Helper\EditorReflectionHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RigelColor.cs" />
-    <Compile Include="RigelConfig.cs" />
+    <Compile Include="EditorConfig.cs" />
     <Compile Include="RigelDrawCall.cs" />
-    <Compile Include="RigelEditorApp.cs" />
+    <Compile Include="EditorApplication.cs" />
     <Compile Include="EGUI\GUIEvent.cs" />
-    <Compile Include="RigelFont.cs" />
-    <Compile Include="RigelGraphics.cs" />
-    <Compile Include="RigelImageData.cs" />
-    <Compile Include="RigelUtility.cs" />
+    <Compile Include="EditorGraphicsManager.cs" />
+    <Compile Include="Helper\EditorUtility.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

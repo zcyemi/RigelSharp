@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using SharpDX;
+using RigelCore;
 
 namespace RigelEditor.EGUI
 {
@@ -393,7 +394,7 @@ namespace RigelEditor.EGUI
         }
         public void SeparatorMove(Vector2 offset, GUIDockSeparator sep)
         {
-            RigelUtility.Assert(!IsContentNode());
+            EditorUtility.Assert(!IsContentNode());
 
             bool horizontal = m_info.m_orient == GUIDockOrient.Horizontal;
             float off = horizontal ? offset.X : offset.Y;
