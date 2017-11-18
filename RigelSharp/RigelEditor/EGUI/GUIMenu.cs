@@ -62,6 +62,8 @@ namespace RigelEditor.EGUI
         public static readonly int ItemHeight = 23;
         public static readonly int ItemWidth = 100;
 
+        internal int Order = 0;
+
         public GUIMenuList(string label)
         {
             m_label = label;

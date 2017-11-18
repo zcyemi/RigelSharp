@@ -8,7 +8,7 @@ using SharpDX;
 
 namespace RigelEditor.EGUI
 {
-    public class GUIMessageBox : IGUIComponent
+    public sealed class GUIMessageBox : IGUIComponent
     {
         public string title = "MessageBox";
         public string info = "No Content";

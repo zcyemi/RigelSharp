@@ -91,7 +91,9 @@ namespace RigelEditor.EGUI
         {
             GUILayout.BeginToolBar(23);
             GUILayout.Text("RIGEL");
-            GUILayout.DrawMenuList(m_menuList,GUIOption.Width(70));
+            //GUILayout.DrawMenuList(m_menuList,GUIOption.Width(70));
+            EditorMenuManager.Instance.OnDrawMainMenuBar();
+
             if (GUILayout.Button("GUISample",GUIOption.Width(70))) m_dockMgr.AddNewContent(new GUITestContent());
             GUILayout.EndToolBar();
 
