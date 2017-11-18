@@ -15,6 +15,7 @@ namespace RigelEditor.EGUI
     {
         private static GUITestContent s_content = null;
 
+        [TODO("Bug", "Can't Add GUITestContent again after delete from docknode.")]
         [EditorMenuItem("Help","GUITestWindow")]
         public static void ShowTestWindow()
         {
@@ -23,7 +24,11 @@ namespace RigelEditor.EGUI
                 s_content = new GUITestContent();
 
                 var dockmgr = RigelEditorApp.Instance.EditorGUI.DockManager;
-                dockmgr.AddNewContent(s_content);
+                if(dockmgr.FindDockContent<GUITestContent>() == null)
+                {
+                    dockmgr.AddNewContent(s_content);
+                }
+                    
             }
 
         }

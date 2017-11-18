@@ -41,7 +41,6 @@ namespace RigelEditor.EGUI
 
         public EditorGUICtx(RenderForm form,EditorGraphicsManager graphics)
         {
-
             //basis
             m_form = form;
             m_graphicsBind = new GUIGraphicsBind(graphics);
@@ -55,7 +54,6 @@ namespace RigelEditor.EGUI
             RegisterEvent();
         }
 
-        
 
         private void OnWindowEvent(GUIEvent guievent)
         {

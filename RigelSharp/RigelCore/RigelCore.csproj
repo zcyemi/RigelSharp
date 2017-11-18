@@ -73,6 +73,7 @@
     <Compile Include="Alg\HashFunction.cs" />
     <Compile Include="Engine\IGameEntry.cs" />
     <Compile Include="EventSlot.cs" />
+    <Compile Include="Helper\DevHelper.cs" />
     <Compile Include="Helper\ReflectionHelper.cs" />
     <Compile Include="Helper\Singleton.cs" />
     <Compile Include="ImageData.cs" />

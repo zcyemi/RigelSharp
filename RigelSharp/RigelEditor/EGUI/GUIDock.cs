@@ -187,6 +187,7 @@ namespace RigelEditor.EGUI
 
             return true;
         }
+
         public void AddContent(GUIDockContentBase c,GUIDockPlace place)
         {
             if(place == GUIDockPlace.center)
@@ -363,6 +364,32 @@ namespace RigelEditor.EGUI
                     match = m_nodeR.CheckDockNodeMatched();
                 }
                 return match;
+            }
+        }
+        public GUIDockContentBase FindDockContent<T>()where T : GUIDockContentBase
+        {
+            if (IsContentNode())
+            {
+                foreach(var content in m_content)
+                {
+                    if(content is T)
+                    {
+                        return content;
+                    }
+                }
+                return null;
+            }
+            else
+            {
+                var content = m_nodeL.FindDockContent<T>();
+                if(content == null)
+                {
+                    return m_nodeR.FindDockContent<T>();
+                }
+                else
+                {
+                    return content;
+                }
             }
         }
 
@@ -769,6 +796,12 @@ namespace RigelEditor.EGUI
         public void AddNewContent(GUIDockContentBase content)
         {
             m_root.AddContent(content, false);
+        }
+
+
+        public GUIDockContentBase FindDockContent<T>() where T : GUIDockContentBase
+        {
+            return m_root.FindDockContent<T>();
         }
 
     }
