@@ -45,10 +45,11 @@ namespace RigelEditor.EGUI
 
 
         /// <summary>
-        /// area always absolute to the baseRect
+        /// 
         /// </summary>
         /// <param name="rect"></param>
         /// <param name="color"></param>
+        /// <param name="options">GUIOptionType.Border</param>
         public static void BeginArea(Vector4 rect, Vector4? color = null,params GUIOption[] options)
         {
             if (color != null)

@@ -28,10 +28,13 @@ namespace RigelEditor.EGUI
         public GUIDrawStageMain(string stagename, int order = 0) : base(stagename, order)
         {
             m_menuList = new GUIMenuList("File");
-            m_menuList.AddMenuItem("File/Test");
-            m_menuList.AddMenuItem("File/Test/xxx");
+            m_menuList.AddMenuItem("Test/AAA");
+            m_menuList.AddMenuItem("Test/xxx");
             m_menuList.AddMenuItem("File/Test2");
             m_menuList.AddMenuItem("Open/Sln");
+
+            Console.WriteLine(m_menuList.PrintMenuInfo());
+
             //m_menuList.AddMenuItem("Exit");
 
             m_dockMgr = new GUIDockMgr();
