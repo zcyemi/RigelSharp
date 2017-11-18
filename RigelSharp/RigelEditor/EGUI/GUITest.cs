@@ -141,14 +141,14 @@ namespace RigelEditor.EGUI
             {
                 //ScrollView
 
-                m_scrollViewPos = GUILayout.BeginScrollView(m_scrollViewPos);
-
-
-                GUILayout.Button("Test Button");
-
-                GUILayout.Text("Test Text");
-
+                m_scrollViewPos = GUILayout.BeginScrollView(m_scrollViewPos, GUIScrollType.Vertical,GUIOption.Height(200));
+                for(int i = 0; i < 5; i++)
+                {
+                    GUILayout.Space(50);
+                    GUILayout.Text((i * 50).ToString());
+                }
                 GUILayout.EndScrollView();
+                GUILayout.Button("---------");
             }
 
         }

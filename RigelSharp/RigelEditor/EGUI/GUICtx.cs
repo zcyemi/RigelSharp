@@ -232,16 +232,7 @@ namespace RigelEditor.EGUI
 
     }
 
-    public class GUIObjScrollView : GUIObjBase
-    {
-        public Vector4 Color = RigelColor.Random();
-
-        public override void Reset()
-        {
-            Checked = false;
-            Color = RigelColor.Random();
-        }
-    }
+    
 
 
 #endregion

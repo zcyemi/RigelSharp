@@ -785,7 +785,7 @@ namespace RigelEditor.EGUI
 
     public class GUIEvent
     {
-        public bool Used { get; set; } = false;
+        public bool Used { get;private set; } = false;
         public RigelEGUIEventType EventType { get; internal set; } = RigelEGUIEventType.None;
         public bool Alt { get; private set; } = false;
         public bool Control { get; private set; } = false;

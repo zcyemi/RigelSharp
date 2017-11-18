@@ -84,6 +84,7 @@
     <Compile Include="EGUI\GUILayout.cs" />
     <Compile Include="EGUI\GUIMessageBox.cs" />
     <Compile Include="EGUI\GUIOption.cs" />
+    <Compile Include="EGUI\GUIScrollView.cs" />
     <Compile Include="EGUI\GUITest.cs" />
     <Compile Include="EGUI\GUIUtility.cs" />
     <Compile Include="EGUI\GUIWindow.cs" />

@@ -404,9 +404,11 @@ namespace RigelEditor.EGUI
             DrawTarget = target;
             s_depthz = target.depth;
         }
-        internal static void DepthIncrease()
+        internal static float DepthIncrease()
         {
+            float z = s_depthz;
             s_depthz -= Context.s_depthStep;
+            return z;
         }
 
         internal static void SetDepth(float depth)

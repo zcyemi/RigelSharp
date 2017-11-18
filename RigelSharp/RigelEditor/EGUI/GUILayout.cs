@@ -152,7 +152,10 @@ namespace RigelEditor.EGUI
             s_ctx.currentLayout.Offset.X += width;
         }
 
-
+        internal static void AutoCaculateOffset(float w, float h)
+        {
+            AutoCaculateOffset((int)w, (int)h);
+        }
         internal static void AutoCaculateOffset(int w, int h)
         {
             var layout = s_ctx.currentLayout;
@@ -311,26 +314,46 @@ namespace RigelEditor.EGUI
 
         }
 
-        public static Vector2 BeginScrollView(Vector2 pos)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <param name="scrolltype"></param>
+        /// <param name="options">GUIOption.With GUIOption.Height</param>
+        /// <returns></returns>
+        public static Vector2 BeginScrollView(Vector2 pos,GUIScrollType scrolltype = GUIScrollType.Vertical,params GUIOption[] options)
         {
+            GUIOption optWidth = null;
+            GUIOption optHeight = null;
+            if(options != null)
+            {
+                foreach(var opt in options)
+                {
+                    if(opt.type == GUIOption.GUIOptionType.width) { optWidth = opt;continue; }
+                    if(opt.type == GUIOption.GUIOptionType.height) { optHeight = opt;continue; }
+                }
+            }
+
             var sizeremain = SizeRemain;
+            if (optWidth != null) sizeremain.X = optWidth.IntValue;
+            if (optHeight != null) sizeremain.Y = optHeight.IntValue;
+
             var rect = new Vector4(s_ctx.currentLayout.Offset, sizeremain.X, sizeremain.Y);
             var rectab = GetRectAbsolute(rect);
             var scrollView = GUI.GetScrollView(rectab);
-            DrawRect(rect, scrollView.Color);
             BeginArea(rectab, null,GUIOption.Border());
-            
-            return pos;
+            return scrollView.Draw(rectab,pos,scrolltype);
         }
 
         public static void EndScrollView()
         {
             var rect = s_ctx.currentArea;
             var sv = GUI.GetScrollView(rect);
-
-            //do
+            sv.LateDraw();
 
             EndArea();
+
+            GUILayout.AutoCaculateOffset(rect.Z, rect.W);
         }
 
         public static void SetLineHeight(int height)
