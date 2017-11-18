@@ -246,17 +246,23 @@ namespace RigelEditor.EGUI
 
             var curarea = s_ctx.currentArea;
             var rect = new Vector4(s_ctx.currentLayout.Offset, adaptive ? curarea.Z : (int)optwidth.value, s_svLineHeight.Value);
-            GUIUtility.RectClip(ref rect, curarea);
+            bool valid = GUIUtility.RectClip(ref rect, curarea);
             int width = 0;
-            if (adaptive)
+            if (valid)
             {
-                width = GUI.DrawText(rect, content, s_ctx.Color, true, GUIOption.Adaptive);
+                if (adaptive)
+                {
+                    width = GUI.DrawText(rect, content, s_ctx.Color, true, GUIOption.Adaptive);
+                }
+                else
+                {
+                    width = GUI.DrawText(rect, content, s_ctx.Color, true);
+                }
             }
-            else
-            {
-                width = GUI.DrawText(rect, content, s_ctx.Color, true);
-            }
-
+            //else
+            //{
+            //    width = GUI.Context.Font.GetTextWidth(content);
+            //}
             AutoCaculateOffsetW(width);
         }
 

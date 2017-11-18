@@ -142,7 +142,8 @@ namespace RigelEditor.EGUI
                 //ScrollView
 
                 m_scrollViewPos = GUILayout.BeginScrollView(m_scrollViewPos, GUIScrollType.Vertical,GUIOption.Height(200));
-                for(int i = 0; i < 5; i++)
+                GUILayout.Text("SampleText");
+                for (int i = 0; i < 5; i++)
                 {
                     GUILayout.Space(50);
                     GUILayout.Text((i * 50).ToString());

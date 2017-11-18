@@ -15,14 +15,20 @@ namespace RigelEditor.EGUI
         /// </summary>
         /// <param name="rect"></param>
         /// <param name="group"></param>
-        /// <returns></returns>
+        /// <returns>**absolute rect**</returns>
         internal static bool RectClip(ref Vector4 rect, Vector4 group)
         {
+            Vector2 rb = rect.Pos() + rect.Size();
+            if (rb.X < 0 || rb.Y < 0) return false;
+            if (rect.X > group.Z || rect.Y > group.W) return false;
+
             rect.X = MathUtil.Clamp(rect.X, 0, group.Z);
             rect.Y = MathUtil.Clamp(rect.Y, 0, group.W);
+            rb.X = MathUtil.Clamp(rb.X, rect.X, group.Z);
+            rb.Y = MathUtil.Clamp(rb.Y, rect.Y, group.W);
 
-            rect.Z = MathUtil.Clamp(rect.Z, 0, group.Z - rect.X);
-            rect.W = MathUtil.Clamp(rect.W, 0, group.W - rect.Y);
+            rect.Z = rb.X - rect.X;
+            rect.W = rb.Y - rect.Y;
 
             rect.X += group.X;
             rect.Y += group.Y;
