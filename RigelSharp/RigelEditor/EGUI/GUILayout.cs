@@ -187,11 +187,24 @@ namespace RigelEditor.EGUI
             AutoCaculateOffset(s_svLineIndent.Value, h);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="label"></param>
+        /// <param name="options">GUIOptionType.Width GUIOptionType.expended GUIOptionType.Grid</param>
+        /// <returns></returns>
         public static bool Button(string label, params GUIOption[] options)
         {
             return Button(label, GUI.Context.BackgroundColor.Value, options);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="label"></param>
+        /// <param name="color"></param>
+        /// <param name="options">GUIOptionType.Width GUIOptionType.expended GUIOptionType.Grid</param>
+        /// <returns></returns>
         public static bool Button(string label, Vector4 color, params GUIOption[] options)
         {
             int width = 50;
@@ -220,20 +233,23 @@ namespace RigelEditor.EGUI
 
             var curarea = s_ctx.currentArea;
             var rect = new Vector4(s_ctx.currentLayout.Offset, width, s_svLineHeight.Value);
-            GUIUtility.RectClip(ref rect, curarea);
+            bool valid = GUIUtility.RectClip(ref rect, curarea);
+
 
             bool clicked = false;
-            if (adaptive)
+            if (valid)
             {
-                var adaptiveValue = GUIOption.AdaptiveValue();
-                clicked = GUI.Button(rect, label, color, GUI.Context.Color, true, options.Append(adaptiveValue));
-                width = adaptiveValue.IntValue;
+                if (adaptive)
+                {
+                    var adaptiveValue = GUIOption.AdaptiveValue();
+                    clicked = GUI.Button(rect, label, color, GUI.Context.Color, true, options.Append(adaptiveValue));
+                    width = adaptiveValue.IntValue;
+                }
+                else
+                {
+                    clicked = GUI.Button(rect, label, color, GUI.Context.Color, true, options);
+                }
             }
-            else
-            {
-                clicked = GUI.Button(rect, label, color, GUI.Context.Color, true, options);
-            }
-
             AutoCaculateOffsetW(width);
 
             return clicked;

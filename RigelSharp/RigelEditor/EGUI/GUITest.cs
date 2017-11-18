@@ -63,11 +63,15 @@ namespace RigelEditor.EGUI
     }
 
 
-    public class GUITestContent: GUIDockContentBase
+    public class GUITestContent : GUIDockContentBase
     {
         private bool m_collapsegroup1 = false;
         private bool m_collapsegroup2 = false;
         private Vector2 m_scrollViewPos = Vector2.Zero;
+
+        private bool m_sampleGUIOption= false;
+        private bool m_sampleScrollView = false;
+        private bool m_sampleGUIComponent = false;
 
         public GUITestContent()
         {
@@ -78,10 +82,28 @@ namespace RigelEditor.EGUI
         {
 
             GUILayout.Text(GUI.DrawTarget.bufferText.Count.ToString());
-            GUILayout.Line(2,null);
+            GUILayout.Line(2, null);
 
-            GUILayout.Text("GUITest Component");
+            GUILayout.Line(1, null);
 
+            {
+                GUILayout.BeginHorizontal();
+                GUILayout.Text("MenuBar");
+                GUI.DrawBorder(GUILayout.s_ctx.currentLayout.LastRect, 1, RigelColor.Red);
+
+                GUILayout.EndHorizontal();
+            }
+
+            SampleGUIComponent();
+
+            SampleGUIOption();
+            SampleScrollView();
+
+        }
+
+        private void SampleGUIComponent()
+        {
+            if (GUILayout.BeginCollapseGroup("[GUIComponent]", ref m_sampleGUIComponent))
             {
                 GUILayout.BeginHorizontal();
                 GUILayout.Text("MessageBox");
@@ -97,51 +119,41 @@ namespace RigelEditor.EGUI
                 }
                 GUILayout.EndHorizontal();
             }
-            
+            GUILayout.EndCollapseGroup();
+        }
 
-            GUILayout.Line(1,null);
+        private void SampleCollapseGroup()
+        {
 
+        }
+
+        private void SampleGUIOption()
+        {
+            if (GUILayout.BeginCollapseGroup("[GUIOptions]", ref m_sampleGUIOption))
             {
-                GUILayout.BeginHorizontal();
-                GUILayout.Text("MenuBar");
-                GUI.DrawBorder(GUILayout.s_ctx.currentLayout.LastRect, 1, RigelColor.Red);
-
-                GUILayout.EndHorizontal();
-            }
-
-            {
-                //Options
                 GUILayout.Button("Expended", GUIOption.Expended);
+                GUILayout.BeginHorizontal();
+                GUILayout.Button("Short-Label");
+                GUILayout.Button("LLLLLLLLLLLLong-Label");
+                GUILayout.Button("Width-100", GUIOption.Width(100));
+                GUILayout.EndHorizontal();
                 GUILayout.BeginHorizontal();
                 GUILayout.Button("Grid 0.5", GUIOption.Grid(0.5f));
                 GUILayout.Button("Grid 0.25", GUIOption.Grid(0.25f));
 
                 GUILayout.EndHorizontal();
             }
+            GUILayout.EndCollapseGroup();
+        }
 
 
+        private void SampleScrollView()
+        {
+            if (GUILayout.BeginCollapseGroup("[ScrollView]", ref m_sampleScrollView))
             {
-                //CollapseGroup
-                if(GUILayout.BeginCollapseGroup("CollapseGroup-1",ref m_collapsegroup1))
-                {
-                    GUILayout.Text("text in collapse group.");
-                }
-                GUILayout.EndCollapseGroup();
-
-                m_collapsegroup2 = GUILayout.BeginCollapseGroup("CollapseGroup-2", ref m_collapsegroup2);
-                if (m_collapsegroup2)
-                {
-                    GUILayout.Button("button in collapse group2.");
-                }
-
-                var t = GUI.Depth;
-                GUILayout.EndCollapseGroup();
-            }
-
-            {
-                //ScrollView
-
-                m_scrollViewPos = GUILayout.BeginScrollView(m_scrollViewPos, GUIScrollType.Vertical,GUIOption.Height(200));
+                //scrollview1
+                GUILayout.BeginHorizontal();
+                m_scrollViewPos = GUILayout.BeginScrollView(m_scrollViewPos, GUIScrollType.Vertical, GUIOption.Width(200),GUIOption.Height(200));
                 GUILayout.Text("SampleText");
                 for (int i = 0; i < 5; i++)
                 {
@@ -150,8 +162,11 @@ namespace RigelEditor.EGUI
                 }
                 GUILayout.EndScrollView();
                 GUILayout.Button("---------");
-            }
+                GUILayout.EndHorizontal();
 
+                GUILayout.Button("dwdw");
+            }
+            GUILayout.EndCollapseGroup();
         }
     }
 }
