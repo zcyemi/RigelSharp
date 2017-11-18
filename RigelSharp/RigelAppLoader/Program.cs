@@ -28,7 +28,7 @@ namespace RigelAppLoader
         static void Main()
         {
 
-            RigelEditorApp app = new RigelEditorApp();
+            RigelEditorApp app = RigelEditorApp.Instance;
             app.EnterRunloop();
         }
 

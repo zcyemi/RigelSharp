@@ -21,31 +21,34 @@ using RigelCore;
 namespace RigelEditor.EGUI
 {
 
-
-
-    public partial class RigelEGUICtx:IDisposable
+    public partial class EditorGUICtx:IDisposable
     {
         private RenderForm m_form;
-        private RigelEGUIGraphicsBind m_graphicsBind = null;
+        private GUIGraphicsBind m_graphicsBind = null;
         private FontInfo m_font = null;
         private bool m_lastFrameDrag = false;
         private Vector2 m_LastPointerDrag;
 
-        internal RigelEGUIGraphicsBind GraphicsBind { get { return m_graphicsBind; } }
+        private GUIDockMgr m_dockMgr;
+
+        internal GUIGraphicsBind GraphicsBind { get { return m_graphicsBind; } }
         internal FontInfo Font { get { return m_font; } }
         public int ClientWidth { get; private set; }
         public int ClientHeight { get; private set; }
 
         public RenderForm Form { get { return m_form; } }
+        public GUIDockMgr DockManager { get { return m_dockMgr; } }
 
-        public RigelEGUICtx(RenderForm form,EditorGraphicsManager graphics)
+        public EditorGUICtx(RenderForm form,EditorGraphicsManager graphics)
         {
 
             //basis
             m_form = form;
-            m_graphicsBind = new RigelEGUIGraphicsBind(graphics);
+            m_graphicsBind = new GUIGraphicsBind(graphics);
             m_font = new FontInfo("arial.ttf");
             m_graphicsBind.CrateFontTexture(m_font);
+
+            m_dockMgr = new GUIDockMgr();
 
             GUIInit();
 

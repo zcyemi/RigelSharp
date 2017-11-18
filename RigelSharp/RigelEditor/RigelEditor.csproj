@@ -92,9 +92,9 @@
     <Compile Include="EGUI\GUIWindow.cs" />
     <Compile Include="EGUI\RigelEGUIBuffer.cs" />
     <Compile Include="EGUI\RigelEGUIBufferGUIWindow.cs" />
-    <Compile Include="EGUI\RigelEGUICtx.cs" />
+    <Compile Include="EditorGUICtx.cs" />
     <Compile Include="EGUI\RigelEGUICtx.Window.cs" />
-    <Compile Include="EGUI\RigelEGUIGraphicsBind.cs" />
+    <Compile Include="EGUI\GUIGraphicsBind.cs" />
     <Compile Include="EGUI\GUIStyle.cs" />
     <Compile Include="EGUI\RigelEGUIWindow.cs" />
     <Compile Include="Helper\EditorReflectionHelper.cs" />

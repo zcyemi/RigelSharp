@@ -881,7 +881,7 @@ namespace RigelEditor.EGUI
         KeyEvent = KeyPress | KeyDown | KeyUp,
     }
 
-    public partial class RigelEGUICtx : IDisposable
+    public partial class EditorGUICtx : IDisposable
     {
         private void RegisterEvent()
         {

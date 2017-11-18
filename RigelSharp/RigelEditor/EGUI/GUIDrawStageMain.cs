@@ -16,24 +16,8 @@ namespace RigelEditor.EGUI
         private int m_lastBufferSizeRect = 0;
         private int m_lastBufferSizeText = 0;
 
-
-        private GUIMenuList m_menuList;
-
-        //dock
-        private GUIDockMgr m_dockMgr;
-        private Vector4 m_dockGroup;
-
-        
-
         public GUIDrawStageMain(string stagename, int order = 0) : base(stagename, order)
         {
-            m_menuList = new GUIMenuList("File");
-            m_menuList.AddMenuItem("Test/AAA");
-            m_menuList.AddMenuItem("Test/xxx");
-            m_menuList.AddMenuItem("File/Test2");
-            m_menuList.AddMenuItem("Open/Sln");
-
-            m_dockMgr = new GUIDockMgr();
         }
 
         public override void Draw(GUIEvent guievent)
@@ -52,7 +36,7 @@ namespace RigelEditor.EGUI
             m_needUpdateBuffer = true;
         }
 
-        public override void SyncBuffer(RigelEGUICtx eguictx)
+        public override void SyncBuffer(EditorGUICtx eguictx)
         {
             if (!m_needUpdateBuffer) return;
 
@@ -90,19 +74,21 @@ namespace RigelEditor.EGUI
         private void DrawContent()
         {
             GUILayout.BeginToolBar(23);
-            GUILayout.Text("RIGEL");
-            //GUILayout.DrawMenuList(m_menuList,GUIOption.Width(70));
-            EditorMenuManager.Instance.OnDrawMainMenuBar();
-
-            if (GUILayout.Button("GUISample",GUIOption.Width(70))) m_dockMgr.AddNewContent(new GUITestContent());
+            {
+                GUILayout.Text("RIGEL");
+                EditorMenuManager.Instance.OnDrawMainMenuBar();
+            }
             GUILayout.EndToolBar();
 
-            m_dockGroup = GUI.Context.currentGroup.Rect;
-            m_dockGroup.Y = 23;
-            m_dockGroup.W -= 23;
 
-            m_dockMgr.Update(m_dockGroup);
-            m_dockMgr.LateUpdate();
+            var dockgroup = GUI.Context.currentGroup.Rect;
+            dockgroup.Y = 23;
+            dockgroup.W -= 23;
+
+
+            var dockmgr = RigelEditorApp.Instance.EditorGUI.DockManager;
+            dockmgr.Update(dockgroup);
+            dockmgr.LateUpdate();
         }
     }
 }

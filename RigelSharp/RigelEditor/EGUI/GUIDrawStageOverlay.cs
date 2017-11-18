@@ -76,7 +76,7 @@ namespace RigelEditor.EGUI
             m_needSyncBuffer = true;
         }
 
-        public override void SyncBuffer(RigelEGUICtx eguictx)
+        public override void SyncBuffer(EditorGUICtx eguictx)
         {
             var bind = eguictx.GraphicsBind;
 

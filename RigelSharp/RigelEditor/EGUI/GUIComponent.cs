@@ -32,10 +32,7 @@ namespace RigelEditor.EGUI
         }
 
         public abstract void Draw(GUIEvent guievent);
-
     }
-
-    
 
     public abstract class GUIDialog:IGUIComponent
     {

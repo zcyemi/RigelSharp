@@ -31,7 +31,7 @@ namespace RigelEditor.EGUI
         public Vector2 UV;
     }
 
-    internal class RigelEGUIGraphicsBind:IDisposable
+    internal class GUIGraphicsBind:IDisposable
     {
         private static readonly string SHADER_FILE_PATH_FONT = "Shader/gui_font.fx";
         private static readonly string SHADER_FILE_PATH_RECT = "Shader/gui_rect.fx";
@@ -100,7 +100,7 @@ namespace RigelEditor.EGUI
         internal bool NeedRebuildCommandList = false;
 
 
-        public RigelEGUIGraphicsBind(EditorGraphicsManager graphics)
+        public GUIGraphicsBind(EditorGraphicsManager graphics)
         {
             m_graphics = graphics;
 
