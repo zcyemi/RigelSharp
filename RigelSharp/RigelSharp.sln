@@ -12,6 +12,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RigelAppLoader", "RigelAppL
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RigelEditor", "RigelEditor\RigelEditor.csproj", "{27B8FC1A-3CEE-4793-9053-35069E645472}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{963D1BE9-E7D6-46C0-8DE8-B1418948C15B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RigelRunner", "RigelRunner\RigelRunner.csproj", "{EA99D0F7-0089-44AF-9508-EDD483B4FE2C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{64E86731-E2FB-4D4B-9F23-1DAD64EF9714}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleGame", "SampleGame\SampleGame.csproj", "{98E1D864-CBEA-4EEE-8A33-E93DAC9F7155}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,9 +38,21 @@ Global
 		{27B8FC1A-3CEE-4793-9053-35069E645472}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{27B8FC1A-3CEE-4793-9053-35069E645472}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{27B8FC1A-3CEE-4793-9053-35069E645472}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA99D0F7-0089-44AF-9508-EDD483B4FE2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA99D0F7-0089-44AF-9508-EDD483B4FE2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA99D0F7-0089-44AF-9508-EDD483B4FE2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA99D0F7-0089-44AF-9508-EDD483B4FE2C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98E1D864-CBEA-4EEE-8A33-E93DAC9F7155}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98E1D864-CBEA-4EEE-8A33-E93DAC9F7155}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98E1D864-CBEA-4EEE-8A33-E93DAC9F7155}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98E1D864-CBEA-4EEE-8A33-E93DAC9F7155}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EA99D0F7-0089-44AF-9508-EDD483B4FE2C} = {963D1BE9-E7D6-46C0-8DE8-B1418948C15B}
+		{98E1D864-CBEA-4EEE-8A33-E93DAC9F7155} = {64E86731-E2FB-4D4B-9F23-1DAD64EF9714}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DA0B8DD1-8381-4910-BDF3-2D7C3339EB99}

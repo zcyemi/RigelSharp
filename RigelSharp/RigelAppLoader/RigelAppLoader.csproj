@@ -90,6 +90,10 @@
       <Project>{27b8fc1a-3cee-4793-9053-35069e645472}</Project>
       <Name>RigelEditor</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SampleGame\SampleGame.csproj">
+      <Project>{98e1d864-cbea-4eee-8a33-e93dac9f7155}</Project>
+      <Name>SampleGame</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Shader\gui_rect.fx">
