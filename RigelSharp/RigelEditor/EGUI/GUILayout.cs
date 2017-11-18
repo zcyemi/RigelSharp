@@ -388,10 +388,10 @@ namespace RigelEditor.EGUI
             s_svLineHeight.Restore();
         }
 
-        public static void DrawMenuList(GUIMenuList menulist)
+        public static void DrawMenuList(GUIMenuList menulist,params GUIOption[] options)
         {
             var pos = s_ctx.GetNextDrawPos();
-            if (Button(menulist.Label))
+            if (Button(menulist.Label,options))
             {
                 pos.Y += s_ctx.currentLayout.LastDrawHeight + 1;
                 menulist.InternalSetStartPos(pos);

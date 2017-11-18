@@ -173,14 +173,14 @@ namespace RigelEditor.EGUI
 
             if (itemuse)
             {
-                Distroy = true;
+                OnDistroy();
             }
             else
             {
                 if (!guievent.Used && guievent.EventType == RigelEGUIEventType.MouseClick)
                 {
                     if (m_parent != null) m_parent.Distroy = false;
-                    Distroy = true;
+                    OnDistroy();
                 }
             }
         }

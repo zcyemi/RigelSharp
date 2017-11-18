@@ -33,10 +33,6 @@ namespace RigelEditor.EGUI
             m_menuList.AddMenuItem("File/Test2");
             m_menuList.AddMenuItem("Open/Sln");
 
-            Console.WriteLine(m_menuList.PrintMenuInfo());
-
-            //m_menuList.AddMenuItem("Exit");
-
             m_dockMgr = new GUIDockMgr();
         }
 
@@ -94,11 +90,9 @@ namespace RigelEditor.EGUI
         private void DrawContent()
         {
             GUILayout.BeginToolBar(23);
-            GUILayout.DrawMenuList(m_menuList);
-            GUILayout.Button("bbb",GUIOption.Width(50));
-            GUILayout.Text("HelloWorld");
-            GUILayout.Text("ABCDEEEDASDWDS",GUIOption.Width(50));
-            if (GUILayout.Button("GUITest")) m_dockMgr.AddNewContent(new GUITestContent());
+            GUILayout.Text("RIGEL");
+            GUILayout.DrawMenuList(m_menuList,GUIOption.Width(70));
+            if (GUILayout.Button("GUISample",GUIOption.Width(70))) m_dockMgr.AddNewContent(new GUITestContent());
             GUILayout.EndToolBar();
 
             m_dockGroup = GUI.Context.currentGroup.Rect;

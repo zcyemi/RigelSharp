@@ -71,6 +71,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EditorMenuManager.cs" />
     <Compile Include="EGUI\GUI.cs" />
     <Compile Include="EGUI\GUIComponent.cs" />
     <Compile Include="EGUI\GUICtx.cs" />
