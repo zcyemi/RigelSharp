@@ -374,14 +374,12 @@ namespace RigelEditor.EGUI
             }
             return open;
         }
-
         public static bool BeginCollapseGroup(string label, ref bool open)
         {
             GUILayout.Space(1);
             open = BeginCollapseGroup(label,open);
             return open;
         }
-
         public static void EndCollapseGroup()
         {
 
@@ -417,7 +415,6 @@ namespace RigelEditor.EGUI
             BeginArea(rectab, null,GUIOption.Border());
             return scrollView.Draw(rectab,pos,scrolltype);
         }
-
         public static void EndScrollView()
         {
             var rect = s_ctx.currentArea;

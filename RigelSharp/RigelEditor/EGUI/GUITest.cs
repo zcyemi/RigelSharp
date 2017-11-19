@@ -9,8 +9,6 @@ using RigelCore;
 
 namespace RigelEditor.EGUI
 {
-
-
     public class GUITestContent : GUIDockContentBase
     {
         private static GUITestContent s_content = null;
@@ -125,7 +123,14 @@ namespace RigelEditor.EGUI
                 GUILayout.BeginHorizontal();
                 GUILayout.Button("Grid 0.5", GUIOption.Grid(0.5f));
                 GUILayout.Button("Grid 0.25", GUIOption.Grid(0.25f));
+                GUILayout.EndHorizontal();
 
+                GUILayout.BeginHorizontal();
+                {
+                    GUILayout.Button("AlignLeft", GUIOption.AlignLeft,GUIOption.Grid(0.33f));
+                    GUILayout.Button("AlignCenter", GUIOption.AlignCenter, GUIOption.Grid(0.34f));
+                    GUILayout.Button("AlignRight", GUIOption.AlignRight, GUIOption.Grid(0.33f));
+                }
                 GUILayout.EndHorizontal();
             }
             GUILayout.EndCollapseGroup();
