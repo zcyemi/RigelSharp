@@ -193,19 +193,35 @@ namespace RigelEditor.EGUI
         public static int DrawText(Vector4 rect, string content, Vector4 color, bool absolute = false, params GUIOption[] options)
         {
             bool adaptive = false;
-            int align = 0;
+            int alignH = 0;
+            int alignV = 0;
             if (options != null)
             {
                 foreach (var o in options)
                 {
                     if (o.type == GUIOption.GUIOptionType.adaptive) { adaptive = true; continue; }
-                    if (o == GUIOption.AlignLeft) { align = -1; continue; }
-                    if (o == GUIOption.AlignRight) { align = 1; continue; }
+                    if (o == GUIOption.AlignHLeft) { alignH = -1; continue; }
+                    if (o == GUIOption.AlignHRight) { alignH = 1; continue; }
+                    if (o == GUIOption.AlignVTop) { alignV = -1; continue; }
+                    if (o == GUIOption.AlignVBottom) { alignV = 1; continue; }
                 }
             }
 
-            int pixelsize = (int)Context.Font.FontPixelSize;
-            rect.Y += rect.W > pixelsize ? (rect.W - pixelsize) / 2 : 0;
+            if(alignV == 0)
+            {
+                int pixelsize = (int)Context.Font.FontPixelSize;
+                rect.Y += rect.W > pixelsize ? (rect.W - pixelsize) / 2 : 0;
+            }
+            else if(alignV == 1)
+            {
+                int pixelsize = (int)Context.Font.FontPixelSize;
+                rect.Y += ((rect.W - pixelsize) - 1);
+            }
+            else
+            {
+                rect.Y += 1;
+            }
+            
 
             bool valid = GUIUtility.RectClip(ref rect, absolute ? s_ctx.baseRect : s_ctx.currentGroup.Absolute);
             if (!valid) return 0;
@@ -220,11 +236,11 @@ namespace RigelEditor.EGUI
             else
             {
                 int textwidth = Context.Font.GetTextWidth(content);
-                if (align == 0)
+                if (alignH == 0)
                 {
                     w = rect.Z > textwidth ? (int)((rect.Z - textwidth) / 2) : 3;
                 }
-                else if (align == -1)
+                else if (alignH == -1)
                 {
                     w = 3;
                 }
@@ -301,10 +317,7 @@ namespace RigelEditor.EGUI
             return glyph.AdvancedX;
         }
 
-        public static bool Toggle(Vector4 rect, bool value, string label)
-        {
-            return value;
-        }
+
 
         public static void DrawRect(Vector4 rect, bool absolute = false, params GUIOption[] options)
         {
@@ -444,7 +457,6 @@ namespace RigelEditor.EGUI
         {
         }
 
-
         public static void DrawComponent(IGUIComponent component)
         {
             component.InitDrawed = false;
@@ -453,12 +465,29 @@ namespace RigelEditor.EGUI
             Event.Use();
         }
 
+        #region Input
+        public static bool Toggle(Vector4 rect, bool value, string label)
+        {
+            DrawRect(rect);
+            return value;
+        }
+
+        #endregion
+
+
+
+
 
         #region ObjectPool
 
         public static GUIObjScrollView GetScrollView(Vector4 rect)
         {
             return Context.poolSrollbar.Get(GUIUtilityInternal.GetHash(rect, GUIObjectType.ScrollBar));
+        }
+
+        public static GUIObjTextInput GetTextInput(Vector4 rect)
+        {
+            return Context.poolTextInput.Get(GUIUtilityInternal.GetHash(rect, GUIObjectType.TextInput));
         }
 
         #endregion

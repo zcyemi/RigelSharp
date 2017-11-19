@@ -30,9 +30,8 @@ namespace RigelEditor.EGUI
             expended = 7,
             grid =  8,
             
-            alignLeft = 20,
-            alignRight = 21,
-            alignCenter = 22,
+            alignHorizonal = 20,
+            alignVertical = 21,
 
             checkRectContains = 100,
             checkTextOverflow = 101,
@@ -66,9 +65,13 @@ namespace RigelEditor.EGUI
         public static readonly GUIOption NoClip = new GUIOption(GUIOptionType.noClip, null);
 
 
-        public static readonly GUIOption AlignLeft = new GUIOption(GUIOptionType.alignLeft, null);
-        public static readonly GUIOption AlignRight = new GUIOption(GUIOptionType.alignRight, null);
-        public static readonly GUIOption AlignCenter = new GUIOption(GUIOptionType.alignCenter, null);
+        public static readonly GUIOption AlignHLeft = new GUIOption(GUIOptionType.alignHorizonal, null);
+        public static readonly GUIOption AlignHRight = new GUIOption(GUIOptionType.alignHorizonal, null);
+        public static readonly GUIOption AlignHCenter = new GUIOption(GUIOptionType.alignHorizonal, null);
+
+        public static readonly GUIOption AlignVTop = new GUIOption(GUIOptionType.alignVertical, null);
+        public static readonly GUIOption AlignVCenter = new GUIOption(GUIOptionType.alignVertical, null);
+        public static readonly GUIOption AlignVBottom = new GUIOption(GUIOptionType.alignVertical, null);
 
         public static GUIOption Grid(float percentage = 1.0f)
         {

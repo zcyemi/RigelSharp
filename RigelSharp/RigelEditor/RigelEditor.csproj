@@ -75,6 +75,7 @@
     <Compile Include="EditorTest.cs" />
     <Compile Include="EGUI\GUI.cs" />
     <Compile Include="EGUI\GUIComponent.cs" />
+    <Compile Include="EGUI\GUIContent.cs" />
     <Compile Include="EGUI\GUICtx.cs" />
     <Compile Include="EGUI\GUIDock.cs" />
     <Compile Include="EGUI\GUIDrag.cs" />
@@ -86,8 +87,10 @@
     <Compile Include="EGUI\GUILayout.cs" />
     <Compile Include="EGUI\GUIMenu.cs" />
     <Compile Include="EGUI\GUIMessageBox.cs" />
+    <Compile Include="EGUI\GUIObject.cs" />
+    <Compile Include="EGUI\GUIObjTextInput.cs" />
     <Compile Include="EGUI\GUIOption.cs" />
-    <Compile Include="EGUI\GUIScrollView.cs" />
+    <Compile Include="EGUI\GUIObjScrollView.cs" />
     <Compile Include="EGUI\GUITest.cs" />
     <Compile Include="EGUI\GUIUtility.cs" />
     <Compile Include="EGUI\GUIWindow.cs" />

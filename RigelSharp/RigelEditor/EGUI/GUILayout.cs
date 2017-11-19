@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using SharpDX;
+using RigelCore;
 
 namespace RigelEditor.EGUI
 {
@@ -49,7 +50,7 @@ namespace RigelEditor.EGUI
         /// Begin Group and Area
         /// </summary>
         /// <param name="rect">related rect</param>
-        public static void BeginContainer(Vector4 rect,Vector4? color = null,params GUIOption[] options)
+        public static void BeginContainer(Vector4 rect, Vector4? color = null, params GUIOption[] options)
         {
             var rectab = GetRectAbsolute(rect);
             GUILayout.BeginArea(rectab, color, options);
@@ -69,17 +70,17 @@ namespace RigelEditor.EGUI
         /// <param name="rect"></param>
         /// <param name="color"></param>
         /// <param name="options">GUIOptionType.Border</param>
-        public static void BeginArea(Vector4 rect, Vector4? color = null,params GUIOption[] options)
+        public static void BeginArea(Vector4 rect, Vector4? color = null, params GUIOption[] options)
         {
             if (color != null)
             {
                 GUI.DrawRect(rect, (Vector4)color, true);
             }
 
-            if(options != null)
+            if (options != null)
             {
                 var optborder = options.FirstOrDefault((x) => { return x.type == GUIOption.GUIOptionType.border; });
-                if(optborder != null)
+                if (optborder != null)
                 {
                     GUI.DrawBorder(rect, 1, optborder.Vector4Value, true);
                 }
@@ -238,7 +239,7 @@ namespace RigelEditor.EGUI
                         width = (int)opt.value;
                         adaptive = false;
                     }
-                    else if(opt.type == GUIOption.GUIOptionType.expended)
+                    else if (opt.type == GUIOption.GUIOptionType.expended)
                     {
                         width = (int)(s_ctx.currentArea.Z - s_ctx.currentLayout.Offset.X);
                         adaptive = false;
@@ -275,7 +276,7 @@ namespace RigelEditor.EGUI
             return clicked;
         }
 
-        public static void Text(string content, params GUIOption[] options)
+        public static void Text(string content,Vector4? color = null,params GUIOption[] options)
         {
             var optwidth = options != null ? options.FirstOrDefault((x) => { return x.type == GUIOption.GUIOptionType.width; }) : null;
             bool adaptive = optwidth == null;
@@ -288,29 +289,26 @@ namespace RigelEditor.EGUI
             {
                 if (adaptive)
                 {
-                    width = GUI.DrawText(rect, content, s_ctx.Color, true, GUIOption.Adaptive);
+                    width = GUI.DrawText(rect, content, color ??s_ctx.Color, true, GUIOption.Adaptive);
+                    AutoCaculateOffsetW(width);
                 }
                 else
                 {
-                    width = GUI.DrawText(rect, content, s_ctx.Color, true);
+                    width = GUI.DrawText(rect, content, s_ctx.Color, true, options);
+                    AutoCaculateOffsetW((int)rect.Z);
                 }
             }
-            //else
-            //{
-            //    width = GUI.Context.Font.GetTextWidth(content);
-            //}
-            AutoCaculateOffsetW(width);
         }
 
 
-        public static void TextBlock(string content,params GUIOption[] options)
+        public static void TextBlock(string content, params GUIOption[] options)
         {
             GUIOption optwidth = null;
             GUIOption optheight = null;
 
-            if(options != null)
+            if (options != null)
             {
-                foreach(var o in options)
+                foreach (var o in options)
                 {
                     if (o.type == GUIOption.GUIOptionType.width) optwidth = o;
                     if (o.type == GUIOption.GUIOptionType.height) optheight = o;
@@ -320,7 +318,7 @@ namespace RigelEditor.EGUI
             if (optwidth != null) remain.X = optwidth.IntValue;
             if (optheight != null) remain.Y = optheight.IntValue;
 
-            var drawRect = new Vector4(s_ctx.currentLayout.Offset,remain.X,remain.Y);
+            var drawRect = new Vector4(s_ctx.currentLayout.Offset, remain.X, remain.Y);
             bool valid = GUIUtility.RectClip(ref drawRect, s_ctx.currentArea);
 
             int drawheight = 0;
@@ -328,12 +326,12 @@ namespace RigelEditor.EGUI
             {
                 drawheight = GUI.TextBlock(drawRect, content, GUI.Context.Color, true);
             }
-            AutoCaculateOffset(drawRect.Z,drawheight);
+            AutoCaculateOffset(drawRect.Z, drawheight);
 
 
         }
 
-        public static void Line(int thickness,Vector4? color, int margin = 2)
+        public static void Line(int thickness, Vector4? color, int margin = 2)
         {
             GUILayout.Space(margin);
             var endpos = new Vector2(thickness, thickness);
@@ -351,7 +349,7 @@ namespace RigelEditor.EGUI
             GUILayout.Space(margin);
         }
 
-            public static void BeginToolBar(int height)
+        public static void BeginToolBar(int height)
         {
             SetLineHeight(height);
             var rect = new Vector4(s_ctx.currentLayout.Offset, s_ctx.currentArea.Z, height);
@@ -366,9 +364,9 @@ namespace RigelEditor.EGUI
             RestoreLineHeight();
         }
 
-        public static bool BeginCollapseGroup(string label,bool open)
+        public static bool BeginCollapseGroup(string label, bool open)
         {
-            if(Button(label, GUIOption.Expended))
+            if (Button(label, GUIOption.Expended))
             {
                 open = !open;
             }
@@ -377,7 +375,7 @@ namespace RigelEditor.EGUI
         public static bool BeginCollapseGroup(string label, ref bool open)
         {
             GUILayout.Space(1);
-            open = BeginCollapseGroup(label,open);
+            open = BeginCollapseGroup(label, open);
             return open;
         }
         public static void EndCollapseGroup()
@@ -392,16 +390,16 @@ namespace RigelEditor.EGUI
         /// <param name="scrolltype"></param>
         /// <param name="options">GUIOption.With GUIOption.Height</param>
         /// <returns></returns>
-        public static Vector2 BeginScrollView(Vector2 pos,GUIScrollType scrolltype = GUIScrollType.Vertical,params GUIOption[] options)
+        public static Vector2 BeginScrollView(Vector2 pos, GUIScrollType scrolltype = GUIScrollType.Vertical, params GUIOption[] options)
         {
             GUIOption optWidth = null;
             GUIOption optHeight = null;
-            if(options != null)
+            if (options != null)
             {
-                foreach(var opt in options)
+                foreach (var opt in options)
                 {
-                    if(opt.type == GUIOption.GUIOptionType.width) { optWidth = opt;continue; }
-                    if(opt.type == GUIOption.GUIOptionType.height) { optHeight = opt;continue; }
+                    if (opt.type == GUIOption.GUIOptionType.width) { optWidth = opt; continue; }
+                    if (opt.type == GUIOption.GUIOptionType.height) { optHeight = opt; continue; }
                 }
             }
 
@@ -412,8 +410,8 @@ namespace RigelEditor.EGUI
             var rect = new Vector4(s_ctx.currentLayout.Offset, sizeremain.X, sizeremain.Y);
             var rectab = GetRectAbsolute(rect);
             var scrollView = GUI.GetScrollView(rectab);
-            BeginArea(rectab, null,GUIOption.Border());
-            return scrollView.Draw(rectab,pos,scrolltype);
+            BeginArea(rectab, null, GUIOption.Border());
+            return scrollView.Draw(rectab, pos, scrolltype);
         }
         public static void EndScrollView()
         {
@@ -435,10 +433,10 @@ namespace RigelEditor.EGUI
             s_svLineHeight.Restore();
         }
 
-        public static void DrawMenuList(GUIMenuList menulist,params GUIOption[] options)
+        public static void DrawMenuList(GUIMenuList menulist, params GUIOption[] options)
         {
             var pos = s_ctx.GetNextDrawPos();
-            if (Button(menulist.Label,options))
+            if (Button(menulist.Label, options))
             {
                 pos.Y += s_ctx.currentLayout.LastDrawHeight + 1;
                 menulist.InternalSetStartPos(pos);
@@ -446,12 +444,52 @@ namespace RigelEditor.EGUI
             }
         }
 
-        public static void DrawRect(Vector4 rect, Vector4 color)
+        public static void DrawRect(Vector4 rect, Vector4 color,params GUIOption[] options)
         {
             GUIUtility.RectClip(ref rect, s_ctx.currentArea);
             GUI.DrawRect(rect, color, true);
         }
 
+        public static void DrawRectOnFlow(Vector2 size, Vector4 color,params GUIOption[] options)
+        {
+            var offset = s_ctx.currentLayout.Offset;
+            Vector4 rect = new Vector4(offset, size.X,size.Y);
+            GUIUtility.RectClip(ref rect, s_ctx.currentArea);
+            if (options != null)
+            {
+                var optcheckcontains = options.FirstOrDefault((x) => { return x.type == GUIOption.GUIOptionType.checkRectContains; });
+                if (optcheckcontains != null) {
+                    optcheckcontains.value = GUIUtility.RectContainsCheck(rect, GUI.Event.Pointer);
+                }
+            }
+            GUI.DrawRect(rect, color, true,GUIOption.NoClip);
+        }
+
+
+        #region 
+
+        public static string TextInput(string content,params GUIOption[] options)
+        {
+            return content;
+        }
+
+        public static string TextInput(string label,string content,params GUIOption[] options)
+        {
+            var sizer = GUILayout.SizeRemain;
+            var rect = new Vector4(s_ctx.currentLayout.Offset, sizer.X, s_svLineHeight);
+            var rectAbsolute = GetRectAbsolute(rect);
+
+            GUIObjTextInput input = GUI.GetTextInput(rectAbsolute);
+            input.Draw(rect, content,label);
+
+            Space(1);
+
+            return content;
+        }
+
+
+
+        #endregion
 
         #region Utility
         public static Vector4 GetRectAbsolute(Vector4 rect)

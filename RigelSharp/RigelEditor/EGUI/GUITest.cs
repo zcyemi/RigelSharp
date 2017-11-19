@@ -38,6 +38,8 @@ namespace RigelEditor.EGUI
         private bool m_sampleLayout = false;
         private bool m_sampleText = false;
 
+        private bool m_sampleInput = false;
+
         public GUITestContent()
         {
             Title = "GUITest";
@@ -46,21 +48,32 @@ namespace RigelEditor.EGUI
         public override void OnGUI()
         {
             SampleText();
-
             SampleLayout();
             SampleGUIComponent();
-
             SampleGUIOption();
             SampleScrollView();
+            SampleInput();
+
+        }
 
 
+        private string m_inputString = "sampleString";
+        private string m_inputString2 = "sampleString2";
+        private void SampleInput()
+        {
+            if(GUILayout.BeginCollapseGroup("Input", ref m_sampleInput))
+            {
+                GUILayout.Button("Test");
+                m_inputString = GUILayout.TextInput("Input", m_inputString);
+                m_inputString2 = GUILayout.TextInput("Sample String 2", m_inputString2);
+            }
+            GUILayout.EndCollapseGroup();
         }
 
         private void SampleLayout()
         {
 
         }
-
         private void SampleGUIComponent()
         {
             if (GUILayout.BeginCollapseGroup("[GUIComponent]", ref m_sampleGUIComponent))
@@ -81,12 +94,10 @@ namespace RigelEditor.EGUI
             }
             GUILayout.EndCollapseGroup();
         }
-
         private void SampleCollapseGroup()
         {
 
         }
-
         private void SampleText()
         {
             string longtext = "A game engine is a software framework designed for the creation and development of video games.Developers use them to create games for consoles, mobile devices and personal computers.The core functionality typically provided by a game engine includes a rendering engine(renderer) for 2D or 3D graphics, a physics engine or collision detection(and collision response), sound, scripting";
@@ -109,7 +120,6 @@ namespace RigelEditor.EGUI
             }
             GUILayout.EndCollapseGroup();
         }
-
         private void SampleGUIOption()
         {
             if (GUILayout.BeginCollapseGroup("[GUIOptions]", ref m_sampleGUIOption))
@@ -127,16 +137,14 @@ namespace RigelEditor.EGUI
 
                 GUILayout.BeginHorizontal();
                 {
-                    GUILayout.Button("AlignLeft", GUIOption.AlignLeft,GUIOption.Grid(0.33f));
-                    GUILayout.Button("AlignCenter", GUIOption.AlignCenter, GUIOption.Grid(0.34f));
-                    GUILayout.Button("AlignRight", GUIOption.AlignRight, GUIOption.Grid(0.33f));
+                    GUILayout.Button("AlignLeft", GUIOption.AlignHLeft,GUIOption.Grid(0.33f));
+                    GUILayout.Button("AlignCenter", GUIOption.AlignHCenter, GUIOption.Grid(0.34f));
+                    GUILayout.Button("AlignRight", GUIOption.AlignHRight, GUIOption.Grid(0.33f));
                 }
                 GUILayout.EndHorizontal();
             }
             GUILayout.EndCollapseGroup();
         }
-
-
         private void SampleScrollView()
         {
             if (GUILayout.BeginCollapseGroup("[ScrollView]", ref m_sampleScrollView))
