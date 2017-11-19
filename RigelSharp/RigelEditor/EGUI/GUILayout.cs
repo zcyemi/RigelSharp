@@ -27,6 +27,8 @@ namespace RigelEditor.EGUI
         //reference to GUI.s_ctx
         public static GUICtx s_ctx;
 
+        public static GUILayoutInfo CurrentLayout { get { return s_ctx.currentLayout; } }
+
 
         private static Stack<GUILayoutInfo> layoutStack { get { return s_ctx.layoutStack; } }
 
@@ -41,6 +43,23 @@ namespace RigelEditor.EGUI
             {
                 return s_ctx.currentArea.Size() - s_ctx.currentLayout.Offset;
             }
+        }
+
+        /// <summary>
+        /// Begin Group and Area
+        /// </summary>
+        /// <param name="rect">related rect</param>
+        public static void BeginContainer(Vector4 rect,Vector4? color = null,params GUIOption[] options)
+        {
+            var rectab = GetRectAbsolute(rect);
+            GUILayout.BeginArea(rectab, color, options);
+            GUI.BeginGroup(rectab, null, true);
+        }
+
+        public static void EndContainer()
+        {
+            GUI.EndGroup();
+            GUILayout.EndArea();
         }
 
 
@@ -281,6 +300,37 @@ namespace RigelEditor.EGUI
             //    width = GUI.Context.Font.GetTextWidth(content);
             //}
             AutoCaculateOffsetW(width);
+        }
+
+
+        public static void TextBlock(string content,params GUIOption[] options)
+        {
+            GUIOption optwidth = null;
+            GUIOption optheight = null;
+
+            if(options != null)
+            {
+                foreach(var o in options)
+                {
+                    if (o.type == GUIOption.GUIOptionType.width) optwidth = o;
+                    if (o.type == GUIOption.GUIOptionType.height) optheight = o;
+                }
+            }
+            var remain = SizeRemain;
+            if (optwidth != null) remain.X = optwidth.IntValue;
+            if (optheight != null) remain.Y = optheight.IntValue;
+
+            var drawRect = new Vector4(s_ctx.currentLayout.Offset,remain.X,remain.Y);
+            bool valid = GUIUtility.RectClip(ref drawRect, s_ctx.currentArea);
+
+            int drawheight = 0;
+            if (valid)
+            {
+                drawheight = GUI.TextBlock(drawRect, content, GUI.Context.Color, true);
+            }
+            AutoCaculateOffset(drawRect.Z,drawheight);
+
+
         }
 
         public static void Line(int thickness,Vector4? color, int margin = 2)

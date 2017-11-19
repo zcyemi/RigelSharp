@@ -149,6 +149,47 @@ namespace RigelEditor.EGUI
         {
             DrawText(position, text, Context.Color, absolute);
         }
+
+        /// <summary>
+        /// Multiline Text
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="text"></param>
+        /// <param name="color"></param>
+        /// <param name="absoulte"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        public static int TextBlock(Vector4 rect,string text, Vector4 color,bool absoulte = false,params GUIOption[] options)
+        {
+            bool valid = GUIUtility.RectClip(ref rect, absoulte ? s_ctx.baseRect : s_ctx.currentGroup.Absolute);
+
+            if (!valid)
+            {
+                return (int)rect.W;
+            }
+            Vector4 startpos = rect;
+
+
+            uint lineh = Context.Font.FontPixelSize + 3;
+            int w = 0;
+            foreach(var c in text)
+            {
+                int cw = Context.Font.GetCharWidth(c);
+                if((w + cw) > rect.Z)
+                {
+                    startpos.Y += lineh;
+                    w = 0;
+
+                    if ((startpos.Y + lineh) > (rect.W + rect.Y)) return (int)rect.W;
+                }
+                startpos.X = w;
+                w +=DrawChar(startpos, c, color);
+                
+            }
+
+            return (int)(startpos.Y + lineh - rect.Y);
+        }
+
         public static int DrawText(Vector4 rect, string content, Vector4 color, bool absolute = false, params GUIOption[] options)
         {
             bool adaptive = options.FirstOrDefault((x) => { return x == GUIOption.Adaptive; }) != null;
@@ -197,6 +238,10 @@ namespace RigelEditor.EGUI
         }
         public static int DrawChar(Vector4 rect, uint c, Vector4 color)
         {
+            if(c < 33)
+            {
+                return 6;
+            }
             var glyph = Context.Font.GetGlyphInfo(c);
             if (glyph == null) return (int)Context.Font.FontPixelSize;
 

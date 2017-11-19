@@ -30,7 +30,6 @@ namespace RigelEditor.EGUI
                 }
                     
             }
-
         }
 
         private Vector2 m_scrollViewPos = Vector2.Zero;
@@ -39,6 +38,7 @@ namespace RigelEditor.EGUI
         private bool m_sampleScrollView = false;
         private bool m_sampleGUIComponent = false;
         private bool m_sampleLayout = false;
+        private bool m_sampleText = false;
 
         public GUITestContent()
         {
@@ -47,6 +47,7 @@ namespace RigelEditor.EGUI
 
         public override void OnGUI()
         {
+            SampleText();
 
             SampleLayout();
             SampleGUIComponent();
@@ -86,6 +87,29 @@ namespace RigelEditor.EGUI
         private void SampleCollapseGroup()
         {
 
+        }
+
+        private void SampleText()
+        {
+            string longtext = "A game engine is a software framework designed for the creation and development of video games.Developers use them to create games for consoles, mobile devices and personal computers.The core functionality typically provided by a game engine includes a rendering engine(renderer) for 2D or 3D graphics, a physics engine or collision detection(and collision response), sound, scripting";
+
+            if (GUILayout.BeginCollapseGroup("[TextRendering]",ref m_sampleText))
+            {
+                GUILayout.Text(longtext);
+                GUILayout.Text(@"Single line text.");
+                GUILayout.Text("Space[ ]");
+                GUILayout.Text("Tab[\t]");
+
+                GUILayout.BeginContainer(new Vector4(GUILayout.s_ctx.currentLayout.Offset, 100, 100));
+
+                GUI.TextBlock(new Vector4(0, 0, 100, 100), longtext, RigelColor.Red);
+                GUILayout.EndContainer();
+                GUILayout.Space(100);
+
+                GUILayout.TextBlock(longtext, GUIOption.Width(300));
+                GUILayout.TextBlock(longtext);
+            }
+            GUILayout.EndCollapseGroup();
         }
 
         private void SampleGUIOption()
