@@ -480,7 +480,7 @@ namespace RigelEditor.EGUI
             var rectAbsolute = GetRectAbsolute(rect);
 
             GUIObjTextInput input = GUI.GetTextInput(rectAbsolute);
-            input.Draw(rect, content,label);
+            content = input.Draw(rect, content,label);
 
             Space(1);
 
