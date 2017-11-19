@@ -53,7 +53,7 @@ namespace RigelEditor.EGUI
                 if (Focused && GUI.Event.EventType == RigelEGUIEventType.KeyDown)
                 {
                     int lastpos = Pos;
-                    var newcontent = ProcessInput(content, GUI.Event.Key,ref Pos);
+                    var newcontent = GUITextProcessor.ProcessInput(content, GUI.Event.Key,ref Pos);
                     if(content != newcontent)
                     {
                         contentChanged = true;
@@ -110,31 +110,6 @@ namespace RigelEditor.EGUI
         }
 
 
-        private string ProcessInput(string text,KeyCode key,ref int pos)
-        {
-            switch (key)
-            {
-                case KeyCode.Back:
-                    if(pos > 0)
-                    {
-                        text = text.Remove(pos-1, 1);
-                        pos--;
-                    }
-                    break;
-                case KeyCode.Space:
-                    text = text.Insert(pos," ");
-                    pos++;
-                    break;
-            }
-
-            int keyv = (int)key;
-
-            if((int)KeyCode.A <= keyv && keyv <= (int)KeyCode.Z)
-            {
-                text = text.Insert(pos, GUI.Event.Shift ? key.ToString().ToUpper() : key.ToString().ToLower());
-                pos += 1;
-            }
-            return text;
-        }
+        
     }
 }

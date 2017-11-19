@@ -633,7 +633,7 @@ namespace RigelEditor.EGUI
         OemSemicolon = 186,
         //
         // 摘要:
-        //     OEM 1 键。
+        //     OEM 1 键。//;
         Oem1 = 186,
         //
         // 摘要:
@@ -698,7 +698,7 @@ namespace RigelEditor.EGUI
         //
         // 摘要:
         //     OEM 7 键。
-        Oem7 = 222,
+        Oem7 = 222, //'
         //
         // 摘要:
         //     OEM 8 键。
