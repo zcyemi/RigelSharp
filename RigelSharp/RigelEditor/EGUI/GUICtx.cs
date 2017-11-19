@@ -49,11 +49,12 @@ namespace RigelEditor.EGUI
         }
 
         public Stack<int> depthLayer = new Stack<int>();
-
-
         public float s_depthStep = 0.0001f;
 
         public FontInfo Font { get; set; }
+
+        //Input
+        public bool InputChanged = false;
 
         //component
         public Stack<IGUIComponent> componentStack = new Stack<IGUIComponent>();

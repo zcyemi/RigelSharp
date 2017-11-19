@@ -494,6 +494,24 @@ namespace RigelEditor.EGUI
 
 
         #region utility
+
+        /// <summary>
+        /// don't use nested Begin/End ChangeCheck
+        /// </summary>
+        public static void BeginChangeCheck()
+        {
+            s_ctx.InputChanged = false;
+        }
+
+        public static bool EndChangeCheck()
+        {
+            var ret = s_ctx.InputChanged;
+            s_ctx.InputChanged = false;
+
+            return ret;
+        }
+
+
         internal static void SetDrawTarget(GUIDrawTarget target)
         {
             DrawTarget = target;

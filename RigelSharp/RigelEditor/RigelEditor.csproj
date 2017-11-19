@@ -94,6 +94,7 @@
     <Compile Include="EGUI\GUIOption.cs" />
     <Compile Include="EGUI\GUIObjScrollView.cs" />
     <Compile Include="EGUI\GUITest.cs" />
+    <Compile Include="EGUI\GUITextProcessor.cs" />
     <Compile Include="EGUI\GUIUtility.cs" />
     <Compile Include="EGUI\GUIWindow.cs" />
     <Compile Include="EGUI\RigelEGUIBuffer.cs" />
