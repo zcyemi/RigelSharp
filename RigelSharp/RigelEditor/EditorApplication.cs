@@ -21,6 +21,7 @@ namespace RigelEditor
 {
     public class RigelEditorApp :Singleton<RigelEditorApp>
     {
+        private String m_title = "Rigel";
 
         private RenderForm m_windowForm;
         private EditorGraphicsManager m_graphics;
@@ -31,7 +32,7 @@ namespace RigelEditor
 
         public RigelEditorApp()
         {
-            m_windowForm = new RenderForm("Rigel");
+            m_windowForm = new RenderForm(m_title);
             m_windowForm.AllowUserResizing = true;
 
             m_graphics = new EditorGraphicsManager();
@@ -60,6 +61,11 @@ namespace RigelEditor
 
             m_graphics.Dispose();
             m_windowForm.Dispose();
+        }
+        
+        internal void SetCaptionInfo(string content)
+        {
+            m_windowForm.Text = string.Format("{0} - {1}", m_title, content);
         }
 
     }

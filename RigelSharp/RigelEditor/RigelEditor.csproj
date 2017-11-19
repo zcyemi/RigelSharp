@@ -71,6 +71,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EditorAPI.cs" />
+    <Compile Include="EditorDialogs.cs" />
     <Compile Include="EditorMenuManager.cs" />
     <Compile Include="EditorTest.cs" />
     <Compile Include="EGUI\GUI.cs" />
@@ -105,6 +107,7 @@
     <Compile Include="Player\PlayerEditorWindow.cs" />
     <Compile Include="Player\PlayerManager.cs" />
     <Compile Include="EditorAboutWindow.cs" />
+    <Compile Include="Project\ProjectInfo.cs" />
     <Compile Include="Project\ProjectManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EditorConfig.cs" />

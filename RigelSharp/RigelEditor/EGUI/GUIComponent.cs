@@ -40,7 +40,7 @@ namespace RigelEditor.EGUI
         protected Vector2 m_size = new Vector2(400, 300);
 
 
-        public override void Draw(GUIEvent guievent)
+        public sealed override void Draw(GUIEvent guievent)
         {
             var rect = new Vector4(0, 0, m_size.X,m_size.Y).CenterPos(GUI.Context.baseRect.Size());
 
@@ -51,6 +51,33 @@ namespace RigelEditor.EGUI
             OnDraw();
 
             GUILayout.EndArea();
+        }
+
+        protected abstract void OnDraw();
+    }
+
+    public abstract class GUIWindowedDialog: IGUIComponent
+    {
+        protected bool m_dialogMoveable = true;
+        protected bool m_dialogRezieable = true;
+        protected bool m_dialogCloseable = true;
+
+        protected Vector2 m_dialogMaxSize = new Vector2(800, 600);
+        protected Vector2 m_dialogMinSize = new Vector2(625, 360);
+
+        private Vector2 m_size;
+
+        public GUIWindowedDialog(bool moveable,bool resizeable,bool closeable)
+        {
+            m_size = m_dialogMinSize;
+            m_dialogMoveable = moveable;
+            m_dialogRezieable = resizeable;
+            m_dialogCloseable = closeable;
+        }
+
+        public sealed override void Draw(GUIEvent guievent)
+        {
+
         }
 
         protected abstract void OnDraw();

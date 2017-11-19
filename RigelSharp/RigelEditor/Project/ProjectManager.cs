@@ -4,6 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using RigelCore;
+using RigelEditor;
+using RigelEditor.EGUI;
+
 namespace RigelEditor.Project
 {
     public class ProjectManager
@@ -13,7 +17,7 @@ namespace RigelEditor.Project
         [EditorMenuItem("File","Project/New")]
         public static void MenuItemProjectNew()
         {
-
+            GUI.DrawComponent(new EditorFileSystemDialog("OpenFolder"));
         }
 
         [EditorMenuItem("File","Project/Open")]
@@ -22,4 +26,6 @@ namespace RigelEditor.Project
 
         }
     }
+
+
 }

@@ -38,6 +38,27 @@ namespace RigelEditor
             if(level >= EditorConfig.AssertLevel)
                 Debug.Assert(condition, message);
         }
+
+        #region Dialog
+
+        public static void OpenFileDialog(string folder,string extension = "",Action<string> callback = null)
+        {
+
+        }
+
+        public static void OpenFolderDialog(string folder,Action<string> callback)
+        {
+
+        }
+
+        public static void SaveFileDialog(string filepath,Action<string> callback)
+        {
+
+        }
+
+        #endregion
+
+
     }
 
     public static class VectorExtension
