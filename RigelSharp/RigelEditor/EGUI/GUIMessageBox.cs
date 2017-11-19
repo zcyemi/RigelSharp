@@ -8,7 +8,7 @@ using SharpDX;
 
 namespace RigelEditor.EGUI
 {
-    public class GUIMessageBox : IGUIComponent
+    public sealed class GUIMessageBox : IGUIComponent
     {
         public string title = "MessageBox";
         public string info = "No Content";
@@ -39,7 +39,7 @@ namespace RigelEditor.EGUI
                 rect.W = GUILayout.s_svLineHeight;
                 GUI.DrawRect(rect, GUIStyle.Current.ColorActiveD);
                 GUILayout.Text(title);
-                GUILayout.Text(info, GUIOption.Width(480));
+                GUILayout.Text(info,null,GUIOption.Width(480));
 
                 var off = GUILayout.s_ctx.currentLayout.Offset;
 

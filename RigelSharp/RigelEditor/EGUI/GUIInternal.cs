@@ -13,11 +13,11 @@ namespace RigelEditor.EGUI
     {
         private static GUICtx s_ctx;
 
-        private static RigelEGUICtx s_eguictx;
+        private static EditorGUICtx s_eguictx;
 
         private static List<GUIDrawStage> s_drawStages;
 
-        public static void Init(RigelEGUICtx eguictx)
+        public static void Init(EditorGUICtx eguictx)
         {
             s_eguictx = eguictx;
 

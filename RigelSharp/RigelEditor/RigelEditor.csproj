@@ -71,8 +71,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EditorMenuManager.cs" />
+    <Compile Include="EditorTest.cs" />
     <Compile Include="EGUI\GUI.cs" />
     <Compile Include="EGUI\GUIComponent.cs" />
+    <Compile Include="EGUI\GUIContent.cs" />
     <Compile Include="EGUI\GUICtx.cs" />
     <Compile Include="EGUI\GUIDock.cs" />
     <Compile Include="EGUI\GUIDrag.cs" />
@@ -82,22 +85,27 @@
     <Compile Include="EGUI\GUIDrawStageWindows.cs" />
     <Compile Include="EGUI\GUIInternal.cs" />
     <Compile Include="EGUI\GUILayout.cs" />
+    <Compile Include="EGUI\GUIMenu.cs" />
     <Compile Include="EGUI\GUIMessageBox.cs" />
+    <Compile Include="EGUI\GUIObject.cs" />
+    <Compile Include="EGUI\GUIObjTextInput.cs" />
     <Compile Include="EGUI\GUIOption.cs" />
-    <Compile Include="EGUI\GUIScrollView.cs" />
+    <Compile Include="EGUI\GUIObjScrollView.cs" />
     <Compile Include="EGUI\GUITest.cs" />
     <Compile Include="EGUI\GUIUtility.cs" />
     <Compile Include="EGUI\GUIWindow.cs" />
     <Compile Include="EGUI\RigelEGUIBuffer.cs" />
     <Compile Include="EGUI\RigelEGUIBufferGUIWindow.cs" />
-    <Compile Include="EGUI\RigelEGUICtx.cs" />
+    <Compile Include="EditorGUICtx.cs" />
     <Compile Include="EGUI\RigelEGUICtx.Window.cs" />
-    <Compile Include="EGUI\RigelEGUIGraphicsBind.cs" />
+    <Compile Include="EGUI\GUIGraphicsBind.cs" />
     <Compile Include="EGUI\GUIStyle.cs" />
     <Compile Include="EGUI\RigelEGUIWindow.cs" />
     <Compile Include="Helper\EditorReflectionHelper.cs" />
     <Compile Include="Player\PlayerEditorWindow.cs" />
     <Compile Include="Player\PlayerManager.cs" />
+    <Compile Include="EditorAboutWindow.cs" />
+    <Compile Include="Project\ProjectManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EditorConfig.cs" />
     <Compile Include="RigelDrawCall.cs" />

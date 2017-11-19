@@ -79,6 +79,11 @@ namespace RigelCore
             return m_glyphInfo[c];
         }
 
+        public int GetCharWidth(uint c)
+        {
+            return m_charWidth[c];
+        }
+
         public int GetTextWidth(string str)
         {
             int width = 0;
@@ -102,6 +107,7 @@ namespace RigelCore
         private int m_textureSize;
         private float m_glyphUV;
         private GlyphInfo[] m_glyphInfo = new GlyphInfo[128];
+        private int[] m_charWidth = new int[128];
 
         private int m_ascender;
 
@@ -128,7 +134,12 @@ namespace RigelCore
             int lineposy = 0;
             int linehmax = 0;
 
-            for(uint c = 33; c < 127; c++)
+            for(uint c = 0;c< 33; c++)
+            {
+                m_charWidth[c] = 6;
+            }
+
+            for (uint c = 33; c < 127; c++)
             {
                 DrawGlyphToImage(c, img, lineposx, lineposy);
 
@@ -145,6 +156,8 @@ namespace RigelCore
                     PixelWidth = bitmap.Width,
                     PixelHeight = bitmap.Rows,
                 };
+
+                m_charWidth[c] = m_glyphInfo[c].AdvancedX;
                 m_glyphInfo[c].UpdateUVData(m_textureSize);
 
                 linehmax = bitmap.Rows > linehmax ? bitmap.Rows : linehmax;

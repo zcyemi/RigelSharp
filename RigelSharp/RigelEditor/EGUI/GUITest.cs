@@ -9,68 +9,36 @@ using RigelCore;
 
 namespace RigelEditor.EGUI
 {
-    public class GUITestComponent : IGUIComponent
-    {
-        public override void Draw(GUIEvent guievent)
-        {
-            GUILayout.BeginArea(new Vector4(50, 50, 400, 300));
-            GUILayout.Button("Button1");
-            if (GUILayout.Button("Button2"))
-            {
-                Distroy = true;
-            }
-            GUILayout.EndArea();
-        }
-
-    }
-
-
-    public class GUITestLayout
-    {
-        public static void Sample_GroupMixedWithArea()
-        {
-            var narea = GUI.Context.currentArea;
-            narea.Y = 20;
-            narea.W -= 20;
-
-            var ngroup = GUI.Context.currentGroup.Rect;
-            ngroup.Y = 20;
-            ngroup.W -= 20;
-            GUI.BeginGroup(ngroup, RigelColor.Random());
-            GUILayout.BeginArea(narea);
-
-            GUILayout.Button("BtnArea");
-
-            GUI.Button(new Vector4(100, 0, 100, 20), "BtnGroup");
-
-            GUI.BeginGroup(new Vector4(100, 100, 100, 100), RigelColor.Random());
-
-            GUILayout.Button("BtnAra2");
-            GUI.Button(new Vector4(0, 0, 100, 20), "BtnGroup2");
-            GUI.EndGroup();
-
-            GUILayout.BeginArea(new Vector4(200, 100, 100, 200), RigelColor.Random());
-            GUILayout.BeginToolBar(20);
-            GUILayout.Text("Thisisatoolbar");
-            GUILayout.EndToolBar();
-
-            GUILayout.EndArea();
-
-
-
-            GUILayout.EndArea();
-            GUI.EndGroup();
-        }
-    }
-
-
     public class GUITestContent : GUIDockContentBase
     {
+        private static GUITestContent s_content = null;
+
+        [TODO("Bug", "Can't Add GUITestContent again after delete from docknode.")]
+        [EditorMenuItem("Help","GUITestWindow")]
+        public static void ShowTestWindow()
+        {
+            if(s_content == null)
+            {
+                s_content = new GUITestContent();
+
+                var dockmgr = RigelEditorApp.Instance.EditorGUI.DockManager;
+                if(dockmgr.FindDockContent<GUITestContent>() == null)
+                {
+                    dockmgr.AddNewContent(s_content);
+                }
+                    
+            }
+        }
+
         private Vector2 m_scrollViewPos = Vector2.Zero;
 
         private bool m_sampleGUIOption= false;
         private bool m_sampleScrollView = false;
         private bool m_sampleGUIComponent = false;
+        private bool m_sampleLayout = false;
+        private bool m_sampleText = false;
+
+        private bool m_sampleInput = false;
 
         public GUITestContent()
         {
@@ -79,27 +47,33 @@ namespace RigelEditor.EGUI
 
         public override void OnGUI()
         {
-
-            GUILayout.Text(GUI.DrawTarget.bufferText.Count.ToString());
-            GUILayout.Line(2, null);
-
-            GUILayout.Line(1, null);
-
-            {
-                GUILayout.BeginHorizontal();
-                GUILayout.Text("MenuBar");
-                GUI.DrawBorder(GUILayout.s_ctx.currentLayout.LastRect, 1, RigelColor.Red);
-
-                GUILayout.EndHorizontal();
-            }
-
+            SampleText();
+            SampleLayout();
             SampleGUIComponent();
-
             SampleGUIOption();
             SampleScrollView();
+            SampleInput();
 
         }
 
+
+        private string m_inputString = "sampleString";
+        private string m_inputString2 = "sampleString2";
+        private void SampleInput()
+        {
+            if(GUILayout.BeginCollapseGroup("Input", ref m_sampleInput))
+            {
+                GUILayout.Button("Test");
+                m_inputString = GUILayout.TextInput("Input", m_inputString);
+                m_inputString2 = GUILayout.TextInput("Sample String 2", m_inputString2);
+            }
+            GUILayout.EndCollapseGroup();
+        }
+
+        private void SampleLayout()
+        {
+
+        }
         private void SampleGUIComponent()
         {
             if (GUILayout.BeginCollapseGroup("[GUIComponent]", ref m_sampleGUIComponent))
@@ -120,12 +94,32 @@ namespace RigelEditor.EGUI
             }
             GUILayout.EndCollapseGroup();
         }
-
         private void SampleCollapseGroup()
         {
 
         }
+        private void SampleText()
+        {
+            string longtext = "A game engine is a software framework designed for the creation and development of video games.Developers use them to create games for consoles, mobile devices and personal computers.The core functionality typically provided by a game engine includes a rendering engine(renderer) for 2D or 3D graphics, a physics engine or collision detection(and collision response), sound, scripting";
 
+            if (GUILayout.BeginCollapseGroup("[TextRendering]",ref m_sampleText))
+            {
+                GUILayout.Text(longtext);
+                GUILayout.Text(@"Single line text.");
+                GUILayout.Text("Space[ ]");
+                GUILayout.Text("Tab[\t]");
+
+                GUILayout.BeginContainer(new Vector4(GUILayout.s_ctx.currentLayout.Offset, 100, 100));
+
+                GUI.TextBlock(new Vector4(0, 0, 100, 100), longtext, RigelColor.Red);
+                GUILayout.EndContainer();
+                GUILayout.Space(100);
+
+                GUILayout.TextBlock(longtext, GUIOption.Width(300));
+                GUILayout.TextBlock(longtext);
+            }
+            GUILayout.EndCollapseGroup();
+        }
         private void SampleGUIOption()
         {
             if (GUILayout.BeginCollapseGroup("[GUIOptions]", ref m_sampleGUIOption))
@@ -139,13 +133,18 @@ namespace RigelEditor.EGUI
                 GUILayout.BeginHorizontal();
                 GUILayout.Button("Grid 0.5", GUIOption.Grid(0.5f));
                 GUILayout.Button("Grid 0.25", GUIOption.Grid(0.25f));
+                GUILayout.EndHorizontal();
 
+                GUILayout.BeginHorizontal();
+                {
+                    GUILayout.Button("AlignLeft", GUIOption.AlignHLeft,GUIOption.Grid(0.33f));
+                    GUILayout.Button("AlignCenter", GUIOption.AlignHCenter, GUIOption.Grid(0.34f));
+                    GUILayout.Button("AlignRight", GUIOption.AlignHRight, GUIOption.Grid(0.33f));
+                }
                 GUILayout.EndHorizontal();
             }
             GUILayout.EndCollapseGroup();
         }
-
-
         private void SampleScrollView()
         {
             if (GUILayout.BeginCollapseGroup("[ScrollView]", ref m_sampleScrollView))

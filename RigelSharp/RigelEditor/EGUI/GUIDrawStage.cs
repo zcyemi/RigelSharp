@@ -30,7 +30,7 @@ namespace RigelEditor.EGUI
             GUI.SetDrawTarget(m_drawTarget);
         }
 
-        public virtual void SyncBuffer(RigelEGUICtx eguictx)
+        public virtual void SyncBuffer(EditorGUICtx eguictx)
         {
 
         }
