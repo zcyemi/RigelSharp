@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace RigelCore.Engine
 {
-    public class Shader
-    {
-    }
+
+
 }

@@ -92,7 +92,7 @@ namespace RigelEditor.EGUI
 
         private DeviceContext m_gDeferredContext = null;
         private CommandList m_gCommandlist = null;
-
+        private RawCommandBuffer m_commandBuffer = null;
 
 
         /// <summary>
@@ -105,11 +105,31 @@ namespace RigelEditor.EGUI
         {
             m_graphics = graphics;
 
-            //graphics.EventReleaseCommandList += ReleaseCommandList;
+            m_graphics.EventPostResizeBuffer += OnEventPostResizeBuffer;
+            m_graphics.EventPreResizeBuffer += OnEventPreResizeBuffer;
+            m_graphics.EventPreRender += OnEventPreRender;
 
             InitGraphicsObjects();
         }
 
+        private void OnEventPreRender()
+        {
+            if (NeedRebuildCommandList)
+            {
+                ReleaseCommandList();
+                BuildCommandList();
+            }
+        }
+
+        private void OnEventPreResizeBuffer()
+        {
+            ReleaseCommandList();
+        }
+
+        private void OnEventPostResizeBuffer()
+        {
+            BuildCommandList();
+        }
 
         private void InitGraphicsObjects()
         {
@@ -154,9 +174,6 @@ namespace RigelEditor.EGUI
                 m_gFontBlendState = new BlendState(m_graphics.Device, blenddesc);
             }
             
-
-
-
             //buffers
             //vertexbuffer window
             m_bufferDataRect = new RigelEGUIBufferGUIWindow<RigelEGUIVertex>(1024);
@@ -308,190 +325,200 @@ namespace RigelEditor.EGUI
                 m_gCommandlist.Dispose();
                 m_gCommandlist = null;
             }
+
         }
 
         private void BuildCommandList()
         {
-            //m_gDeferredContext.OutputMerger.SetRenderTargets(m_graphics.DepthStencilViewDefault, m_graphics.RenderTargetViewDefault);
-            //m_gDeferredContext.Rasterizer.SetViewport(m_graphics.ViewPortDefault);
-            
-            //m_gDeferredContext.InputAssembler.InputLayout = m_gInputlayout;
-            //m_gDeferredContext.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
-            //m_gDeferredContext.InputAssembler.SetIndexBuffer(m_gIndicesBuffer, Format.R32_UInt, 0);
-            //m_gDeferredContext.VertexShader.SetConstantBuffer(0, m_gConstBuffer);
-            //m_gDeferredContext.VertexShader.Set(m_gShaderVertex);
+            m_gDeferredContext.OutputMerger.SetRenderTargets(m_graphics.DefaultDepthStencilView, m_graphics.DefaultRenderTargetView);
+            m_gDeferredContext.Rasterizer.SetViewport(m_graphics.DefaultViewPort);
 
-            //m_gDeferredContext.PixelShader.Set(m_gShaderPixelRect);
+            m_gDeferredContext.InputAssembler.InputLayout = m_gInputlayout;
+            m_gDeferredContext.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
+            m_gDeferredContext.InputAssembler.SetIndexBuffer(m_gIndicesBuffer, Format.R32_UInt, 0);
+            m_gDeferredContext.VertexShader.SetConstantBuffer(0, m_gConstBuffer);
+            m_gDeferredContext.VertexShader.Set(m_gShaderVertex);
 
-            ////draw main rect
-            //m_gDeferredContext.InputAssembler.SetVertexBuffers(0, m_gVertBufferMainRectBinding);
-            //int mainRectIndexed = m_bufferMainRect.BufferDataCount / 2 * 3;
-            //m_gDeferredContext.DrawIndexed(mainRectIndexed, 0, 0);
+            m_gDeferredContext.PixelShader.Set(m_gShaderPixelRect);
 
-            ////draw window rect
-            //m_gDeferredContext.InputAssembler.SetVertexBuffers(0, m_gVertBufferWindowRectBinding);
-            //EditorUtility.Log("buffer data count:" + m_bufferDataRect.BufferDataCount);
-            //int indexedCount = m_bufferDataRect.BufferDataCount / 2 * 3;
-            //m_gDeferredContext.DrawIndexed(indexedCount, 0, 0);
-       
+            //draw main rect
+            m_gDeferredContext.InputAssembler.SetVertexBuffers(0, m_gVertBufferMainRectBinding);
+            int mainRectIndexed = m_bufferMainRect.BufferDataCount / 2 * 3;
+            m_gDeferredContext.DrawIndexed(mainRectIndexed, 0, 0);
 
-            
-            //m_gDeferredContext.PixelShader.Set(m_gShaderPixelFont);
-            //m_gDeferredContext.PixelShader.SetShaderResource(0, m_gFontTextureView);
-            //m_gDeferredContext.PixelShader.SetSampler(0, m_gFontTextureSampler);
-            //m_gDeferredContext.OutputMerger.SetBlendState(m_gFontBlendState);
+            //draw window rect
+            m_gDeferredContext.InputAssembler.SetVertexBuffers(0, m_gVertBufferWindowRectBinding);
+            EditorUtility.Log("buffer data count:" + m_bufferDataRect.BufferDataCount);
+            int indexedCount = m_bufferDataRect.BufferDataCount / 2 * 3;
+            m_gDeferredContext.DrawIndexed(indexedCount, 0, 0);
 
-            ////draw main text
-            //m_gDeferredContext.InputAssembler.SetVertexBuffers(0, m_gVertBufferMainTextBinding);
-            //int mainTextIndexed = m_bufferMainText.BufferDataCount / 2 * 3;
-            //m_gDeferredContext.DrawIndexed(mainTextIndexed, 0, 0);
+            m_gDeferredContext.PixelShader.Set(m_gShaderPixelFont);
+            m_gDeferredContext.PixelShader.SetShaderResource(0, m_gFontTextureView);
+            m_gDeferredContext.PixelShader.SetSampler(0, m_gFontTextureSampler);
+            m_gDeferredContext.OutputMerger.SetBlendState(m_gFontBlendState);
 
-            ////draw window text
-            //m_gDeferredContext.InputAssembler.SetVertexBuffers(0, m_gVertBufferWindowTextBinding);
-            //int textIndexedCount = m_bufferDataText.BufferDataCount / 2 * 3;
-            //m_gDeferredContext.DrawIndexed(textIndexedCount, 0, 0);
+            //draw main text
+            m_gDeferredContext.InputAssembler.SetVertexBuffers(0, m_gVertBufferMainTextBinding);
+            int mainTextIndexed = m_bufferMainText.BufferDataCount / 2 * 3;
+            m_gDeferredContext.DrawIndexed(mainTextIndexed, 0, 0);
 
-            //m_gCommandlist = m_gDeferredContext.FinishCommandList(false);
+            //draw window text
+            m_gDeferredContext.InputAssembler.SetVertexBuffers(0, m_gVertBufferWindowTextBinding);
+            int textIndexedCount = m_bufferDataText.BufferDataCount / 2 * 3;
+            m_gDeferredContext.DrawIndexed(textIndexedCount, 0, 0);
+
+            m_gCommandlist = m_gDeferredContext.FinishCommandList(false);
+
+            NeedRebuildCommandList = false;
+
+            if(m_commandBuffer == null)
+            {
+                m_commandBuffer = new RawCommandBuffer(m_gCommandlist);
+
+                m_graphics.RegisterCommandBuffer(CommandBufferStage.PostRender, m_commandBuffer);
+
+                Console.WriteLine("Craete GUI CommandBuffer");
+
+            }
+            else
+            {
+                m_commandBuffer.ReplaceCommandList(m_gCommandlist);
+            }
 
         }
 
-        public void Render(EditorGraphicsManager graphics)
+        public void Update()
         {
-            //if (m_graphics != graphics) throw new Exception("RigelGraphics not match!");
+            if (m_guiparamsChanged)
+            {
+                m_graphics.ImmediateContext.UpdateSubresource(ref m_matrixgui, m_gConstBuffer);
+                m_guiparamsChanged = false;
+            }
 
-            ////bufferData
-            //if (m_guiparamsChanged)
-            //{
-            //    m_graphics.ImmediateContext.UpdateSubresource(ref m_matrixgui, m_gConstBuffer);
-            //    m_guiparamsChanged = false;
-            //}
-
-            ////buffer extends check
-            //if (m_bufferMainText.BufferResized)
-            //{
-            //    var desc = m_gVertBufferMainText.Description;
-            //    if (m_gVertBufferMainText != null)
-            //    {
-            //        m_gVertBufferMainText.Dispose();
-            //    }
-            //    desc.SizeInBytes = m_bufferMainText.BufferSizeInByte;
-            //    m_gVertBufferMainText = new Buffer(m_graphics.Device, desc);
-            //    m_gVertBufferMainTextBinding = new VertexBufferBinding(
-            //        m_gVertBufferMainText,
-            //        m_bufferMainText.ItemSizeInByte,
-            //        0
-            //    );
-            //    m_bufferMainText.SetResizeDone();
-            //}
-
-            //if (m_bufferMainRect.BufferResized)
-            //{
-            //    var desc = m_gVertBufferMainRect.Description;
-            //    if(m_gVertBufferMainRect != null)
-            //    {
-            //        m_gVertBufferMainRect.Dispose();
-            //    }
-            //    desc.SizeInBytes = m_bufferMainRect.BufferSizeInByte;
-            //    m_gVertBufferMainRect = new Buffer(m_graphics.Device, desc);
-            //    m_gVertBufferMainRectBinding = new VertexBufferBinding(
-            //        m_gVertBufferMainRect,
-            //        m_bufferMainRect.ItemSizeInByte,
-            //        0
-            //    );
-            //    m_bufferMainRect.SetResizeDone();
-            //}
-
-            ////indices buffer
-            //if (m_bufferDataIndices.BufferResized)
-            //{
-            //    var desc = m_gIndicesBuffer.Description;
-            //    if(m_gIndicesBuffer != null)
-            //    {
-            //        m_gIndicesBuffer.Dispose();
-            //    }
-            //    desc.SizeInBytes = m_bufferDataIndices.BufferSizeInByte;
-            //    m_gIndicesBuffer = new Buffer(m_graphics.Device, desc);
-            //    m_bufferDataIndices.SetResizeDone();
-            //}
-
-            ////buffer data update
-            //if (m_bufferMainRect.Dirty)
-            //{
-            //    var pinnedptr = GCHandle.Alloc(m_bufferMainRect.BufferData, GCHandleType.Pinned);
-            //    m_graphics.ImmediateContext.UpdateSubresource(new DataBox()
-            //    {
-            //        DataPointer = pinnedptr.AddrOfPinnedObject()
-            //    }, m_gVertBufferMainRect, 0);
-            //    pinnedptr.Free();
-            //    m_bufferMainRect.SetDirty(false);
-            //}
-            //if (m_bufferMainText.Dirty)
-            //{
-            //    var pinnedptr = GCHandle.Alloc(m_bufferMainText.BufferData, GCHandleType.Pinned);
-            //    m_graphics.ImmediateContext.UpdateSubresource(new DataBox()
-            //    {
-            //        DataPointer = pinnedptr.AddrOfPinnedObject()
-            //    }, m_gVertBufferMainText, 0);
-            //    pinnedptr.Free();
-            //    m_bufferMainText.SetDirty(false);
-            //}
-
-            //if (m_bufferDataRect.Dirty)
-            //{
-            //    var pinnedptr = GCHandle.Alloc(m_bufferDataRect.BufferData, GCHandleType.Pinned);
-            //    m_graphics.ImmediateContext.UpdateSubresource(new DataBox()
-            //    {
-            //        DataPointer = pinnedptr.AddrOfPinnedObject()
-            //    }, m_gVertBufferWindowRect, 0);
-            //    pinnedptr.Free();
-
-            //    m_bufferDataRect.SetDirty(false);
-
-            //    EditorUtility.Log("update vertexbuffer rect data");
-            //}
-
-            //if (m_bufferDataText.Dirty)
-            //{
-            //    var pinnedptr = GCHandle.Alloc(m_bufferDataText.BufferData, GCHandleType.Pinned);
-            //    m_graphics.ImmediateContext.UpdateSubresource(new DataBox()
-            //    {
-            //        DataPointer = pinnedptr.AddrOfPinnedObject()
-            //    }, m_gVertBufferWindowText, 0);
-            //    pinnedptr.Free();
-
-            //    m_bufferDataRect.SetDirty(false);
-
-            //    EditorUtility.Log("update vertexbuffer text data");
-            //}
-
-            //if (m_bufferDataIndices.Dirty)
-            //{
-            //    var pinnedptr = GCHandle.Alloc(m_bufferDataIndices.BufferData, GCHandleType.Pinned);
-            //    m_graphics.ImmediateContext.UpdateSubresource(new DataBox()
-            //    {
-            //        DataPointer = pinnedptr.AddrOfPinnedObject(),
-            //        RowPitch = 0,
-            //        SlicePitch = m_bufferDataIndices.ItemSizeInByte,
-            //    }, m_gIndicesBuffer, 0);
-            //    pinnedptr.Free();
-
-            //    m_bufferDataIndices.SetDirty(false);
-            //    EditorUtility.Log("update indicesbuffer data");
-            //}
-
-            //if (graphics.NeedRebuildCommandList || NeedRebuildCommandList)
-            //{
-            //    if(m_gCommandlist != null)
-            //    {
-            //        m_gCommandlist.Dispose();
-            //    }
-            //    BuildCommandList();
-
-            //    NeedRebuildCommandList = false;
-            //}
-
-            //graphics.ImmediateContext.ExecuteCommandList(m_gCommandlist,false);
+            BufferExten();
+            BufferDataUpdate();
         }
+
+
+        private void BufferExten()
+        {
+            //buffer extends check
+            if (m_bufferMainText.BufferResized)
+            {
+                var desc = m_gVertBufferMainText.Description;
+                if (m_gVertBufferMainText != null)
+                {
+                    m_gVertBufferMainText.Dispose();
+                }
+                desc.SizeInBytes = m_bufferMainText.BufferSizeInByte;
+                m_gVertBufferMainText = new Buffer(m_graphics.Device, desc);
+                m_gVertBufferMainTextBinding = new VertexBufferBinding(
+                    m_gVertBufferMainText,
+                    m_bufferMainText.ItemSizeInByte,
+                    0
+                );
+                m_bufferMainText.SetResizeDone();
+            }
+
+            if (m_bufferMainRect.BufferResized)
+            {
+                var desc = m_gVertBufferMainRect.Description;
+                if (m_gVertBufferMainRect != null)
+                {
+                    m_gVertBufferMainRect.Dispose();
+                }
+                desc.SizeInBytes = m_bufferMainRect.BufferSizeInByte;
+                m_gVertBufferMainRect = new Buffer(m_graphics.Device, desc);
+                m_gVertBufferMainRectBinding = new VertexBufferBinding(
+                    m_gVertBufferMainRect,
+                    m_bufferMainRect.ItemSizeInByte,
+                    0
+                );
+                m_bufferMainRect.SetResizeDone();
+            }
+
+            //indices buffer
+            if (m_bufferDataIndices.BufferResized)
+            {
+                var desc = m_gIndicesBuffer.Description;
+                if (m_gIndicesBuffer != null)
+                {
+                    m_gIndicesBuffer.Dispose();
+                }
+                desc.SizeInBytes = m_bufferDataIndices.BufferSizeInByte;
+                m_gIndicesBuffer = new Buffer(m_graphics.Device, desc);
+                m_bufferDataIndices.SetResizeDone();
+            }
+        }
+
+        private void BufferDataUpdate()
+        {
+            ////buffer data update
+            if (m_bufferMainRect.Dirty)
+            {
+                var pinnedptr = GCHandle.Alloc(m_bufferMainRect.BufferData, GCHandleType.Pinned);
+                m_graphics.ImmediateContext.UpdateSubresource(new DataBox()
+                {
+                    DataPointer = pinnedptr.AddrOfPinnedObject()
+                }, m_gVertBufferMainRect, 0);
+                pinnedptr.Free();
+                m_bufferMainRect.SetDirty(false);
+            }
+            if (m_bufferMainText.Dirty)
+            {
+                var pinnedptr = GCHandle.Alloc(m_bufferMainText.BufferData, GCHandleType.Pinned);
+                m_graphics.ImmediateContext.UpdateSubresource(new DataBox()
+                {
+                    DataPointer = pinnedptr.AddrOfPinnedObject()
+                }, m_gVertBufferMainText, 0);
+                pinnedptr.Free();
+                m_bufferMainText.SetDirty(false);
+            }
+
+            if (m_bufferDataRect.Dirty)
+            {
+                var pinnedptr = GCHandle.Alloc(m_bufferDataRect.BufferData, GCHandleType.Pinned);
+                m_graphics.ImmediateContext.UpdateSubresource(new DataBox()
+                {
+                    DataPointer = pinnedptr.AddrOfPinnedObject()
+                }, m_gVertBufferWindowRect, 0);
+                pinnedptr.Free();
+
+                m_bufferDataRect.SetDirty(false);
+
+                EditorUtility.Log("update vertexbuffer rect data");
+            }
+
+            if (m_bufferDataText.Dirty)
+            {
+                var pinnedptr = GCHandle.Alloc(m_bufferDataText.BufferData, GCHandleType.Pinned);
+                m_graphics.ImmediateContext.UpdateSubresource(new DataBox()
+                {
+                    DataPointer = pinnedptr.AddrOfPinnedObject()
+                }, m_gVertBufferWindowText, 0);
+                pinnedptr.Free();
+
+                m_bufferDataRect.SetDirty(false);
+
+                EditorUtility.Log("update vertexbuffer text data");
+            }
+
+            if (m_bufferDataIndices.Dirty)
+            {
+                var pinnedptr = GCHandle.Alloc(m_bufferDataIndices.BufferData, GCHandleType.Pinned);
+                m_graphics.ImmediateContext.UpdateSubresource(new DataBox()
+                {
+                    DataPointer = pinnedptr.AddrOfPinnedObject(),
+                    RowPitch = 0,
+                    SlicePitch = m_bufferDataIndices.ItemSizeInByte,
+                }, m_gIndicesBuffer, 0);
+                pinnedptr.Free();
+
+                m_bufferDataIndices.SetDirty(false);
+                EditorUtility.Log("update indicesbuffer data");
+            }
+        }
+
 
         public void Dispose()
         {
@@ -517,6 +544,9 @@ namespace RigelEditor.EGUI
 
             if (m_gCommandlist != null) m_gCommandlist.Dispose();
             if (m_gDeferredContext != null) m_gDeferredContext.Dispose();
+
+            m_commandBuffer.Dispose();
+            m_commandBuffer = null;
 
             m_graphics = null;
         }

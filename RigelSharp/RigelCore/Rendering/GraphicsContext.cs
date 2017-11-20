@@ -24,9 +24,7 @@ namespace RigelCore.Rendering
         private Device m_device;
         private SwapChain m_swapchain;
         private SwapChainDescription m_swapchainDesc;
-
         private DeviceContext m_context;
-
         private Texture2D m_backBuffer;
         private RenderTargetView m_renderTargetView;
         private Texture2D m_depthBuffer;
@@ -35,11 +33,28 @@ namespace RigelCore.Rendering
         private Viewport m_viewport;
 
         public Device Device { get { return m_device; } }
+        public Viewport DefaultViewPort { get { return m_viewport; } }
+        public RenderTargetView DefaultRenderTargetView { get { return m_renderTargetView; } }
+        public DepthStencilView DefaultDepthStencilView { get { return m_depthcStencilView; } }
+        public DeviceContext ImmediateContext { get { return m_context; } }
+
+        public event Action EventPreResizeBuffer = delegate { };
+        public event Action EventPostResizeBuffer = delegate { };
+
+        /// <summary>
+        /// event before draw call
+        /// </summary>
+        public event Action EventPreRender = delegate { };
+
+
+        private Dictionary<CommandBufferStage, List<ICommandBuffer>> m_commandBuffer = new Dictionary<CommandBufferStage, List<ICommandBuffer>>();
         
 
         public GraphicsContext()
         {
-
+            m_commandBuffer.Add(CommandBufferStage.Default, new List<ICommandBuffer>());
+            m_commandBuffer.Add(CommandBufferStage.PostRender, new List<ICommandBuffer>());
+            m_commandBuffer.Add(CommandBufferStage.PreRender, new List<ICommandBuffer>());
         }
 
         public void CreateWithSwapChain(IntPtr handle,int width,int height)
@@ -61,6 +76,11 @@ namespace RigelCore.Rendering
             var factory = m_swapchain.GetParent<Factory>();
             factory.MakeWindowAssociation(handle, WindowAssociationFlags.IgnoreAll);
             factory.Dispose();
+
+            //first resetbuffer
+            m_resizeWidth = width;
+            m_resizeHeight = height;
+            DoResizeBuffer();
         }
 
         public void Render()
@@ -72,9 +92,17 @@ namespace RigelCore.Rendering
                 m_needResize = false;
             }
 
+            EventPreRender.Invoke();
 
             m_context.ClearDepthStencilView(m_depthcStencilView, DepthStencilClearFlags.Depth, 1.0f, 0);
-            m_context.ClearRenderTargetView(m_renderTargetView, Color.DarkRed);
+            m_context.ClearRenderTargetView(m_renderTargetView, Color.Black);
+
+            //do render
+            {
+                m_commandBuffer[CommandBufferStage.PreRender].ForEach((x) => { x.Render(this); });
+                m_commandBuffer[CommandBufferStage.Default].ForEach((x) => { x.Render(this); });
+                m_commandBuffer[CommandBufferStage.PostRender].ForEach((x) => { x.Render(this); });
+            }
 
             m_swapchain.Present(1, PresentFlags.None);
 
@@ -83,6 +111,7 @@ namespace RigelCore.Rendering
         private void DoResizeBuffer()
         {
             //clear all command buffer
+            EventPreResizeBuffer.Invoke();
 
             Utilities.Dispose(ref m_backBuffer);
             Utilities.Dispose(ref m_renderTargetView);
@@ -113,6 +142,7 @@ namespace RigelCore.Rendering
             m_context.Rasterizer.SetViewport(m_viewport);
             m_context.OutputMerger.SetTargets(m_depthcStencilView, m_renderTargetView);
 
+            EventPostResizeBuffer.Invoke();
         }
         
         public void Dispose()
@@ -135,20 +165,35 @@ namespace RigelCore.Rendering
         }
 
 
-#region CommandBuffer
-        public void RegisterCommandBuffer(CommandBufferStage stage,CommandBuffer commandbuffer)
-        {
 
+#region CommandBuffer
+        public void RegisterCommandBuffer(CommandBufferStage stage,ICommandBuffer commandbuffer)
+        {
+            var buffers = m_commandBuffer[stage];
+            if (!buffers.Contains(commandbuffer))
+            {
+                buffers.Add(commandbuffer);
+            }
         }
 
-        public void RemoveCommandBuffer(CommandBufferStage stage,CommandBuffer commandBuffer)
+        public void RemoveCommandBuffer(CommandBufferStage stage, ICommandBuffer commandBuffer)
         {
-
+            var buffers = m_commandBuffer[stage];
+            if (buffers.Contains(commandBuffer))
+            {
+                buffers.Remove(commandBuffer);
+                commandBuffer.Dispose();
+            }
         }
 
         public void ClearCommandBuffer(CommandBufferStage stage)
         {
-
+            var buffers = m_commandBuffer[stage];
+            foreach(var cmdbuffer in buffers)
+            {
+                cmdbuffer.Dispose();
+            }
+            buffers.Clear();
         }
 
         public void ClearAllCommandBuffer()

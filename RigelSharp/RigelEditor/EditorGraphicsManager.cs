@@ -22,11 +22,8 @@ namespace RigelEditor
 {
     public class EditorGraphicsManager : Singleton<EditorGraphicsManager>,IDisposable
     {
-        private RenderForm m_form;
-
         public event Action EventReleaseCommandList = delegate { };
 
-        public bool NeedRebuildCommandList { get; private set; }
 
         private GraphicsContext m_graphics;
 

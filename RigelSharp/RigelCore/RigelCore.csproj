@@ -84,6 +84,7 @@
     <Compile Include="Rendering\CommandBuffer.cs" />
     <Compile Include="Rendering\GraphicsContext.cs" />
     <Compile Include="Rendering\GraphicsManager.cs" />
+    <Compile Include="Rendering\RenderTextureIdentifier.cs" />
     <Compile Include="RgWindow.cs" />
     <Compile Include="RigelAPI.cs" />
     <Compile Include="FontInfo.cs" />
