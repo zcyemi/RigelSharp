@@ -24,42 +24,47 @@ namespace RigelEditor
         private String m_title = "Rigel";
 
         private RenderForm m_windowForm;
-        private EditorGraphicsManager m_graphics;
-        private EditorGUICtx m_EGUI;
 
-        public EditorGUICtx EditorGUI { get { return m_EGUI; } }
+        public RenderForm Form { get { return m_windowForm; } }
+        public EditorGUICtx EditorGUI { get; private set; }
 
 
         public RigelEditorApp()
         {
+
+        }
+
+        public void Init()
+        {
             m_windowForm = new RenderForm(m_title);
             m_windowForm.AllowUserResizing = true;
 
-            m_graphics = new EditorGraphicsManager();
-            m_graphics.CreateWithSwapChain(m_windowForm);
 
-            m_EGUI = new EditorGUICtx(m_windowForm,m_graphics);
-
+            EditorGraphicsManager.Instance.Init();
             //test
             //var testwind = RigelEGUIWindow.GetWindow<RigelEditorAboutPage>();
             //var consolewin = RigelEGUIWindow.GetWindow<RigelEditorConsoleWindow>();
+
+            EditorModuleManager.Instance.Init();
+            EditorGUI = EditorModuleManager.Instance.FindModule<EditorGUICtx>();
         }
 
         public void EnterRunloop() {
 
             RenderLoop.Run(m_windowForm, () =>
             {
-                m_graphics.Render(()=> {
+                EditorModuleManager.Instance.Update();
 
-                    m_EGUI.Render(m_graphics);
+                EditorGraphicsManager.Instance.Render(() =>
+                {
+                    EditorGUI.Render(EditorGraphicsManager.Instance);
 
                 });
             });
 
-            m_EGUI.Dispose();
+            EditorModuleManager.Instance.Dispose();
+            EditorGraphicsManager.Instance.Dispose();
 
-
-            m_graphics.Dispose();
             m_windowForm.Dispose();
         }
         

@@ -15,9 +15,12 @@ using SharpDX.Windows;
 using Buffer = SharpDX.Direct3D11.Buffer;
 using Device = SharpDX.Direct3D11.Device;
 
+using RigelCore;
+using SharpDX;
+
 namespace RigelEditor
 {
-    public class EditorGraphicsManager : IDisposable
+    public class EditorGraphicsManager : Singleton<EditorGraphicsManager>,IDisposable
     {
         private RenderForm m_form;
 
@@ -44,6 +47,15 @@ namespace RigelEditor
         private bool m_needResize = true;
         public bool NeedRebuildCommandList { get; private set; }
 
+        public EditorGraphicsManager()
+        {
+
+        }
+
+        public void Init()
+        {
+            CreateWithSwapChain(RigelEditorApp.Instance.Form);
+        }
 
         public void CreateWithSwapChain(RenderForm form)
         {

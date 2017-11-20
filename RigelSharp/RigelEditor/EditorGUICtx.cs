@@ -21,7 +21,7 @@ using RigelCore;
 namespace RigelEditor.EGUI
 {
 
-    public partial class EditorGUICtx:IDisposable
+    public partial class EditorGUICtx:IDisposable,IEditorModule
     {
         private RenderForm m_form;
         private GUIGraphicsBind m_graphicsBind = null;
@@ -39,11 +39,16 @@ namespace RigelEditor.EGUI
         public RenderForm Form { get { return m_form; } }
         public GUIDockMgr DockManager { get { return m_dockMgr; } }
 
-        public EditorGUICtx(RenderForm form,EditorGraphicsManager graphics)
+        public EditorGUICtx()
+        {
+
+        }
+
+        public void Init()
         {
             //basis
-            m_form = form;
-            m_graphicsBind = new GUIGraphicsBind(graphics);
+            m_form = RigelEditorApp.Instance.Form;
+            m_graphicsBind = new GUIGraphicsBind(EditorGraphicsManager.Instance);
             m_font = new FontInfo("arial.ttf");
             m_graphicsBind.CrateFontTexture(m_font);
 
@@ -132,11 +137,18 @@ namespace RigelEditor.EGUI
 
         public void Dispose()
         {
-            m_graphicsBind.Dispose();
+            if(m_graphicsBind != null) m_graphicsBind.Dispose();
             m_form = null;
         }
 
         
+
+        public void Update()
+        {
+
+        }
+
+
         //internal T FindWindowOfType<T>() where T : RigelEGUIWindow,new()
         //{
         //    foreach(var w in m_windows)

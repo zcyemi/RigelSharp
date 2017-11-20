@@ -14,4 +14,19 @@ namespace RigelEditor
             Console.WriteLine((int)' ');
         }
     }
+
+    class EditorModuleTest : IEditorModule
+    {
+        public void Dispose()
+        {
+        }
+
+        public void Init()
+        {
+        }
+
+        public void Update()
+        {
+        }
+    }
 }

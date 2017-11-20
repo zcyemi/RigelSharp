@@ -74,6 +74,7 @@
     <Compile Include="EditorAPI.cs" />
     <Compile Include="EditorDialogs.cs" />
     <Compile Include="EditorMenuManager.cs" />
+    <Compile Include="EditorModule.cs" />
     <Compile Include="EditorTest.cs" />
     <Compile Include="EGUI\GUI.cs" />
     <Compile Include="EGUI\GUIComponent.cs" />

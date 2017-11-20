@@ -72,12 +72,18 @@
   <ItemGroup>
     <Compile Include="Alg\HashFunction.cs" />
     <Compile Include="Engine\IGameEntry.cs" />
+    <Compile Include="Engine\Material.cs" />
+    <Compile Include="Engine\Mesh.cs" />
+    <Compile Include="Engine\Shader.cs" />
     <Compile Include="EventSlot.cs" />
     <Compile Include="Helper\DevHelper.cs" />
     <Compile Include="Helper\ReflectionHelper.cs" />
     <Compile Include="Helper\Singleton.cs" />
     <Compile Include="ImageData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Rendering\CommandBuffer.cs" />
+    <Compile Include="Rendering\GraphicsContext.cs" />
+    <Compile Include="Rendering\GraphicsManager.cs" />
     <Compile Include="RgWindow.cs" />
     <Compile Include="RigelAPI.cs" />
     <Compile Include="FontInfo.cs" />
@@ -87,9 +93,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Rendering\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
