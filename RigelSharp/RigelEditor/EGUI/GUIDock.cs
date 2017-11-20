@@ -59,7 +59,6 @@ namespace RigelEditor.EGUI
     public class GUIDockSeparator
     {
         public GUIDockNode m_parent;
-        private bool m_ondrag = false;
 
         private Vector4 m_rect;
         private Vector4 m_rectab;

@@ -35,7 +35,6 @@ namespace RigelEditor.EGUI
         private bool m_sampleGUIOption= false;
         private bool m_sampleScrollView = false;
         private bool m_sampleGUIComponent = false;
-        private bool m_sampleLayout = false;
         private bool m_sampleText = false;
 
         private bool m_sampleInput = false;
@@ -48,7 +47,6 @@ namespace RigelEditor.EGUI
         public override void OnGUI()
         {
             SampleText();
-            SampleLayout();
             SampleGUIComponent();
             SampleGUIOption();
             SampleScrollView();
@@ -70,10 +68,6 @@ namespace RigelEditor.EGUI
             GUILayout.EndCollapseGroup();
         }
 
-        private void SampleLayout()
-        {
-
-        }
         private void SampleGUIComponent()
         {
             if (GUILayout.BeginCollapseGroup("[GUIComponent]", ref m_sampleGUIComponent))

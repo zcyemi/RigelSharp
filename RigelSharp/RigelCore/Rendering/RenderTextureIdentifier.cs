@@ -4,8 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RigelCore.Engine
+namespace RigelCore.Rendering
 {
-
-
+    public enum RenderTextureIdentifier
+    {
+        Default,
+        DepthStencilView
+    }
 }

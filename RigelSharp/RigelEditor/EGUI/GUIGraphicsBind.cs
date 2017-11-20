@@ -17,6 +17,7 @@ using Device = SharpDX.Direct3D11.Device;
 
 using RigelEditor;
 using RigelCore;
+using RigelCore.Rendering;
 
 namespace RigelEditor.EGUI
 {
@@ -61,7 +62,7 @@ namespace RigelEditor.EGUI
         private bool m_guiparamsChanged = true;
 
 
-        private EditorGraphicsManager m_graphics = null;
+        private GraphicsContext m_graphics = null;
 
         private VertexShader m_gShaderVertex = null;
         private PixelShader m_gShaderPixelFont = null;
@@ -91,7 +92,7 @@ namespace RigelEditor.EGUI
 
         private DeviceContext m_gDeferredContext = null;
         private CommandList m_gCommandlist = null;
-
+        private RawCommandBuffer m_commandBuffer = null;
 
 
         /// <summary>
@@ -100,15 +101,35 @@ namespace RigelEditor.EGUI
         internal bool NeedRebuildCommandList = false;
 
 
-        public GUIGraphicsBind(EditorGraphicsManager graphics)
+        public GUIGraphicsBind(GraphicsContext graphics)
         {
             m_graphics = graphics;
 
-            graphics.EventReleaseCommandList += ReleaseCommandList;
+            m_graphics.EventPostResizeBuffer += OnEventPostResizeBuffer;
+            m_graphics.EventPreResizeBuffer += OnEventPreResizeBuffer;
+            m_graphics.EventPreRender += OnEventPreRender;
 
             InitGraphicsObjects();
         }
 
+        private void OnEventPreRender()
+        {
+            if (NeedRebuildCommandList)
+            {
+                ReleaseCommandList();
+                BuildCommandList();
+            }
+        }
+
+        private void OnEventPreResizeBuffer()
+        {
+            ReleaseCommandList();
+        }
+
+        private void OnEventPostResizeBuffer()
+        {
+            BuildCommandList();
+        }
 
         private void InitGraphicsObjects()
         {
@@ -153,9 +174,6 @@ namespace RigelEditor.EGUI
                 m_gFontBlendState = new BlendState(m_graphics.Device, blenddesc);
             }
             
-
-
-
             //buffers
             //vertexbuffer window
             m_bufferDataRect = new RigelEGUIBufferGUIWindow<RigelEGUIVertex>(1024);
@@ -307,13 +325,14 @@ namespace RigelEditor.EGUI
                 m_gCommandlist.Dispose();
                 m_gCommandlist = null;
             }
+
         }
 
         private void BuildCommandList()
         {
-            m_gDeferredContext.OutputMerger.SetRenderTargets(m_graphics.DepthStencilViewDefault, m_graphics.RenderTargetViewDefault);
-            m_gDeferredContext.Rasterizer.SetViewport(m_graphics.ViewPortDefault);
-            
+            m_gDeferredContext.OutputMerger.SetRenderTargets(m_graphics.DefaultDepthStencilView, m_graphics.DefaultRenderTargetView);
+            m_gDeferredContext.Rasterizer.SetViewport(m_graphics.DefaultViewPort);
+
             m_gDeferredContext.InputAssembler.InputLayout = m_gInputlayout;
             m_gDeferredContext.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
             m_gDeferredContext.InputAssembler.SetIndexBuffer(m_gIndicesBuffer, Format.R32_UInt, 0);
@@ -332,9 +351,7 @@ namespace RigelEditor.EGUI
             EditorUtility.Log("buffer data count:" + m_bufferDataRect.BufferDataCount);
             int indexedCount = m_bufferDataRect.BufferDataCount / 2 * 3;
             m_gDeferredContext.DrawIndexed(indexedCount, 0, 0);
-       
 
-            
             m_gDeferredContext.PixelShader.Set(m_gShaderPixelFont);
             m_gDeferredContext.PixelShader.SetShaderResource(0, m_gFontTextureView);
             m_gDeferredContext.PixelShader.SetSampler(0, m_gFontTextureSampler);
@@ -352,19 +369,39 @@ namespace RigelEditor.EGUI
 
             m_gCommandlist = m_gDeferredContext.FinishCommandList(false);
 
+            NeedRebuildCommandList = false;
+
+            if(m_commandBuffer == null)
+            {
+                m_commandBuffer = new RawCommandBuffer(m_gCommandlist);
+
+                m_graphics.RegisterCommandBuffer(CommandBufferStage.PostRender, m_commandBuffer);
+
+                Console.WriteLine("Craete GUI CommandBuffer");
+
+            }
+            else
+            {
+                m_commandBuffer.ReplaceCommandList(m_gCommandlist);
+            }
+
         }
 
-        public void Render(EditorGraphicsManager graphics)
+        public void Update()
         {
-            if (m_graphics != graphics) throw new Exception("RigelGraphics not match!");
-
-            //bufferData
             if (m_guiparamsChanged)
             {
                 m_graphics.ImmediateContext.UpdateSubresource(ref m_matrixgui, m_gConstBuffer);
                 m_guiparamsChanged = false;
             }
 
+            BufferExten();
+            BufferDataUpdate();
+        }
+
+
+        private void BufferExten()
+        {
             //buffer extends check
             if (m_bufferMainText.BufferResized)
             {
@@ -386,7 +423,7 @@ namespace RigelEditor.EGUI
             if (m_bufferMainRect.BufferResized)
             {
                 var desc = m_gVertBufferMainRect.Description;
-                if(m_gVertBufferMainRect != null)
+                if (m_gVertBufferMainRect != null)
                 {
                     m_gVertBufferMainRect.Dispose();
                 }
@@ -404,7 +441,7 @@ namespace RigelEditor.EGUI
             if (m_bufferDataIndices.BufferResized)
             {
                 var desc = m_gIndicesBuffer.Description;
-                if(m_gIndicesBuffer != null)
+                if (m_gIndicesBuffer != null)
                 {
                     m_gIndicesBuffer.Dispose();
                 }
@@ -412,8 +449,11 @@ namespace RigelEditor.EGUI
                 m_gIndicesBuffer = new Buffer(m_graphics.Device, desc);
                 m_bufferDataIndices.SetResizeDone();
             }
+        }
 
-            //buffer data update
+        private void BufferDataUpdate()
+        {
+            ////buffer data update
             if (m_bufferMainRect.Dirty)
             {
                 var pinnedptr = GCHandle.Alloc(m_bufferMainRect.BufferData, GCHandleType.Pinned);
@@ -477,20 +517,8 @@ namespace RigelEditor.EGUI
                 m_bufferDataIndices.SetDirty(false);
                 EditorUtility.Log("update indicesbuffer data");
             }
-
-            if (graphics.NeedRebuildCommandList || NeedRebuildCommandList)
-            {
-                if(m_gCommandlist != null)
-                {
-                    m_gCommandlist.Dispose();
-                }
-                BuildCommandList();
-
-                NeedRebuildCommandList = false;
-            }
-
-            graphics.ImmediateContext.ExecuteCommandList(m_gCommandlist,false);
         }
+
 
         public void Dispose()
         {
@@ -516,6 +544,9 @@ namespace RigelEditor.EGUI
 
             if (m_gCommandlist != null) m_gCommandlist.Dispose();
             if (m_gDeferredContext != null) m_gDeferredContext.Dispose();
+
+            m_commandBuffer.Dispose();
+            m_commandBuffer = null;
 
             m_graphics = null;
         }
