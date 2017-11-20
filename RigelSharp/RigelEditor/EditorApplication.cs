@@ -57,7 +57,7 @@ namespace RigelEditor
 
                 EditorGraphicsManager.Instance.Render(() =>
                 {
-                    EditorGUI.Render(EditorGraphicsManager.Instance);
+                    //EditorGUI.Render(EditorGraphicsManager.Instance);
 
                 });
             });

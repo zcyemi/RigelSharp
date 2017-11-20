@@ -48,7 +48,7 @@ namespace RigelEditor.EGUI
         {
             //basis
             m_form = RigelEditorApp.Instance.Form;
-            m_graphicsBind = new GUIGraphicsBind(EditorGraphicsManager.Instance);
+            m_graphicsBind = new GUIGraphicsBind(EditorGraphicsManager.Instance.Graphics);
             m_font = new FontInfo("arial.ttf");
             m_graphicsBind.CrateFontTexture(m_font);
 

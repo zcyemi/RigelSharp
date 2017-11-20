@@ -8,8 +8,6 @@ namespace RigelEditor.EGUI
 {
     public abstract class GUIWindow : GUIDockContentBase
     {
-
-        public abstract void OnGUI();
     }
 
 

@@ -12,7 +12,7 @@ namespace RigelEditor.Project
 
         private ProjectInfo()
         {
-
+            m_path = "";
         }
 
         public static ProjectInfo LoadProjcet(string projpath)
