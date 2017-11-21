@@ -8,6 +8,7 @@ using System.IO;
 
 using SharpDX;
 using RigelCore;
+using RigelCore.Rendering;
 
 namespace RigelEditor.EGUI
 {
@@ -64,6 +65,9 @@ namespace RigelEditor.EGUI
         internal GUIObjPool<GUIObjScrollView> poolSrollbar = new GUIObjPool<GUIObjScrollView>();
         internal GUIObjPool<GUIObjTextInput> poolTextInput = new GUIObjPool<GUIObjTextInput>();
 
+        internal GUITextureStorage m_texStorage = new GUITextureStorage();
+        internal GUITextureStorage TextureStorage { get { return m_texStorage; } }
+
         public void Frame(GUIEvent guievent, int width, int height)
         {
             EditorUtility.Assert(groupStack.Count == 0);
@@ -88,6 +92,18 @@ namespace RigelEditor.EGUI
             //ObjPools
             poolSrollbar.OnFrame();
             poolTextInput.OnFrame();
+
+            m_texStorage.OnFrame();
+        }
+
+        public void EndFrame()
+        {
+            m_texStorage.EndFrame();
+        }
+
+        public void AddTextureDrawCall(RenderTextureIdentifier rt,Vector4 rect,float depth)
+        {
+            m_texStorage.AddDraw(rt, rect, depth);
         }
 
     }
@@ -113,6 +129,8 @@ namespace RigelEditor.EGUI
             bufferText = new List<RigelEGUIVertex>();
         }
     }
+
+    
 
     public class GUIStackValue<T>
     {
@@ -144,6 +162,8 @@ namespace RigelEditor.EGUI
         {
             return v.Value;
         }
+
+        
     }
 
 

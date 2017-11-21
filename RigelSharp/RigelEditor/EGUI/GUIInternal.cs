@@ -55,6 +55,13 @@ namespace RigelEditor.EGUI
             {
                 s_drawStages[i].SyncBuffer(s_eguictx);
             }
+
+            GUI.Context.EndFrame();
+            if (GUI.Context.TextureStorage.Changed)
+            {
+                s_eguictx.GraphicsBind.SetDynamicBufferTexture(GUI.Context.TextureStorage.BufferData);
+            }
+
         }
 
         public static void SetCursor(System.Windows.Forms.Cursor cursor)

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using SharpDX;
 using RigelCore;
+using RigelCore.Rendering;
 
 namespace RigelEditor.EGUI
 {
@@ -27,6 +28,8 @@ namespace RigelEditor.EGUI
     {
         //reference to GUI.s_ctx
         public static GUICtx s_ctx;
+        public static GUICtx Context { get { return s_ctx; } }
+
 
         public static GUILayoutInfo CurrentLayout { get { return s_ctx.currentLayout; } }
 
@@ -67,7 +70,7 @@ namespace RigelEditor.EGUI
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="rect"></param>
+        /// <param name="rect"> absolute rect</param>
         /// <param name="color"></param>
         /// <param name="options">GUIOptionType.Border</param>
         public static void BeginArea(Vector4 rect, Vector4? color = null, params GUIOption[] options)
@@ -463,6 +466,12 @@ namespace RigelEditor.EGUI
                 }
             }
             GUI.DrawRect(rect, color, true,GUIOption.NoClip);
+        }
+
+        public static void DrawTexture(Vector4 rect,RenderTextureIdentifier rt)
+        {
+            Context.AddTextureDrawCall(rt, rect, GUI.Depth);
+            GUI.DepthIncrease();
         }
 
 

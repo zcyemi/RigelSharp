@@ -21,6 +21,7 @@ namespace RigelCore.Rendering
         private int m_resizeWidth, m_resizeHeight;
         private bool m_needResize = true;
 
+        //dxobjects
         private Device m_device;
         private SwapChain m_swapchain;
         private SwapChainDescription m_swapchainDesc;
@@ -30,6 +31,8 @@ namespace RigelCore.Rendering
         private Texture2D m_depthBuffer;
         private DepthStencilView m_depthcStencilView;
 
+        private ShaderResourceView m_srvBackBuffer;
+
         private Viewport m_viewport;
 
         public Device Device { get { return m_device; } }
@@ -38,8 +41,13 @@ namespace RigelCore.Rendering
         public DepthStencilView DefaultDepthStencilView { get { return m_depthcStencilView; } }
         public DeviceContext ImmediateContext { get { return m_context; } }
 
+
+        public ShaderResourceView SRVBackBuffer { get { return m_srvBackBuffer; } }
+
+
         public event Action EventPreResizeBuffer = delegate { };
         public event Action EventPostResizeBuffer = delegate { };
+
 
         /// <summary>
         /// event before draw call
@@ -67,7 +75,7 @@ namespace RigelCore.Rendering
                 OutputHandle = handle,
                 SampleDescription = new SampleDescription(1, 0),
                 SwapEffect = SwapEffect.Discard,
-                Usage = Usage.RenderTargetOutput
+                Usage = Usage.RenderTargetOutput | Usage.ShaderInput
             };
 
             Device.CreateWithSwapChain(DriverType.Hardware, DeviceCreationFlags.None, m_swapchainDesc, out m_device, out m_swapchain);
@@ -118,10 +126,18 @@ namespace RigelCore.Rendering
             Utilities.Dispose(ref m_depthBuffer);
             Utilities.Dispose(ref m_depthcStencilView);
 
+            Utilities.Dispose(ref m_srvBackBuffer);
+
             m_swapchain.ResizeBuffers(m_swapchainDesc.BufferCount, m_resizeWidth, m_resizeHeight, Format.Unknown, SwapChainFlags.None);
             m_backBuffer = Texture2D.FromSwapChain<Texture2D>(m_swapchain, 0);
 
+            //rtv
             m_renderTargetView = new RenderTargetView(m_device, m_backBuffer);
+            
+            //back buffer srv
+            m_srvBackBuffer = new ShaderResourceView(m_device, m_backBuffer);
+
+            //dsv
             m_depthBuffer = new Texture2D(m_device, new Texture2DDescription()
             {
                 Format = Format.D32_Float_S8X24_UInt,
@@ -129,13 +145,12 @@ namespace RigelCore.Rendering
                 MipLevels = 1,
                 Width = m_backBuffer.Description.Width,
                 Height = m_backBuffer.Description.Height,
-                SampleDescription = new SampleDescription(1,0),
+                SampleDescription = new SampleDescription(1, 0),
                 Usage = ResourceUsage.Default,
                 BindFlags = BindFlags.DepthStencil,
                 CpuAccessFlags = CpuAccessFlags.None,
                 OptionFlags = ResourceOptionFlags.None
             });
-
             m_depthcStencilView = new DepthStencilView(m_device, m_depthBuffer);
 
             m_viewport = new Viewport(0, 0, m_resizeWidth, m_resizeHeight);

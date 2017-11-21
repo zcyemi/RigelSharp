@@ -22,15 +22,18 @@ namespace RigelCore.Rendering
 
         public InternalRenderTextureIdentifier m_identifier = InternalRenderTextureIdentifier.Default;
 
+
+        public static readonly RenderTextureIdentifier RenderTargetView = new RenderTextureIdentifier(InternalRenderTextureIdentifier.RenderTargetView);
+        public static readonly RenderTextureIdentifier DepthStencilView = new RenderTextureIdentifier(InternalRenderTextureIdentifier.DepthStencilView);
+
         public RenderTextureIdentifier(Texture2D texture)
         {
             m_tex = texture;
         }
 
-        public RenderTextureIdentifier(InternalRenderTextureIdentifier identifier)
+        private RenderTextureIdentifier(InternalRenderTextureIdentifier identifier)
         {
             m_identifier = identifier;
-            m_tex = null;
         }
 
         public T GetRawRenderTexture<T>(GraphicsContext context) where T: ResourceView
@@ -46,7 +49,17 @@ namespace RigelCore.Rendering
             return null;
         }
 
-        public static readonly RenderTextureIdentifier DefaultRenderTargetView = new RenderTextureIdentifier(InternalRenderTextureIdentifier.RenderTargetView);
+        public override bool Equals(object obj)
+        {
+            RenderTextureIdentifier other = obj as RenderTextureIdentifier;
+            if (other == null) return false;
+            if (other == this) return true;
+
+            if (m_tex == other.m_tex) return true;
+            return false;
+        }
+
+        public static readonly RenderTextureIdentifier DefaultRenderTarget = new RenderTextureIdentifier(InternalRenderTextureIdentifier.RenderTargetView);
         public static readonly RenderTextureIdentifier DefaultDepthStencilView = new RenderTextureIdentifier(InternalRenderTextureIdentifier.DepthStencilView);
     }
 }

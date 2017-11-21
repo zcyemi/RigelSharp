@@ -60,6 +60,7 @@ namespace RigelEditor.EGUI
 
         private Matrix m_matrixgui;
         private bool m_guiparamsChanged = true;
+        private bool m_guidynamicDrawChanged = false;
 
 
         private GraphicsContext m_graphics = null;
@@ -79,6 +80,12 @@ namespace RigelEditor.EGUI
         private VertexBufferBinding m_gVertBufferMainRectBinding;
         private Buffer m_gVertBufferMainText = null;
         private VertexBufferBinding m_gVertBufferMainTextBinding;
+
+        //dynamic draw buffer
+        private Buffer m_gVertBufferDynmic = null;
+        private VertexBufferBinding m_gVertBufferDynamicBinding;
+        private int m_gVertBufferDynamicQuadCount = 0;
+
 
 
         private Buffer m_gConstBuffer = null;
@@ -116,7 +123,7 @@ namespace RigelEditor.EGUI
 
         private void OnEventPreRender()
         {
-            if (NeedRebuildCommandList)
+            if (NeedRebuildCommandList || m_guidynamicDrawChanged)
             {
                 ReleaseCommandList();
                 BuildCommandList();
@@ -206,6 +213,7 @@ namespace RigelEditor.EGUI
                 OptionFlags = ResourceOptionFlags.None,
                 StructureByteStride = 0,
             };
+
             m_gVertBufferWindowText = new Buffer(m_graphics.Device, vbufferdescText);
             m_gVertBufferWindowTextBinding = new VertexBufferBinding(
                 m_gVertBufferWindowText, 
@@ -229,6 +237,19 @@ namespace RigelEditor.EGUI
                 m_bufferMainText.ItemSizeInByte,
                 0
             );
+
+            //dynamic vertex buffer
+            var vbufferDescDynamic = new BufferDescription()
+            {
+                SizeInBytes = EditorUtility.SizeOf<RigelEGUIVertex>() * 256,
+                BindFlags = BindFlags.VertexBuffer,
+                Usage = ResourceUsage.Default,
+                CpuAccessFlags = CpuAccessFlags.None,
+                OptionFlags = ResourceOptionFlags.None,
+                StructureByteStride = 0,
+            };
+            m_gVertBufferDynmic = new Buffer(m_graphics.Device, vbufferDescDynamic);
+            m_gVertBufferDynamicBinding = new VertexBufferBinding(m_gVertBufferDynmic, EditorUtility.SizeOf<RigelEGUIVertex>(), 0);
 
             //const buffer
             var cbufferdesc = new BufferDescription()
@@ -327,7 +348,6 @@ namespace RigelEditor.EGUI
                 m_gCommandlist.Dispose();
                 m_gCommandlist = null;
             }
-
         }
 
         private void BuildCommandList()
@@ -369,6 +389,17 @@ namespace RigelEditor.EGUI
             int textIndexedCount = m_bufferDataText.BufferDataCount / 2 * 3;
             m_gDeferredContext.DrawIndexed(textIndexedCount, 0, 0);
 
+
+            //draw dynamic texture buffer
+            if (m_guidynamicDrawChanged && m_gVertBufferDynamicQuadCount > 0)
+            {
+                m_gDeferredContext.InputAssembler.SetVertexBuffers(0, m_gVertBufferDynamicBinding);
+                m_gDeferredContext.PixelShader.SetShaderResource(0, m_graphics.SRVBackBuffer);
+                m_gDeferredContext.DrawIndexed(6, 0, 0);
+
+                m_guidynamicDrawChanged = false;
+            }
+
             m_gCommandlist = m_gDeferredContext.FinishCommandList(false);
 
             NeedRebuildCommandList = false;
@@ -395,8 +426,38 @@ namespace RigelEditor.EGUI
 
             BufferExten();
             BufferDataUpdate();
+            BufferDynamicUpdate();
+
         }
 
+
+        private void BufferDynamicUpdate()
+        {
+            
+        }
+
+        public void SetDynamicBufferTexture(RigelEGUIVertex[] vertexdata)
+        {
+            if(vertexdata.Length == 0)
+            {
+                m_gVertBufferDynamicQuadCount = 0;
+                m_guidynamicDrawChanged = true;
+                return;
+            }
+
+            m_gVertBufferDynamicQuadCount = vertexdata.Length / 4;
+
+            var pinnedptr = GCHandle.Alloc(vertexdata.ToArray(), GCHandleType.Pinned);
+            m_graphics.ImmediateContext.UpdateSubresource(new DataBox()
+            {
+                DataPointer = pinnedptr.AddrOfPinnedObject()
+            }, m_gVertBufferDynmic, 0);
+            pinnedptr.Free();
+
+            Console.WriteLine("update buffer data:"  + m_gVertBufferDynamicQuadCount);
+
+            m_guidynamicDrawChanged = true;
+        }
 
         private void BufferExten()
         {
@@ -527,6 +588,7 @@ namespace RigelEditor.EGUI
             if (m_gShaderVertex != null) m_gShaderVertex.Dispose();
             if (m_gInputlayout != null) m_gInputlayout.Dispose();
 
+            if (m_gVertBufferDynmic != null) m_gVertBufferDynmic.Dispose();
 
             if (m_gVertBufferWindowRect != null) m_gVertBufferWindowRect.Dispose();
             if (m_gVertBufferWindowText != null) m_gVertBufferWindowText.Dispose();

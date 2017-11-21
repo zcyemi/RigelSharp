@@ -30,6 +30,10 @@ namespace RigelEditor.EGUI
             bw.Write((byte)type);
 
             long hash = RigelCore.Alg.HashFunction.RSHash(ms.ToArray());
+
+            bw.Close();
+            ms.Dispose();
+
             return hash;
         }
     }
