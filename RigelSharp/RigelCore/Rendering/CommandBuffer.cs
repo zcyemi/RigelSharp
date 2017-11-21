@@ -54,8 +54,24 @@ namespace RigelCore.Rendering
         }
     }
 
+    internal enum CommandDataType
+    {
+        ClearRenderTarget,
+        Draw,
+    }
+
+    internal struct CommandBufferData
+    {
+        public CommandDataType Type;
+
+        public Vector4 ParamVec4;
+        public RenderTextureIdentifier ParamRTId;
+    }
+
     public class CommandBuffer:ICommandBuffer
     {
+        private CommandList m_commandList = null;
+        private List<CommandBufferData> m_commandData = new List<CommandBufferData>();
 
         public CommandBuffer()
         {
@@ -63,14 +79,21 @@ namespace RigelCore.Rendering
         }
 
 
-        public void ClearRenderTarget(Vector4 color)
+        public void ClearRenderTarget(RenderTextureIdentifier texture,Vector4 color)
         {
-
+            m_commandData.Add(new CommandBufferData()
+            {
+                Type = CommandDataType.ClearRenderTarget,
+                ParamRTId = texture,
+                ParamVec4 = color,
+            });
         }
 
         public void Dispose()
         {
-
+            if(m_commandList != null)
+                m_commandList.Dispose();
+            m_commandList = null;
         }
 
         public void Draw(Mesh mesh,Material material)
@@ -80,6 +103,59 @@ namespace RigelCore.Rendering
 
         public void Render(GraphicsContext graphics)
         {
+            if(m_commandList == null)
+            {
+                InternalRebuildCommandList(graphics);
+            }
+
+            if(m_commandList != null)
+            {
+                graphics.ImmediateContext.ExecuteCommandList(m_commandList, false);
+            }
         }
+
+        public void ClearAllCommand()
+        {
+            InternalReleaseCommandList();
+
+            m_commandData.Clear();
+        }
+
+        internal void InternalReleaseCommandList()
+        {
+            if (m_commandList != null)
+            {
+                m_commandList.Dispose();
+                m_commandList = null;
+            }
+        }
+
+        internal void InternalRebuildCommandList(GraphicsContext context)
+        {
+            if (m_commandData.Count == 0) return;
+
+            var deferred = new DeviceContext(context.Device);
+
+            foreach (var cmd in m_commandData)
+            {
+                switch (cmd.Type)
+                {
+                    case CommandDataType.ClearRenderTarget:
+
+                        deferred.ClearRenderTargetView(cmd.ParamRTId.GetRawRenderTexture<RenderTargetView>(context),new Color(cmd.ParamVec4));
+                        break;
+                    case CommandDataType.Draw:
+
+                        break;
+                }
+            }
+
+            m_commandList =  deferred.FinishCommandList(false);
+            deferred.Dispose();
+            deferred = null;
+        }
+
     }
+
+
 }

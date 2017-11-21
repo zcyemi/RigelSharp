@@ -147,6 +147,8 @@ namespace RigelCore.Rendering
         
         public void Dispose()
         {
+            ClearAllCommandBuffer();
+
             if (m_depthcStencilView != null) m_depthcStencilView.Dispose();
             if (m_depthBuffer != null) m_depthBuffer.Dispose();
             if (m_renderTargetView != null) m_renderTargetView.Dispose();
@@ -198,7 +200,13 @@ namespace RigelCore.Rendering
 
         public void ClearAllCommandBuffer()
         {
+            foreach(var bufferlist in m_commandBuffer.Values)
+            {
+                bufferlist.ForEach((x) => { x.Dispose(); });
+                bufferlist.Clear();
+            }
 
+            m_commandBuffer.Clear();
         }
 
 #endregion

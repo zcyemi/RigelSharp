@@ -92,7 +92,9 @@ namespace RigelEditor.EGUI
 
         private DeviceContext m_gDeferredContext = null;
         private CommandList m_gCommandlist = null;
+
         private RawCommandBuffer m_commandBuffer = null;
+        private static readonly CommandBufferStage m_commandBufferStage = CommandBufferStage.PostRender;
 
 
         /// <summary>
@@ -374,11 +376,7 @@ namespace RigelEditor.EGUI
             if(m_commandBuffer == null)
             {
                 m_commandBuffer = new RawCommandBuffer(m_gCommandlist);
-
-                m_graphics.RegisterCommandBuffer(CommandBufferStage.PostRender, m_commandBuffer);
-
-                Console.WriteLine("Craete GUI CommandBuffer");
-
+                m_graphics.RegisterCommandBuffer(m_commandBufferStage, m_commandBuffer);
             }
             else
             {
@@ -522,6 +520,8 @@ namespace RigelEditor.EGUI
 
         public void Dispose()
         {
+            m_graphics.RemoveCommandBuffer(m_commandBufferStage, m_commandBuffer);
+
             if (m_gShaderPixelRect != null) m_gShaderPixelRect.Dispose();
             if( m_gShaderPixelFont != null) m_gShaderPixelFont.Dispose();
             if (m_gShaderVertex != null) m_gShaderVertex.Dispose();
