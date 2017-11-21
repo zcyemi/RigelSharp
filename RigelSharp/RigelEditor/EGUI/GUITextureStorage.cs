@@ -77,9 +77,7 @@ namespace RigelEditor.EGUI
 
 
         private List<RigelEGUIVertex> m_bufferData = new List<RigelEGUIVertex>();
-        private RigelEGUIVertex[] m_bufferDataRaw;
-
-        public RigelEGUIVertex[] BufferData { get { return m_bufferDataRaw; } }
+        public List<RigelEGUIVertex> BufferData { get { return m_bufferData; } }
 
         public bool Changed { get { return m_changed; } }
 
@@ -184,6 +182,7 @@ namespace RigelEditor.EGUI
                     var vert = new RigelEGUIVertex();
                     vert.Position = new Vector4(rect.X, rect.Y, draw.m_depth, 1);
                     vert.UV = Vector2.Zero;
+                    vert.Color = Vector4.One;
                     m_bufferData.Add(vert);
 
                     vert.Position.Y += rect.W;
@@ -199,8 +198,6 @@ namespace RigelEditor.EGUI
                     m_bufferData.Add(vert);
                 }
             }
-
-            m_bufferDataRaw = m_bufferData.ToArray();
 
         }
     }

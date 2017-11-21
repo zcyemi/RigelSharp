@@ -59,7 +59,7 @@ namespace RigelEditor.EGUI
             GUI.Context.EndFrame();
             if (GUI.Context.TextureStorage.Changed)
             {
-                s_eguictx.GraphicsBind.SetDynamicBufferTexture(GUI.Context.TextureStorage.BufferData);
+                s_eguictx.GraphicsBind.SetDynamicBufferTexture(GUI.Context.TextureStorage.BufferData.ToArray(),GUI.Context.TextureStorage.BufferData.Count);
             }
 
         }

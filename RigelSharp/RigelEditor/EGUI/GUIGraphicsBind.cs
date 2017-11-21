@@ -82,6 +82,7 @@ namespace RigelEditor.EGUI
         private VertexBufferBinding m_gVertBufferMainTextBinding;
 
         //dynamic draw buffer
+        private RigelEGUIVertex[] m_dynamicVertexBuffer;
         private Buffer m_gVertBufferDynmic = null;
         private VertexBufferBinding m_gVertBufferDynamicBinding;
         private int m_gVertBufferDynamicQuadCount = 0;
@@ -239,6 +240,7 @@ namespace RigelEditor.EGUI
             );
 
             //dynamic vertex buffer
+            m_dynamicVertexBuffer = new RigelEGUIVertex[256];
             var vbufferDescDynamic = new BufferDescription()
             {
                 SizeInBytes = EditorUtility.SizeOf<RigelEGUIVertex>() * 256,
@@ -369,15 +371,17 @@ namespace RigelEditor.EGUI
             m_gDeferredContext.DrawIndexed(mainRectIndexed, 0, 0);
 
             //draw window rect
-            m_gDeferredContext.InputAssembler.SetVertexBuffers(0, m_gVertBufferWindowRectBinding);
-            EditorUtility.Log("buffer data count:" + m_bufferDataRect.BufferDataCount);
-            int indexedCount = m_bufferDataRect.BufferDataCount / 2 * 3;
-            m_gDeferredContext.DrawIndexed(indexedCount, 0, 0);
+            //m_gDeferredContext.InputAssembler.SetVertexBuffers(0, m_gVertBufferWindowRectBinding);
+            //EditorUtility.Log("buffer data count:" + m_bufferDataRect.BufferDataCount);
+            //int indexedCount = m_bufferDataRect.BufferDataCount / 2 * 3;
+            //m_gDeferredContext.DrawIndexed(indexedCount, 0, 0);
 
             m_gDeferredContext.PixelShader.Set(m_gShaderPixelFont);
             m_gDeferredContext.PixelShader.SetShaderResource(0, m_gFontTextureView);
             m_gDeferredContext.PixelShader.SetSampler(0, m_gFontTextureSampler);
             m_gDeferredContext.OutputMerger.SetBlendState(m_gFontBlendState);
+
+
 
             //draw main text
             m_gDeferredContext.InputAssembler.SetVertexBuffers(0, m_gVertBufferMainTextBinding);
@@ -385,20 +389,21 @@ namespace RigelEditor.EGUI
             m_gDeferredContext.DrawIndexed(mainTextIndexed, 0, 0);
 
             //draw window text
-            m_gDeferredContext.InputAssembler.SetVertexBuffers(0, m_gVertBufferWindowTextBinding);
-            int textIndexedCount = m_bufferDataText.BufferDataCount / 2 * 3;
-            m_gDeferredContext.DrawIndexed(textIndexedCount, 0, 0);
-
+            //m_gDeferredContext.InputAssembler.SetVertexBuffers(0, m_gVertBufferWindowTextBinding);
+            //int textIndexedCount = m_bufferDataText.BufferDataCount / 2 * 3;
+            //m_gDeferredContext.DrawIndexed(textIndexedCount, 0, 0);
 
             //draw dynamic texture buffer
             if (m_guidynamicDrawChanged && m_gVertBufferDynamicQuadCount > 0)
             {
                 m_gDeferredContext.InputAssembler.SetVertexBuffers(0, m_gVertBufferDynamicBinding);
-                m_gDeferredContext.PixelShader.SetShaderResource(0, m_graphics.SRVBackBuffer);
-                m_gDeferredContext.DrawIndexed(6, 0, 0);
-
+                //m_gDeferredContext.PixelShader.SetShaderResource(0, m_graphics.SRVBackBuffer);
+                m_gDeferredContext.DrawIndexed(m_gVertBufferDynamicQuadCount*6, 0, 0);
                 m_guidynamicDrawChanged = false;
             }
+            
+
+
 
             m_gCommandlist = m_gDeferredContext.FinishCommandList(false);
 
@@ -436,27 +441,12 @@ namespace RigelEditor.EGUI
             
         }
 
-        public void SetDynamicBufferTexture(RigelEGUIVertex[] vertexdata)
+        public void SetDynamicBufferTexture(RigelEGUIVertex[] vertexdata,int length)
         {
-            if(vertexdata.Length == 0)
-            {
-                m_gVertBufferDynamicQuadCount = 0;
-                m_guidynamicDrawChanged = true;
-                return;
-            }
-
-            m_gVertBufferDynamicQuadCount = vertexdata.Length / 4;
-
-            var pinnedptr = GCHandle.Alloc(vertexdata.ToArray(), GCHandleType.Pinned);
-            m_graphics.ImmediateContext.UpdateSubresource(new DataBox()
-            {
-                DataPointer = pinnedptr.AddrOfPinnedObject()
-            }, m_gVertBufferDynmic, 0);
-            pinnedptr.Free();
-
-            Console.WriteLine("update buffer data:"  + m_gVertBufferDynamicQuadCount);
-
+            vertexdata.CopyTo(m_dynamicVertexBuffer, 0);
+            m_gVertBufferDynamicQuadCount = length / 4;
             m_guidynamicDrawChanged = true;
+            
         }
 
         private void BufferExten()
@@ -534,32 +524,43 @@ namespace RigelEditor.EGUI
                 m_bufferMainText.SetDirty(false);
             }
 
-            if (m_bufferDataRect.Dirty)
+            //if (m_bufferDataRect.Dirty)
+            //{
+            //    var pinnedptr = GCHandle.Alloc(m_bufferDataRect.BufferData, GCHandleType.Pinned);
+            //    m_graphics.ImmediateContext.UpdateSubresource(new DataBox()
+            //    {
+            //        DataPointer = pinnedptr.AddrOfPinnedObject()
+            //    }, m_gVertBufferWindowRect, 0);
+            //    pinnedptr.Free();
+
+            //    m_bufferDataRect.SetDirty(false);
+
+            //    EditorUtility.Log("update vertexbuffer rect data");
+            //}
+
+            //if (m_bufferDataText.Dirty)
+            //{
+            //    var pinnedptr = GCHandle.Alloc(m_bufferDataText.BufferData, GCHandleType.Pinned);
+            //    m_graphics.ImmediateContext.UpdateSubresource(new DataBox()
+            //    {
+            //        DataPointer = pinnedptr.AddrOfPinnedObject()
+            //    }, m_gVertBufferWindowText, 0);
+            //    pinnedptr.Free();
+
+            //    m_bufferDataRect.SetDirty(false);
+
+            //    EditorUtility.Log("update vertexbuffer text data");
+            //}
+
+            if (m_guidynamicDrawChanged && m_dynamicVertexBuffer.Length > 0)
             {
-                var pinnedptr = GCHandle.Alloc(m_bufferDataRect.BufferData, GCHandleType.Pinned);
+                var pinnedptr = GCHandle.Alloc(m_dynamicVertexBuffer, GCHandleType.Pinned);
                 m_graphics.ImmediateContext.UpdateSubresource(new DataBox()
                 {
                     DataPointer = pinnedptr.AddrOfPinnedObject()
-                }, m_gVertBufferWindowRect, 0);
+                },m_gVertBufferDynmic,0);
+
                 pinnedptr.Free();
-
-                m_bufferDataRect.SetDirty(false);
-
-                EditorUtility.Log("update vertexbuffer rect data");
-            }
-
-            if (m_bufferDataText.Dirty)
-            {
-                var pinnedptr = GCHandle.Alloc(m_bufferDataText.BufferData, GCHandleType.Pinned);
-                m_graphics.ImmediateContext.UpdateSubresource(new DataBox()
-                {
-                    DataPointer = pinnedptr.AddrOfPinnedObject()
-                }, m_gVertBufferWindowText, 0);
-                pinnedptr.Free();
-
-                m_bufferDataRect.SetDirty(false);
-
-                EditorUtility.Log("update vertexbuffer text data");
             }
 
             if (m_bufferDataIndices.Dirty)
