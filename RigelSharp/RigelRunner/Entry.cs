@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using RigelCore;
+using RigelCore.Engine;
 
 namespace RigelRunner
 {
@@ -13,7 +14,7 @@ namespace RigelRunner
         [STAThread]
         static void Main(params string[] args)
         {
-
+            GameEngine.Run();
         }
     }
 }

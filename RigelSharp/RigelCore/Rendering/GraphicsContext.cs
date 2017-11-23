@@ -64,17 +64,19 @@ namespace RigelCore.Rendering
             m_commandBuffer.Add(CommandBufferStage.PreRender, new List<ICommandBuffer>());
         }
 
-        public void CreateWithSwapChain(IntPtr handle,int width,int height)
+        public void CreateWithSwapChain(IntPtr handle,int width,int height,bool windowed =true,bool allowModeSwitch = false)
         {
+
             m_swapchainDesc = new SwapChainDescription
             {
                 BufferCount = 1,
                 ModeDescription = new ModeDescription(width, height, new Rational(60, 1), Format.R8G8B8A8_UNorm),
-                IsWindowed = true,
+                IsWindowed = windowed,
                 OutputHandle = handle,
                 SampleDescription = new SampleDescription(1, 0),
                 SwapEffect = SwapEffect.Discard,
-                Usage = Usage.RenderTargetOutput | Usage.ShaderInput
+                Usage = Usage.RenderTargetOutput | Usage.ShaderInput,
+                Flags = allowModeSwitch ? SwapChainFlags.AllowModeSwitch : SwapChainFlags.None
             };
 
             Device.CreateWithSwapChain(DriverType.Hardware, DeviceCreationFlags.None, m_swapchainDesc, out m_device, out m_swapchain);
@@ -88,6 +90,11 @@ namespace RigelCore.Rendering
             m_resizeWidth = width;
             m_resizeHeight = height;
             DoResizeBuffer();
+        }
+
+        public void SwitchFullscreen(bool fullscreen,Output output = null)
+        {
+            m_swapchain.SetFullscreenState(fullscreen, output);
         }
 
         public void Render()
