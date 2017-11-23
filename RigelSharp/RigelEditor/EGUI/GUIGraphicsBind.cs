@@ -401,8 +401,6 @@ namespace RigelEditor.EGUI
                 m_gDeferredContext.DrawIndexed(m_gVertBufferDynamicQuadCount*6, 0, 0);
                 m_guidynamicDrawChanged = false;
             }
-            
-
 
 
             m_gCommandlist = m_gDeferredContext.FinishCommandList(false);

@@ -117,7 +117,6 @@ namespace RigelEditor.EGUI
             if (m_changed)
             {
                 GenVertexBuffer();
-                Console.WriteLine("tex draw changed!");
             }
 
             return m_changed;
@@ -198,7 +197,6 @@ namespace RigelEditor.EGUI
                     m_bufferData.Add(vert);
                 }
             }
-
         }
     }
 }

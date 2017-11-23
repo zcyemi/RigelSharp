@@ -17,7 +17,6 @@ namespace RigelCore.Rendering
 {
     public class GraphicsContext : IDisposable
     {
-
         private int m_resizeWidth, m_resizeHeight;
         private bool m_needResize = true;
 

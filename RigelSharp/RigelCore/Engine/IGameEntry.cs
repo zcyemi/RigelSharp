@@ -13,5 +13,7 @@ namespace RigelCore.Engine
         void OnUpdate();
 
         void OnDestroy();
+
+
     }
 }
