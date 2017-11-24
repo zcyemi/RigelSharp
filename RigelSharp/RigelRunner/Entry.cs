@@ -14,6 +14,9 @@ namespace RigelRunner
         [STAThread]
         static void Main(params string[] args)
         {
+            //temp load the script assembly
+            SampleGame.TestClass.Test();
+
             GameEngine.Run();
         }
     }

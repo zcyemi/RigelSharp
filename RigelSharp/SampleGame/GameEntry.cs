@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using RigelCore;
 using RigelCore.Engine;
 
+[assembly: GameScript(typeof(SampleGame.GameEntry))]
 namespace SampleGame
 {
     public class GameEntry : IGameEntry
@@ -25,4 +26,14 @@ namespace SampleGame
             Console.WriteLine("Game End");
         }
     }
+
+    public static class TestClass
+    {
+        public static void Test()
+        {
+            Console.WriteLine("Test");
+        }
+    }
+
 }
+

@@ -39,6 +39,7 @@ namespace RigelEditor
             m_windowForm = new RenderForm(m_title);
             m_windowForm.AllowUserResizing = true;
 
+            
 
             EditorGraphicsManager.Instance.Init();
             //test

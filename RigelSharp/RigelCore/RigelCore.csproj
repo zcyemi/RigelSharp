@@ -72,11 +72,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Alg\HashFunction.cs" />
+    <Compile Include="Engine\BaseComponent.cs" />
+    <Compile Include="Engine\Camera.cs" />
     <Compile Include="Engine\GameEngine.cs" />
+    <Compile Include="Engine\GameObject.cs" />
+    <Compile Include="Engine\GameScriptAttribute.cs" />
+    <Compile Include="Engine\GObject.cs" />
     <Compile Include="Engine\IGameEntry.cs" />
     <Compile Include="Engine\Material.cs" />
     <Compile Include="Engine\Mesh.cs" />
+    <Compile Include="Engine\Scene.cs" />
     <Compile Include="Engine\Shader.cs" />
+    <Compile Include="Engine\Transform.cs" />
     <Compile Include="EventSlot.cs" />
     <Compile Include="Helper\DevHelper.cs" />
     <Compile Include="Helper\ReflectionHelper.cs" />

@@ -31,7 +31,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject />
+    <StartupObject>RigelRunner.Entry</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -52,6 +52,10 @@
     <ProjectReference Include="..\RigelCore\RigelCore.csproj">
       <Project>{f29a7e2d-8106-44a3-a404-64870126be84}</Project>
       <Name>RigelCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SampleGame\SampleGame.csproj">
+      <Project>{98e1d864-cbea-4eee-8a33-e93dac9f7155}</Project>
+      <Name>SampleGame</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
