@@ -45,4 +45,17 @@ namespace RigelEditor
         }
     }
 
+    internal class EditorTestWindowedDialog : GUIWindowedDialog
+    {
+        public EditorTestWindowedDialog() : base(true, true, true)
+        {
+
+        }
+
+        protected override void OnDraw()
+        {
+
+        }
+    }
+
 }

@@ -85,7 +85,7 @@ namespace RigelEditor.EGUI
                 var optborder = options.FirstOrDefault((x) => { return x.type == GUIOption.GUIOptionType.border; });
                 if (optborder != null)
                 {
-                    GUI.DrawBorder(rect.Padding(-1), 1, optborder.Vector4Value, true);
+                    GUI.DrawBorder(rect, 1, optborder.Vector4Value, true);
                 }
             }
 
@@ -281,6 +281,7 @@ namespace RigelEditor.EGUI
 
         public static void Text(string content,Vector4? color = null,params GUIOption[] options)
         {
+
             var optwidth = options != null ? options.FirstOrDefault((x) => { return x.type == GUIOption.GUIOptionType.width; }) : null;
             bool adaptive = optwidth == null;
 

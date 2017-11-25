@@ -38,6 +38,7 @@ namespace RigelEditor.EGUI
         private bool m_sampleText = false;
 
         private bool m_sampleInput = false;
+        private bool m_sampleDialog = false;
 
         public GUITestContent()
         {
@@ -52,6 +53,8 @@ namespace RigelEditor.EGUI
             SampleScrollView();
             SampleInput();
 
+            SampleDialog();
+
         }
 
 
@@ -64,6 +67,19 @@ namespace RigelEditor.EGUI
                 GUILayout.Button("Test");
                 m_inputString = GUILayout.TextInput("Input", m_inputString);
                 m_inputString2 = GUILayout.TextInput("Sample String 2", m_inputString2);
+            }
+            GUILayout.EndCollapseGroup();
+        }
+
+        private void SampleDialog()
+        {
+            if(GUILayout.BeginCollapseGroup("Dialogs",ref m_sampleDialog))
+            {
+                if(GUILayout.Button("EditorTestWindowedDialog"))
+                {
+                    var dialog = new EditorTestWindowedDialog();
+                    GUI.DrawComponent(dialog);
+                }
             }
             GUILayout.EndCollapseGroup();
         }

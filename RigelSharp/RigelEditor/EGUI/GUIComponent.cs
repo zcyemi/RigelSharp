@@ -63,21 +63,83 @@ namespace RigelEditor.EGUI
         protected bool m_dialogCloseable = true;
 
         protected Vector2 m_dialogMaxSize = new Vector2(800, 600);
-        protected Vector2 m_dialogMinSize = new Vector2(625, 360);
+        protected Vector2 m_dialogMinSize = new Vector2(100, 100);
 
-        private Vector2 m_size;
+        private GUIDragState m_dragMove = new GUIDragState();
+        private GUIDragState m_dragResizeHV = new GUIDragState();
+
+        private Vector2 m_size = new Vector2(400, 300);
+        private Vector2 m_pos;
+        private Vector4 m_hedaerRect;
+
+        protected string m_title = "GUIWindowedDialog";
 
         public GUIWindowedDialog(bool moveable,bool resizeable,bool closeable)
         {
-            m_size = m_dialogMinSize;
             m_dialogMoveable = moveable;
             m_dialogRezieable = resizeable;
             m_dialogCloseable = closeable;
+
+            m_hedaerRect = new Vector4(0, 0, m_size.X, 23);
+
+            m_pos = (GUI.Context.baseRect.Size() - m_size) * 0.5f;
         }
 
         public sealed override void Draw(GUIEvent guievent)
         {
+            m_hedaerRect.Z = m_size.X;
+            m_pos.X = (int)m_pos.X;
+            m_pos.Y = (int)m_pos.Y;
 
+            var rect = new Vector4(m_pos, m_size.X, m_size.Y);
+
+            GUILayout.BeginArea(rect, GUIStyle.Current.BackgroundColor, GUIOption.Border());
+
+            bool headerover = GUIUtility.RectContainsCheck(GUILayout.GetRectAbsolute(m_hedaerRect), GUI.Event.Pointer);
+            GUILayout.DrawRect(m_hedaerRect, headerover? GUIStyle.Current.ColorActive: GUIStyle.Current.ColorActiveD);
+            GUILayout.BeginHorizontal();
+            GUILayout.Text(m_title);
+            if (m_dialogCloseable)
+            {
+                GUILayout.Indent((int)(rect.Z - GUILayout.CurrentLayout.Offset.X - 24));
+                if (GUILayout.Button("X", GUIStyle.Current.ColorActiveD, GUIOption.Width(23)))
+                {
+                    OnDestroy();
+                }
+            }
+            GUILayout.EndHorizontal();
+            
+
+
+            OnDraw();
+
+
+            //for optimize
+            bool onmove = false;
+            if (m_dialogMoveable && m_dragMove.OnDrag(headerover))
+            {
+                m_pos += GUI.Event.DragOffset;
+
+                m_pos.X = MathUtil.Clamp(m_pos.X, 0, GUI.Context.baseRect.Z);
+                m_pos.Y = MathUtil.Clamp(m_pos.Y, 0, GUI.Context.baseRect.W);
+                onmove = true;
+            }
+            if(m_dialogRezieable && ! onmove){
+                var rectResize = GUILayout.Context.currentArea;
+                rectResize.Y += (rectResize.W - 3);
+                rectResize.X += rectResize.Z - 3;
+                rectResize.Z = 6;
+                rectResize.W = 6;
+
+                if (m_dragResizeHV.OnDrag(rectResize))
+                {
+                    m_size += GUI.Event.DragOffset;
+                    m_size.Y = MathUtil.Clamp(m_size.Y, m_dialogMinSize.Y, m_dialogMaxSize.Y);
+                    m_size.X = MathUtil.Clamp(m_size.X, m_dialogMinSize.X, m_dialogMaxSize.X);
+                }
+            }
+
+            GUILayout.EndArea();
         }
 
         protected abstract void OnDraw();
