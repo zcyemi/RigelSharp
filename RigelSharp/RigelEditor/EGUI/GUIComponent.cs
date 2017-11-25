@@ -34,7 +34,7 @@ namespace RigelEditor.EGUI
         public abstract void Draw(GUIEvent guievent);
     }
 
-    public abstract class GUIDialog:IGUIComponent
+    public abstract class GUIDialog : IGUIComponent
     {
         protected string m_title = "";
         protected Vector2 m_size = new Vector2(400, 300);
@@ -42,9 +42,9 @@ namespace RigelEditor.EGUI
 
         public sealed override void Draw(GUIEvent guievent)
         {
-            var rect = new Vector4(0, 0, m_size.X,m_size.Y).CenterPos(GUI.Context.baseRect.Size());
+            var rect = new Vector4(0, 0, m_size.X, m_size.Y).CenterPos(GUI.Context.baseRect.Size());
 
-            GUILayout.BeginArea(rect,GUIStyle.Current.BackgroundColor,GUIOption.Border());
+            GUILayout.BeginArea(rect, GUIStyle.Current.BackgroundColor, GUIOption.Border());
 
             GUILayout.Text(m_title);
 
@@ -56,7 +56,7 @@ namespace RigelEditor.EGUI
         protected abstract void OnDraw();
     }
 
-    public abstract class GUIWindowedDialog: IGUIComponent
+    public abstract class GUIWindowedDialog : IGUIComponent
     {
         protected bool m_dialogMoveable = true;
         protected bool m_dialogRezieable = true;
@@ -74,7 +74,7 @@ namespace RigelEditor.EGUI
 
         protected string m_title = "GUIWindowedDialog";
 
-        public GUIWindowedDialog(bool moveable,bool resizeable,bool closeable)
+        public GUIWindowedDialog(bool moveable, bool resizeable, bool closeable)
         {
             m_dialogMoveable = moveable;
             m_dialogRezieable = resizeable;
@@ -93,59 +93,73 @@ namespace RigelEditor.EGUI
 
             var rect = new Vector4(m_pos, m_size.X, m_size.Y);
 
-            GUILayout.BeginArea(rect, GUIStyle.Current.BackgroundColor, GUIOption.Border());
-
-            bool headerover = GUIUtility.RectContainsCheck(GUILayout.GetRectAbsolute(m_hedaerRect), GUI.Event.Pointer);
-            GUILayout.DrawRect(m_hedaerRect, headerover? GUIStyle.Current.ColorActive: GUIStyle.Current.ColorActiveD);
-            GUILayout.BeginHorizontal();
-            GUILayout.Text(m_title);
-            if (m_dialogCloseable)
+            GUILayout.BeginContainer(rect, GUIStyle.Current.BackgroundColor, true, GUIOption.Border());
             {
-                GUILayout.Indent((int)(rect.Z - GUILayout.CurrentLayout.Offset.X - 24));
-                if (GUILayout.Button("X", GUIStyle.Current.ColorActiveD, GUIOption.Width(23)))
+                bool headerover = GUIUtility.RectContainsCheck(GUILayout.GetRectAbsolute(m_hedaerRect), GUI.Event.Pointer);
+                GUILayout.DrawRect(m_hedaerRect, headerover ? GUIStyle.Current.ColorActive : GUIStyle.Current.ColorActiveD);
+                GUILayout.BeginHorizontal();
+                GUILayout.Text(m_title);
+                if (m_dialogCloseable)
                 {
-                    OnDestroy();
+                    GUILayout.Indent((int)(rect.Z - GUILayout.CurrentLayout.Offset.X - 24));
+                    if (GUILayout.Button("X", GUIStyle.Current.ColorActiveD, GUIOption.Width(23)))
+                    {
+                        OnDestroy();
+                    }
+                }
+                GUILayout.EndHorizontal();
+
+                var contentrect = GUILayout.Context.currentArea;
+                contentrect.Y += m_hedaerRect.W;
+                contentrect.Z -= 1;
+                contentrect.W -= (m_hedaerRect.W + 1);
+
+                GUILayout.BeginContainer(contentrect);
+                {
+                    OnDraw();
+                }
+                GUILayout.EndContainer();
+
+                //for optimize
+                bool onmove = false;
+                if (m_dialogMoveable && m_dragMove.OnDrag(headerover))
+                {
+                    m_pos += GUI.Event.DragOffset;
+
+                    m_pos.X = MathUtil.Clamp(m_pos.X, 0, GUI.Context.baseRect.Z);
+                    m_pos.Y = MathUtil.Clamp(m_pos.Y, 0, GUI.Context.baseRect.W);
+                    onmove = true;
+                }
+                if (m_dialogRezieable && !onmove)
+                {
+                    var rectResize = GUILayout.Context.currentArea;
+                    rectResize.Y += (rectResize.W - 3);
+                    rectResize.X += rectResize.Z - 3;
+                    rectResize.Z = 6;
+                    rectResize.W = 6;
+
+                    if (m_dragResizeHV.OnDrag(rectResize))
+                    {
+                        m_size += GUI.Event.DragOffset;
+                        m_size.Y = MathUtil.Clamp(m_size.Y, m_dialogMinSize.Y, m_dialogMaxSize.Y);
+                        m_size.X = MathUtil.Clamp(m_size.X, m_dialogMinSize.X, m_dialogMaxSize.X);
+                    }
                 }
             }
-            GUILayout.EndHorizontal();
-            
 
+            //var grect = new Vector4(0, 0, 100, 30);
+            //GUI.DrawRect(grect, RigelColor.Green);
+            //GUI.DrawText(grect, "GUITEXT", RigelColor.White);
+            //GUI.Button(grect, "GUIBUTTON");
+            //GUI.DrawBorder(grect, 2, RigelColor.Green);
 
-            OnDraw();
-
-
-            //for optimize
-            bool onmove = false;
-            if (m_dialogMoveable && m_dragMove.OnDrag(headerover))
-            {
-                m_pos += GUI.Event.DragOffset;
-
-                m_pos.X = MathUtil.Clamp(m_pos.X, 0, GUI.Context.baseRect.Z);
-                m_pos.Y = MathUtil.Clamp(m_pos.Y, 0, GUI.Context.baseRect.W);
-                onmove = true;
-            }
-            if(m_dialogRezieable && ! onmove){
-                var rectResize = GUILayout.Context.currentArea;
-                rectResize.Y += (rectResize.W - 3);
-                rectResize.X += rectResize.Z - 3;
-                rectResize.Z = 6;
-                rectResize.W = 6;
-
-                if (m_dragResizeHV.OnDrag(rectResize))
-                {
-                    m_size += GUI.Event.DragOffset;
-                    m_size.Y = MathUtil.Clamp(m_size.Y, m_dialogMinSize.Y, m_dialogMaxSize.Y);
-                    m_size.X = MathUtil.Clamp(m_size.X, m_dialogMinSize.X, m_dialogMaxSize.X);
-                }
-            }
-
-            GUILayout.EndArea();
+            GUILayout.EndContainer();
         }
 
         protected abstract void OnDraw();
     }
 
-    public abstract class GUIOverlay: IGUIComponent
+    public abstract class GUIOverlay : IGUIComponent
     {
 
         public override void Draw(GUIEvent guievent)
@@ -155,5 +169,5 @@ namespace RigelEditor.EGUI
     }
 
 
-    
+
 }

@@ -87,6 +87,7 @@
     <Compile Include="Engine\Shader.cs" />
     <Compile Include="Engine\Transform.cs" />
     <Compile Include="EventSlot.cs" />
+    <Compile Include="FileSystem.cs" />
     <Compile Include="Helper\DevHelper.cs" />
     <Compile Include="Helper\ReflectionHelper.cs" />
     <Compile Include="Helper\Singleton.cs" />

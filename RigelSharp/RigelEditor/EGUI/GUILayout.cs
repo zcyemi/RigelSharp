@@ -52,10 +52,10 @@ namespace RigelEditor.EGUI
         /// <summary>
         /// Begin Group and Area
         /// </summary>
-        /// <param name="rect">related rect</param>
-        public static void BeginContainer(Vector4 rect, Vector4? color = null, params GUIOption[] options)
+        /// <param name="rect">rect</param>
+        public static void BeginContainer(Vector4 rect, Vector4? color = null,bool absolute = false, params GUIOption[] options)
         {
-            var rectab = GetRectAbsolute(rect);
+            var rectab = absolute? GetRectAbsolute(rect) :rect;
             GUILayout.BeginArea(rectab, color, options);
             GUI.BeginGroup(rectab, null, true);
         }
@@ -258,7 +258,6 @@ namespace RigelEditor.EGUI
             var curarea = s_ctx.currentArea;
             var rect = new Vector4(s_ctx.currentLayout.Offset, width, s_svLineHeight.Value);
             bool valid = GUIUtility.RectClip(ref rect, curarea);
-
 
             bool clicked = false;
             if (valid)

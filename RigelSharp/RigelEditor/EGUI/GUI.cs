@@ -89,9 +89,11 @@ namespace RigelEditor.EGUI
         {
             if (!absolute)
             {
-                var off = s_ctx.currentGroup.Rect.Pos();
+                var off = s_ctx.currentGroup.Absolute.Pos();
                 rect.X += off.X;
                 rect.Y += off.Y;
+
+                absolute = true;
             }
 
             GUIOption optAdaptiveValue = null;

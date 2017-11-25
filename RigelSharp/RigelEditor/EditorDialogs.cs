@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 using RigelEditor.EGUI;
 
+using RigelCore;
+using SharpDX;
+
 namespace RigelEditor
 {
     internal class EditorFileSystemDialog : GUIDialog
@@ -47,14 +50,28 @@ namespace RigelEditor
 
     internal class EditorTestWindowedDialog : GUIWindowedDialog
     {
+        [EditorMenuItem("Test","Dialog")]
+        public static void Test()
+        {
+            var dialog = new EditorTestWindowedDialog();
+            GUI.DrawComponent(dialog);
+        }
+
+        private FileSystem m_filesystem;
+
+        private Vector2 m_scrollpos;
+
         public EditorTestWindowedDialog() : base(true, true, true)
         {
-
+            m_filesystem = new FileSystem(AppContext.BaseDirectory);
         }
 
         protected override void OnDraw()
         {
+            var rect = new Vector4(0, 0, 200, 20);
 
+            GUI.DrawText(rect, "TEXT GUI", RigelColor.Red);
+            GUI.Button(rect, "dwdwdww");
         }
     }
 
