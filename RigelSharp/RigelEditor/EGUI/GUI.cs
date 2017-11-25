@@ -182,7 +182,7 @@ namespace RigelEditor.EGUI
 
                     if ((startpos.Y + lineh) > (rect.W + rect.Y)) return (int)rect.W;
                 }
-                startpos.X = w;
+                startpos.X = w + rect.X;
                 w += DrawChar(startpos, c, color);
 
             }
@@ -316,14 +316,10 @@ namespace RigelEditor.EGUI
 
             return glyph.AdvancedX;
         }
-
-
-
         public static void DrawRect(Vector4 rect, bool absolute = false, params GUIOption[] options)
         {
             DrawRect(rect, Context.BackgroundColor, absolute, options);
         }
-
         /// <summary>
         /// 
         /// </summary>
