@@ -53,7 +53,7 @@ namespace RigelEditor.EGUI
                     if (GUILayout.Button(buttonConfirm, GUIOption.Width(100), GUIOption.Border()))
                     {
                         if (m_callbackConfirm != null) m_callbackConfirm.Invoke();
-                        OnDistroy();
+                        OnDestroy();
                     }
                 }
                 else
@@ -62,12 +62,12 @@ namespace RigelEditor.EGUI
                     if (GUILayout.Button(buttonConfirm, GUIOption.Width(100), GUIOption.Border()))
                     {
                         if (m_callbackConfirm != null) m_callbackConfirm.Invoke();
-                        OnDistroy();
+                        OnDestroy();
                     }
                     if (GUILayout.Button(buttonCancel, GUIOption.Width(100), GUIOption.Border()))
                     {
                         if (m_callbackCancel != null) m_callbackCancel.Invoke();
-                        OnDistroy();
+                        OnDestroy();
                     }
                 }
                 GUILayout.EndHorizontal();

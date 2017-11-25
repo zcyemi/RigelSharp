@@ -28,10 +28,20 @@ namespace RigelEditor
             m_targetpath = GUILayout.TextInput("FileName", m_targetpath);
             GUILayout.BeginHorizontal();
             GUILayout.Indent((int)(m_size.X - 243));
-            GUILayout.Button("Open",GUIOption.Width(120));
-            GUILayout.Button("Cancel", GUIOption.Width(120));
+            if (GUILayout.Button("Open", GUIOption.Width(120))) OnOpen();
+            if (GUILayout.Button("Cancel", GUIOption.Width(120))) OnCancel();
             GUILayout.EndHorizontal();
 
+        }
+
+        private void OnOpen()
+        {
+            OnDestroy();
+        }
+
+        private void OnCancel()
+        {
+            OnDestroy();
         }
     }
 

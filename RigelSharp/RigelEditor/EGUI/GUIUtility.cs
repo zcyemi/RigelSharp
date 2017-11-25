@@ -71,8 +71,8 @@ namespace RigelEditor.EGUI
         public static Vector4 CenterPos(this Vector4 v,Vector2 size)
         {
             size = (size - v.Size()) * 0.5f;
-            v.X += size.X;
-            v.Y += size.Y;
+            v.X += (int)size.X;
+            v.Y += (int)size.Y;
 
             return v;
         }

@@ -456,7 +456,7 @@ namespace RigelEditor.EGUI
         public static void DrawComponent(IGUIComponent component)
         {
             component.InitDrawed = false;
-            component.Distroy = false;
+            component.Destroy = false;
             Context.componentStack.Push(component);
             Event.Use();
         }

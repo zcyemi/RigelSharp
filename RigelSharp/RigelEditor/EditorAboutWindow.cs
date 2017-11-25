@@ -33,7 +33,7 @@ namespace RigelEditor
                     if (GUI.Event.IsMouseActiveEvent())
                     {
                         GUI.Event.Use();
-                        OnDistroy();
+                        OnDestroy();
                     }
                 }
             }

@@ -142,6 +142,9 @@ namespace RigelCore.Rendering
 
             Utilities.Dispose(ref m_srvBackBuffer);
 
+
+            //Console.WriteLine($"RSZ w:{m_resizeWidth} h:{m_resizeHeight}");
+
             m_swapchain.ResizeBuffers(m_swapchainDesc.BufferCount, m_resizeWidth, m_resizeHeight, Format.Unknown, SwapChainFlags.None);
             m_backBuffer = Texture2D.FromSwapChain<Texture2D>(m_swapchain, 0);
 

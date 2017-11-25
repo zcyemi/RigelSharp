@@ -19,16 +19,16 @@ namespace RigelEditor.EGUI
         public int BufferTextCount { get { return BufferTextEnd - BufferTextStart; } }
 
         public bool InitDrawed = false;
-        public bool Distroy { get; internal set; }
+        public bool Destroy { get; internal set; }
 
         public void Show()
         {
             GUI.DrawComponent(this);
         }
 
-        public void OnDistroy()
+        public void OnDestroy()
         {
-            Distroy = true;
+            Destroy = true;
         }
 
         public abstract void Draw(GUIEvent guievent);
