@@ -71,6 +71,8 @@ namespace RigelEditor
             var rect = new Vector4(0, 0, 200, 20);
 
             GUI.DrawText(rect, "TEXT GUI", RigelColor.Red);
+
+            rect.Y += 20;
             GUI.Button(rect, "dwdwdww");
         }
     }

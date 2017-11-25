@@ -87,15 +87,6 @@ namespace RigelEditor.EGUI
         }
         public static bool Button(Vector4 rect, string label, Vector4 color, Vector4 texcolor, bool absolute = false, params GUIOption[] options)
         {
-            if (!absolute)
-            {
-                var off = s_ctx.currentGroup.Absolute.Pos();
-                rect.X += off.X;
-                rect.Y += off.Y;
-
-                absolute = true;
-            }
-
             GUIOption optAdaptiveValue = null;
             if (options != null)
             {
@@ -108,6 +99,17 @@ namespace RigelEditor.EGUI
                 }
             }
 
+            var groupAb = s_ctx.currentGroup.Absolute;
+
+            if (!absolute)
+            {
+                float maxwidth = groupAb.Z - rect.X;
+                if (rect.Z > maxwidth) rect.Z = maxwidth;
+                rect.X += groupAb.X;
+                rect.Y += groupAb.Y;
+                absolute = true;
+            }
+
             bool clicked = false;
             if (GUIUtility.RectContainsCheck(rect, Event.Pointer))
             {
@@ -116,7 +118,6 @@ namespace RigelEditor.EGUI
                     var optCheckRC = options.FirstOrDefault((o) => { return o.type == GUIOption.GUIOptionType.checkRectContains; });
                     if (optCheckRC != null) optCheckRC.value = true;
                 }
-
 
                 if (!Event.Used && Event.EventType == RigelEGUIEventType.MouseClick)
                 {

@@ -47,16 +47,32 @@ namespace RigelEditor.EGUI
 
         public override void OnGUI()
         {
-            SampleText();
+            SampleLayouting();
+
             SampleGUIComponent();
             SampleGUIOption();
+            SampleText();
             SampleScrollView();
             SampleInput();
-
             SampleDialog();
 
         }
 
+        private void SampleLayouting()
+        {
+            var rect = new Vector4(0, 0, 20, 20);
+            GUILayout.DrawRect(rect, RigelColor.Green);
+            GUI.DrawRect(rect, RigelColor.Red);
+
+            GUI.BeginGroup(new Vector4(100, 100, 100, 100), RigelColor.RGBA(23, 74, 176, 255));
+
+            GUI.EndGroup();
+            GUILayout.BeginArea(new Vector4(GUILayout.CurrentLayout.Offset,100, 100), RigelColor.Green);
+
+            GUILayout.EndArea();
+
+            GUILayout.Space(200);
+        }
 
         private string m_inputString = "sampleString";
         private string m_inputString2 = "sampleString2";
@@ -114,12 +130,11 @@ namespace RigelEditor.EGUI
 
             if (GUILayout.BeginCollapseGroup("[TextRendering]",ref m_sampleText))
             {
-                GUILayout.Text(longtext);
-                GUILayout.Text(@"Single line text.");
-                GUILayout.Text("Space[ ]");
-                GUILayout.Text("Tab[\t]");
-
-                GUILayout.BeginContainer(new Vector4(GUILayout.s_ctx.currentLayout.Offset, 100, 100));
+                //GUILayout.Text(longtext);
+                //GUILayout.Text(@"Single line text.");
+                //GUILayout.Text("Space[ ]");
+                //GUILayout.Text("Tab[\t]");
+                GUILayout.BeginContainer(new Vector4(GUILayout.s_ctx.currentLayout.Offset, 100, 100),RigelColor.Green);
 
                 GUI.TextBlock(new Vector4(0, 0, 100, 100), longtext, RigelColor.Red);
                 GUILayout.EndContainer();

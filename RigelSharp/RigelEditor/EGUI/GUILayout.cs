@@ -102,6 +102,17 @@ namespace RigelEditor.EGUI
             s_ctx.currentLayout = curlayout;
         }
 
+        /// <summary>
+        /// begin area at current layoutpos
+        /// </summary>
+        /// <param name="size"></param>
+        /// <param name="color"></param>
+        /// <param name="options"></param>
+        public static void BeginArea(Vector2 size, Vector4? color = null, params GUIOption[] options)
+        {
+            BeginArea(new Vector4(GUILayout.CurrentLayout.Offset, size.X, size.Y), color, options);
+        }
+
         public static void EndArea()
         {
             s_ctx.currentArea = s_ctx.areaStack.Pop();
