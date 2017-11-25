@@ -8,6 +8,9 @@ namespace RigelCore.Engine
 {
     public class Scene
     {
+        private static Scene s_currentScene = new Scene();
+        public static Scene Current { get { return s_currentScene; } }
 
+        
     }
 }

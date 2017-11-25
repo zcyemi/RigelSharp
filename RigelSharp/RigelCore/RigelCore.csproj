@@ -81,6 +81,8 @@
     <Compile Include="Engine\IGameEntry.cs" />
     <Compile Include="Engine\Material.cs" />
     <Compile Include="Engine\Mesh.cs" />
+    <Compile Include="Engine\MeshGraphicsBufferInfo.cs" />
+    <Compile Include="Engine\Render.cs" />
     <Compile Include="Engine\Scene.cs" />
     <Compile Include="Engine\Shader.cs" />
     <Compile Include="Engine\Transform.cs" />
@@ -91,6 +93,8 @@
     <Compile Include="ImageData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rendering\CommandBuffer.cs" />
+    <Compile Include="Rendering\Graphics.cs" />
+    <Compile Include="Rendering\GraphicsBuffer.cs" />
     <Compile Include="Rendering\GraphicsContext.cs" />
     <Compile Include="Rendering\GraphicsManager.cs" />
     <Compile Include="Rendering\RenderTextureIdentifier.cs" />
