@@ -39,6 +39,7 @@ namespace RigelEditor.EGUI
 
         private bool m_sampleInput = false;
         private bool m_sampleDialog = false;
+        private bool m_sampleLayout = false;
 
         public GUITestContent()
         {
@@ -60,18 +61,25 @@ namespace RigelEditor.EGUI
 
         private void SampleLayouting()
         {
-            var rect = new Vector4(0, 0, 20, 20);
-            GUILayout.DrawRect(rect, RigelColor.Green);
-            GUI.DrawRect(rect, RigelColor.Red);
+            
+            if(GUILayout.BeginCollapseGroup("Layout",ref m_sampleLayout))
+            {
+                var rect = new Vector4(100, GUILayout.CurrentLayout.Offset.Y, 20, 20);
+                GUILayout.DrawRect(rect, RigelColor.White);
+                rect.X += 20;
+                rect.Y += 20;
+                GUI.DrawRect(rect, RigelColor.Red);
 
-            GUI.BeginGroup(new Vector4(100, 100, 100, 100), RigelColor.RGBA(23, 74, 176, 255));
+                GUI.BeginGroup(new Vector4(100, 100, 100, 100), RigelColor.RGBA(23, 74, 176, 255));
 
-            GUI.EndGroup();
-            GUILayout.BeginArea(new Vector4(GUILayout.CurrentLayout.Offset,100, 100), RigelColor.Green);
+                GUI.EndGroup();
+                GUILayout.BeginAreaRelative(new Vector4(GUILayout.CurrentLayout.Offset, 100, 100), RigelColor.Green);
 
-            GUILayout.EndArea();
+                GUILayout.EndArea();
 
-            GUILayout.Space(200);
+                GUILayout.Space(200);
+            }
+            GUILayout.EndCollapseGroup();
         }
 
         private string m_inputString = "sampleString";

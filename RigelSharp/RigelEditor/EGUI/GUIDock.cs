@@ -537,12 +537,12 @@ namespace RigelEditor.EGUI
 
                     GUI.BeginGroup(m_info.m_contentRect);
                     {
-                        GUILayout.BeginArea(GUI.Context.currentGroup.Absolute, GUIStyle.Current.DockContentColor);
+                        GUILayout.BeginContainer(GUI.Context.currentGroup.Absolute, GUIStyle.Current.DockContentColor);
                         {
                             //test draw
                             if (m_contentFocus != null) m_contentFocus.OnGUI();
                         }
-                        GUILayout.EndArea();
+                        GUILayout.EndContainer();
                     }
                     GUI.EndGroup();
                 }
