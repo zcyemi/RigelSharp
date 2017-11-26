@@ -93,7 +93,7 @@ namespace RigelEditor.EGUI
 
             var rect = new Vector4(m_pos, m_size.X, m_size.Y);
 
-            GUILayout.BeginContainer(rect, GUIStyle.Current.BackgroundColor, true, GUIOption.Border());
+            GUILayout.BeginContainer(rect, GUIStyle.Current.BackgroundColor, GUIOption.Border());
             {
                 bool headerover = GUIUtility.RectContainsCheck(GUILayout.GetRectAbsolute(m_hedaerRect), GUI.Event.Pointer);
                 GUILayout.DrawRect(m_hedaerRect, headerover ? GUIStyle.Current.ColorActive : GUIStyle.Current.ColorActiveD);
@@ -109,7 +109,7 @@ namespace RigelEditor.EGUI
                 }
                 GUILayout.EndHorizontal();
 
-                var contentrect = GUILayout.Context.currentArea;
+                var contentrect = GUILayout.Context.currentArea.Rect;
                 contentrect.Y += m_hedaerRect.W;
                 contentrect.Z -= 1;
                 contentrect.W -= (m_hedaerRect.W + 1);
@@ -132,7 +132,7 @@ namespace RigelEditor.EGUI
                 }
                 if (m_dialogRezieable && !onmove)
                 {
-                    var rectResize = GUILayout.Context.currentArea;
+                    var rectResize = GUILayout.Context.currentArea.Rect;
                     rectResize.Y += (rectResize.W - 3);
                     rectResize.X += rectResize.Z - 3;
                     rectResize.Z = 6;

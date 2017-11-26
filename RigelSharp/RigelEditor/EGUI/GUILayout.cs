@@ -45,7 +45,7 @@ namespace RigelEditor.EGUI
         {
             get
             {
-                return s_ctx.currentArea.Size() - s_ctx.currentLayout.Offset;
+                return s_ctx.currentArea.Rect.Size() - s_ctx.currentLayout.Offset;
             }
         }
 
@@ -53,11 +53,23 @@ namespace RigelEditor.EGUI
         /// Begin Group and Area
         /// </summary>
         /// <param name="rect">rect</param>
-        public static void BeginContainer(Vector4 rect, Vector4? color = null,bool absolute = false, params GUIOption[] options)
+        public static void BeginContainer(Vector4 rect, Vector4? color = null, params GUIOption[] options)
         {
-            var rectab = absolute? GetRectAbsolute(rect) :rect;
-            GUILayout.BeginArea(rectab, color, options);
-            GUI.BeginGroup(rectab, null, true);
+            GUILayout.BeginArea(rect, color, options);
+            GUI.BeginGroup(rect, null, true);
+        }
+
+        /// <summary>
+        /// relative rect
+        /// </summary>
+        /// <param name="rect"></param>
+        /// <param name="color"></param>
+        /// <param name="options"></param>
+        public static void BeginContainerRelative(Vector4 rect,Vector4? color = null,params GUIOption[] options)
+        {
+            var rectab = GetRectAbsolute(rect);
+            GUILayout.BeginAreaRelative(rect,color,options);
+            GUI.BeginGroup(rectab,null, true);
         }
 
         public static void EndContainer()
@@ -90,7 +102,8 @@ namespace RigelEditor.EGUI
             }
 
             s_ctx.areaStack.Push(s_ctx.currentArea);
-            s_ctx.currentArea = rect;
+            s_ctx.currentArea.Rect = rect;
+            s_ctx.currentArea.ContentMax = rect.Size();
 
             var curlayout = s_ctx.currentLayout;
             layoutStack.Push(curlayout);
@@ -177,7 +190,7 @@ namespace RigelEditor.EGUI
         {
             s_ctx.currentLayout.Offset.X += s_svLineIndent.Value;
         }
-        public static void Indent(int width)
+        public static void Indent(float width)
         {
             s_ctx.currentLayout.Offset.X += width;
         }
@@ -191,6 +204,7 @@ namespace RigelEditor.EGUI
             var layout = s_ctx.currentLayout;
             layout.LastOffset = layout.Offset;
 
+
             if (layout.Verticle)
             {
                 layout.Offset.Y += h + layoutOffY;
@@ -201,6 +215,17 @@ namespace RigelEditor.EGUI
                 layout.Offset.X += w + layoutOffX;
                 layout.SizeMax.Y = Math.Max(layout.SizeMax.Y, h);
             }
+
+            if (layout.Offset.Y > s_ctx.currentArea.ContentMax.Y)
+            {
+                s_ctx.currentArea.ContentMax.Y = layout.Offset.Y;
+            }
+
+            if (layout.Offset.X > s_ctx.currentArea.ContentMax.X)
+            {
+                s_ctx.currentArea.ContentMax.X = layout.Offset.X;
+            }
+
             layout.LastDrawWidth = w;
             layout.LastDrawHeight = h;
             layout.LastRect = new Vector4(layout.LastOffset, w, h);
@@ -250,12 +275,12 @@ namespace RigelEditor.EGUI
                     }
                     else if (opt.type == GUIOption.GUIOptionType.expended)
                     {
-                        width = (int)(s_ctx.currentArea.Z - s_ctx.currentLayout.Offset.X);
+                        width = (int)(s_ctx.currentArea.Rect.Z - s_ctx.currentLayout.Offset.X);
                         adaptive = false;
                     }
                     else if (opt.type == GUIOption.GUIOptionType.grid)
                     {
-                        width = (int)(s_ctx.currentArea.Z * opt.FloatValue);
+                        width = (int)(s_ctx.currentArea.Rect.Z * opt.FloatValue);
                         adaptive = false;
                     }
                 }
@@ -263,7 +288,7 @@ namespace RigelEditor.EGUI
 
             var curarea = s_ctx.currentArea;
             var rect = new Vector4(s_ctx.currentLayout.Offset, width, s_svLineHeight.Value);
-            bool valid = GUIUtility.RectClip(ref rect, curarea);
+            bool valid = GUIUtility.RectClip(ref rect, curarea.Rect);
 
             bool clicked = false;
             if (valid)
@@ -291,8 +316,8 @@ namespace RigelEditor.EGUI
             bool adaptive = optwidth == null;
 
             var curarea = s_ctx.currentArea;
-            var rect = new Vector4(s_ctx.currentLayout.Offset, adaptive ? curarea.Z : (int)optwidth.value, s_svLineHeight.Value);
-            bool valid = GUIUtility.RectClip(ref rect, curarea);
+            var rect = new Vector4(s_ctx.currentLayout.Offset, adaptive ? curarea.Rect.Z : (int)optwidth.value, s_svLineHeight.Value);
+            bool valid = GUIUtility.RectClip(ref rect, curarea.Rect);
             int width = 0;
             if (valid)
             {
@@ -328,7 +353,7 @@ namespace RigelEditor.EGUI
             if (optheight != null) remain.Y = optheight.IntValue;
 
             var drawRect = new Vector4(s_ctx.currentLayout.Offset, remain.X, remain.Y);
-            bool valid = GUIUtility.RectClip(ref drawRect, s_ctx.currentArea);
+            bool valid = GUIUtility.RectClip(ref drawRect, s_ctx.currentArea.Rect);
 
             int drawheight = 0;
             if (valid)
@@ -347,11 +372,11 @@ namespace RigelEditor.EGUI
             var startpos = s_ctx.currentLayout.Offset;
             if (s_ctx.currentLayout.Verticle)
             {
-                endpos.X = s_ctx.currentArea.Z;
+                endpos.X = s_ctx.currentArea.Rect.Z;
             }
             else
             {
-                endpos.Y = s_ctx.currentArea.W;
+                endpos.Y = s_ctx.currentArea.Rect.W;
             }
             GUI.DrawLineAxisAligned(startpos, endpos, thickness, color);
 
@@ -361,7 +386,7 @@ namespace RigelEditor.EGUI
         public static void BeginToolBar(int height)
         {
             SetLineHeight(height);
-            var rect = new Vector4(s_ctx.currentLayout.Offset, s_ctx.currentArea.Z, height);
+            var rect = new Vector4(s_ctx.currentLayout.Offset, s_ctx.currentArea.Rect.Z, height);
             DrawRect(rect, GUIStyle.Current.MainMenuBGColor);
             BeginHorizontal();
 
@@ -419,16 +444,17 @@ namespace RigelEditor.EGUI
             var rect = new Vector4(s_ctx.currentLayout.Offset, sizeremain.X, sizeremain.Y);
             var rectab = GetRectAbsolute(rect);
             var scrollView = GUI.GetScrollView(rectab);
-            BeginArea(rectab, null, GUIOption.Border());
+            BeginContainer(rectab,null,GUIOption.Border(GUIStyle.Current.BackgroundColorS));
+
             return scrollView.Draw(rectab, pos, scrolltype);
         }
         public static void EndScrollView()
         {
-            var rect = s_ctx.currentArea;
+            var rect = s_ctx.currentArea.Rect;
             var sv = GUI.GetScrollView(rect);
             sv.LateDraw();
 
-            EndArea();
+            EndContainer();
 
             GUILayout.AutoCaculateOffset(rect.Z, rect.W);
         }
@@ -455,7 +481,7 @@ namespace RigelEditor.EGUI
 
         public static void DrawRect(Vector4 rect, Vector4 color,params GUIOption[] options)
         {
-            GUIUtility.RectClip(ref rect, s_ctx.currentArea);
+            GUIUtility.RectClip(ref rect, s_ctx.currentArea.Rect);
             GUI.DrawRect(rect, color, true);
         }
 
@@ -463,7 +489,7 @@ namespace RigelEditor.EGUI
         {
             var offset = s_ctx.currentLayout.Offset;
             Vector4 rect = new Vector4(offset, size.X,size.Y);
-            GUIUtility.RectClip(ref rect, s_ctx.currentArea);
+            GUIUtility.RectClip(ref rect, s_ctx.currentArea.Rect);
             if (options != null)
             {
                 var optcheckcontains = options.FirstOrDefault((x) => { return x.type == GUIOption.GUIOptionType.checkRectContains; });
@@ -509,7 +535,7 @@ namespace RigelEditor.EGUI
         #region Utility
         public static Vector4 GetRectAbsolute(Vector4 rect)
         {
-            var off = s_ctx.currentArea.Pos();
+            var off = s_ctx.currentArea.Rect.Pos();
             rect.X += off.X;
             rect.Y += off.Y;
             return rect;

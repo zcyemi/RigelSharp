@@ -170,7 +170,7 @@ namespace RigelEditor.EGUI
 
             GUILayout.RestoreLineHeight();
 
-            GUI.DrawBorder(GUI.Context.currentArea, 1, GUIStyle.Current.ColorActiveD, true);
+            GUI.DrawBorder(GUI.Context.currentArea.Rect, 1, GUIStyle.Current.ColorActiveD, true);
             GUILayout.EndArea();
 
             if (itemuse)
