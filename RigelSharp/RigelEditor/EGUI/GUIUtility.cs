@@ -37,6 +37,33 @@ namespace RigelEditor.EGUI
             return true;
         }
 
+        internal static bool RectClip(ref Vector4 rect, Vector4 group,out Vector4 clipoffset)
+        {
+            clipoffset = Vector4.Zero;
+            var rectori = rect;
+
+            Vector2 rb = rect.Pos() + rect.Size();
+            if (rb.X < 0 || rb.Y < 0) return false;
+            if (rect.X > group.Z || rect.Y > group.W) return false;
+
+            rect.X = MathUtil.Clamp(rect.X, 0, group.Z);
+            rect.Y = MathUtil.Clamp(rect.Y, 0, group.W);
+            rb.X = MathUtil.Clamp(rb.X, rect.X, group.Z);
+            rb.Y = MathUtil.Clamp(rb.Y, rect.Y, group.W);
+
+            rect.Z = rb.X - rect.X;
+            rect.W = rb.Y - rect.Y;
+
+            clipoffset = rectori - rect;
+
+            rect.X += group.X;
+            rect.Y += group.Y;
+
+            if (rect.Z < 1.0f || rect.W < 1.0f) return false;
+
+            return true;
+        }
+
         internal static bool RectContainsCheck(Vector2 pos, Vector2 size, Vector2 point)
         {
             if (point.X < pos.X || point.X > pos.X + size.X) return false;

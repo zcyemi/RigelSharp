@@ -290,7 +290,9 @@ namespace RigelEditor.EGUI
             var rect = new Vector4(s_ctx.currentLayout.Offset, width, s_svLineHeight.Value);
 
             var rectpre = rect;
-            bool valid = GUIUtility.RectClip(ref rect, curarea);
+
+            Vector4 clip;
+            bool valid = GUIUtility.RectClip(ref rect, curarea,out clip);
 
             bool clicked = false;
             if (valid)
@@ -298,12 +300,12 @@ namespace RigelEditor.EGUI
                 if (adaptive)
                 {
                     var adaptiveValue = GUIOption.AdaptiveValue(curarea.X + curarea.Z - rect.X);
-                    clicked = GUI.Button(rect, label, color, GUI.Context.Color, true, options.Append(adaptiveValue));
+                    clicked = GUI.Button(rect, label, color, GUI.Context.Color, true, options.Append(adaptiveValue,GUIOption.TextClip(clip)));
                     width = adaptiveValue.IntValue;
                 }
                 else
                 {
-                    clicked = GUI.Button(rect, label, color, GUI.Context.Color, true, options);
+                    clicked = GUI.Button(rect, label, color, GUI.Context.Color, true, options.Append(GUIOption.TextClip(clip)));
                 }
             }
             AutoCaculateOffsetW(width);
@@ -313,7 +315,17 @@ namespace RigelEditor.EGUI
 
         public static void Text(string content,Vector4? color = null,params GUIOption[] options)
         {
-            var optwidth = options != null ? options.FirstOrDefault((x) => { return x.type == GUIOption.GUIOptionType.width; }) : null;
+            GUIOption optwidth = null;
+            if(options != null)
+            {
+                foreach(var opt in options)
+                {
+                    if(opt.type == GUIOption.GUIOptionType.width)
+                    {
+                        optwidth = opt;
+                    }
+                }
+            }
             bool adaptive = optwidth == null;
 
             var curarea = s_ctx.currentArea;

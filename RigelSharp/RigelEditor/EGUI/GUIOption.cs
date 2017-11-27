@@ -33,6 +33,8 @@ namespace RigelEditor.EGUI
             alignHorizonal = 20,
             alignVertical = 21,
 
+            textClip = 24,
+
             checkRectContains = 100,
             checkTextOverflow = 101,
         }
@@ -73,6 +75,16 @@ namespace RigelEditor.EGUI
         public static readonly GUIOption AlignVCenter = new GUIOption(GUIOptionType.alignVertical, null);
         public static readonly GUIOption AlignVBottom = new GUIOption(GUIOptionType.alignVertical, null);
 
+        /// <summary>
+        // restore clipping info for text rect
+        /// </summary>
+        /// <param name="clipoffset"></param>
+        /// <returns></returns>
+        public static GUIOption TextClip(Vector4 clipoffset)
+        {
+            return new GUIOption(GUIOptionType.textClip, clipoffset);
+        }
+
         public static GUIOption Grid(float percentage = 1.0f)
         {
             return new GUIOption(GUIOptionType.grid, percentage);
@@ -107,6 +119,13 @@ namespace RigelEditor.EGUI
         {
             List<GUIOption> list = new List<GUIOption>(opt);
             list.Add(newopt);
+            return list.ToArray();
+        }
+
+        public static GUIOption[] Append(this GUIOption[] opt,params GUIOption[] newoptions)
+        {
+            List<GUIOption> list = new List<GUIOption>(opt);
+            list.AddRange(newoptions);
             return list.ToArray();
         }
     }

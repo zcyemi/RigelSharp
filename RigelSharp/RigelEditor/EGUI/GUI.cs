@@ -110,6 +110,14 @@ namespace RigelEditor.EGUI
                 absolute = true;
             }
 
+            
+
+            float depthz = GUI.Depth;
+            GUI.DepthIncrease();
+
+            int textw = DrawText(rect, label, texcolor, absolute, options);
+            depthz = GUI.SetDepth(depthz);
+
             bool clicked = false;
             if (GUIUtility.RectContainsCheck(rect, Event.Pointer))
             {
@@ -143,7 +151,9 @@ namespace RigelEditor.EGUI
             {
                 DrawRect(rect, color, absolute);
             }
-            DrawText(rect, label, texcolor, absolute, options);
+
+
+            GUI.SetDepth(depthz);
 
             return clicked;
         }
@@ -196,8 +206,10 @@ namespace RigelEditor.EGUI
         public static int DrawText(Vector4 rect, string content, Vector4 color, bool absolute = false, params GUIOption[] options)
         {
             bool adaptive = false;
-            int alignH = 0;
-            int alignV = 0;
+            int alignH = 0;     //-1 Left   0 None  1 Right
+            int alignV = 0;     //-1 Top    0 None  1 Bottom
+
+            GUIOption optTextClip = null;
             if (options != null)
             {
                 foreach (var o in options)
@@ -207,6 +219,7 @@ namespace RigelEditor.EGUI
                     if (o == GUIOption.AlignHRight) { alignH = 1; continue; }
                     if (o == GUIOption.AlignVTop) { alignV = -1; continue; }
                     if (o == GUIOption.AlignVBottom) { alignV = 1; continue; }
+                    if(o.type == GUIOption.GUIOptionType.textClip) { optTextClip = o; continue; }
                 }
             }
 
@@ -235,6 +248,7 @@ namespace RigelEditor.EGUI
             {
                 rect.X += 3;    //default offset;
                 w += 3;
+                rect.Z -= 3;
             }
             else
             {
@@ -252,6 +266,7 @@ namespace RigelEditor.EGUI
                     w = (int)rect.Z - textwidth - 3;
                 }
                 rect.X += w;
+                rect.Z -= w;
             }
 
             if (adaptive)
@@ -261,17 +276,48 @@ namespace RigelEditor.EGUI
                     int xoff = DrawChar(rect, c, color);
                     w += xoff;
                     rect.X += xoff;
+                    rect.Z -= xoff;
+                    if (rect.Z < 3) break;
                 }
                 w += 3;
             }
             else
             {
+                int clipoff = 0;
+                if(optTextClip != null)
+                {
+                    clipoff = (int)optTextClip.Vector4Value.X;
+                }
                 foreach (var c in content)
                 {
+                    if(clipoff < 0)
+                    {
+                        if (c < 33)
+                        {
+                            clipoff += 6;
+                            if(clipoff > 0)
+                            {
+                                w += 6;
+                            }
+                            continue;
+                        }
+                        int cw = Context.Font.GetGlyphInfo(c).AdvancedX;
+                        clipoff += cw;
+                        if(clipoff < 0)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            w += clipoff;
+                        }
+                    }
+
                     int xoff = DrawChar(rect, c, color);
                     w += xoff;
                     rect.X += xoff;
-                    if (w > rect.Z - 3) break;
+                    rect.Z -= xoff;
+                    if (rect.Z < 3) break;
                 }
             }
             return w;
@@ -287,8 +333,8 @@ namespace RigelEditor.EGUI
 
             float x1 = rect.X + glyph.LineOffsetX;
             float y1 = rect.Y + glyph.LineOffsetY;
-            float x2 = x1 + glyph.PixelWidth;
-            float y2 = y1 + glyph.PixelHeight;
+            float x2 = Math.Min(rect.X+ rect.Z,x1 + glyph.PixelWidth);
+            float y2 = Math.Min(rect.Y+ rect.W,y1 + glyph.PixelHeight);
 
             BufferText.Add(new RigelEGUIVertex()
             {
@@ -523,10 +569,13 @@ namespace RigelEditor.EGUI
             return z;
         }
 
-        internal static void SetDepth(float depth)
+        internal static float SetDepth(float depth)
         {
+            float retd = s_depthz;
             s_depthz = depth;
+            return retd;
         }
+
 
         public static Vector4 GetRectAbsolute(Vector4 rect)
         {
