@@ -286,16 +286,18 @@ namespace RigelEditor.EGUI
                 }
             }
 
-            var curarea = s_ctx.currentArea;
+            var curarea = s_ctx.currentArea.Rect;
             var rect = new Vector4(s_ctx.currentLayout.Offset, width, s_svLineHeight.Value);
-            bool valid = GUIUtility.RectClip(ref rect, curarea.Rect);
+
+            var rectpre = rect;
+            bool valid = GUIUtility.RectClip(ref rect, curarea);
 
             bool clicked = false;
             if (valid)
             {
                 if (adaptive)
                 {
-                    var adaptiveValue = GUIOption.AdaptiveValue();
+                    var adaptiveValue = GUIOption.AdaptiveValue(curarea.X + curarea.Z - rect.X);
                     clicked = GUI.Button(rect, label, color, GUI.Context.Color, true, options.Append(adaptiveValue));
                     width = adaptiveValue.IntValue;
                 }
@@ -311,7 +313,6 @@ namespace RigelEditor.EGUI
 
         public static void Text(string content,Vector4? color = null,params GUIOption[] options)
         {
-
             var optwidth = options != null ? options.FirstOrDefault((x) => { return x.type == GUIOption.GUIOptionType.width; }) : null;
             bool adaptive = optwidth == null;
 

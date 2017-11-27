@@ -94,7 +94,7 @@ namespace RigelEditor.EGUI
                 if (optAdaptiveValue != null)
                 {
                     int textWidth = Context.Font.GetTextWidth(label);
-                    rect.Z = textWidth + 6;
+                    rect.Z = Math.Min(textWidth + 6,optAdaptiveValue.IntValue);
                     optAdaptiveValue.value = (int)rect.Z;
                 }
             }

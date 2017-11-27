@@ -213,10 +213,12 @@ namespace RigelEditor.EGUI
                     {
                         GUILayout.Button("Scroll Horizontal");
 
+                        GUILayout.Space(20);
                         GUILayout.BeginHorizontal();
                         for (int i = 0; i < 5; i++)
                         {
                             GUILayout.Button("Btn " + i);
+                            GUILayout.Text("TEXT:" + i);
                             GUILayout.Indent(100);
                         }
                         GUILayout.EndHorizontal();

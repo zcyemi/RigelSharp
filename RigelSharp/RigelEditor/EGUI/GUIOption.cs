@@ -55,9 +55,9 @@ namespace RigelEditor.EGUI
             value = v;
         }
 
-        public static GUIOption AdaptiveValue()
+        public static GUIOption AdaptiveValue(float maxvalue)
         {
-            return new GUIOption(GUIOptionType.adaptiveValue, null);
+            return new GUIOption(GUIOptionType.adaptiveValue,(int)maxvalue);
         }
 
         public static readonly GUIOption Expended = new GUIOption(GUIOptionType.expended, null);
