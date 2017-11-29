@@ -17,15 +17,16 @@ namespace RigelCore.Engine
     {
         private static RenderForm s_form;
         private static bool s_inited = false;
-        private static GraphicsContext s_graphicsCtx;
+        private static GraphicsManager s_graphicsManager;
         private static bool s_windowed = true;
 
         private static IGameEntry s_gamescript = null;
 
+        public static GraphicsManager GraphicsMgr { get { return s_graphicsManager; } }
+
 
         public static void Run()
         {
-            
 
             if (s_inited) return;
             s_inited = true;
@@ -34,14 +35,11 @@ namespace RigelCore.Engine
             if (s_gamescript == null) return;
 
             s_form = new RenderForm("RigelGame");
-            s_form.KeyUp += ProcessFullScreenSwitch;
             s_form.IsFullscreen = true;
             s_form.Show();
 
-            s_graphicsCtx = new GraphicsContext();
-            s_graphicsCtx.CreateWithSwapChain(s_form.Handle, s_form.Size.Width, s_form.Size.Height, s_windowed, true);
-
-
+            s_graphicsManager = new GraphicsManager();
+            s_graphicsManager.Init(s_form);
             //init
             s_gamescript.OnStart();
 
@@ -51,17 +49,7 @@ namespace RigelCore.Engine
         private static void OnFrame()
         {
             s_gamescript.OnUpdate();
-            s_graphicsCtx.Render();
-        }
-
-        private static void ProcessFullScreenSwitch(object sender, System.Windows.Forms.KeyEventArgs e)
-        {
-            if(e.KeyCode == System.Windows.Forms.Keys.Return && e.Alt)
-            {
-                Console.WriteLine("switch fullscreen");
-                s_windowed = !s_windowed;
-                s_graphicsCtx.SwitchFullscreen(s_windowed);
-            }
+            s_graphicsManager.OnFrame();
         }
 
         public static void Exit()

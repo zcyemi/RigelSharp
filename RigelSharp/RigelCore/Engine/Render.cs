@@ -4,14 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using SharpDX;
-
 namespace RigelCore.Engine
 {
-    
-
-    public class Transform
+    public class Render :BaseComponent
     {
-        public Vector4 Position;
+
     }
 }

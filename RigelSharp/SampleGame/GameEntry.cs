@@ -15,6 +15,15 @@ namespace SampleGame
         public void OnStart()
         {
             Console.WriteLine("Game Start");
+
+            TestDraw();
+        }
+
+        private void TestDraw()
+        {
+            GameObject g = new GameObject();
+            var camera =  g.AddComponent<Camera>();
+            
         }
 
         public void OnUpdate()

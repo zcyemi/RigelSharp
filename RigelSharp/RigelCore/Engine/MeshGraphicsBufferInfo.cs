@@ -4,14 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using SharpDX;
-
 namespace RigelCore.Engine
 {
-    
-
-    public class Transform
+    public struct MeshGraphicsBufferInfo
     {
-        public Vector4 Position;
+        public bool valid;
     }
 }

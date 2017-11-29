@@ -13,6 +13,9 @@ using SharpDX.Win32;
 using Buffer = SharpDX.Direct3D11.Buffer;
 using Device = SharpDX.Direct3D11.Device;
 
+using RigelCore;
+using RigelCore.Engine;
+
 namespace RigelCore.Rendering
 {
     public class GraphicsContext : IDisposable
@@ -97,13 +100,18 @@ namespace RigelCore.Rendering
             m_swapchain.SetFullscreenState(fullscreen, output);
         }
 
-        public void Render()
+        public void Render(Action immediateDrall = null)
         {
             //process resize
             if (m_needResize)
             {
                 DoResizeBuffer();
                 m_needResize = false;
+            }
+
+            if(immediateDrall != null)
+            {
+                immediateDrall.Invoke();
             }
 
             EventPreRender.Invoke();
@@ -133,6 +141,9 @@ namespace RigelCore.Rendering
             Utilities.Dispose(ref m_depthcStencilView);
 
             Utilities.Dispose(ref m_srvBackBuffer);
+
+
+            //Console.WriteLine($"RSZ w:{m_resizeWidth} h:{m_resizeHeight}");
 
             m_swapchain.ResizeBuffers(m_swapchainDesc.BufferCount, m_resizeWidth, m_resizeHeight, Format.Unknown, SwapChainFlags.None);
             m_backBuffer = Texture2D.FromSwapChain<Texture2D>(m_swapchain, 0);
@@ -187,6 +198,8 @@ namespace RigelCore.Rendering
             m_needResize = true;
         }
 
+
+        
 
 
 #region CommandBuffer

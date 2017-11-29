@@ -170,19 +170,19 @@ namespace RigelEditor.EGUI
 
             GUILayout.RestoreLineHeight();
 
-            GUI.DrawBorder(GUI.Context.currentArea, 1, GUIStyle.Current.ColorActiveD, true);
+            GUI.DrawBorder(GUI.Context.currentArea.Rect, 1, GUIStyle.Current.ColorActiveD, true);
             GUILayout.EndArea();
 
             if (itemuse)
             {
-                OnDistroy();
+                OnDestroy();
             }
             else
             {
                 if (!guievent.Used && guievent.EventType == RigelEGUIEventType.MouseClick)
                 {
-                    if (m_parent != null) m_parent.Distroy = false;
-                    OnDistroy();
+                    if (m_parent != null) m_parent.Destroy = false;
+                    OnDestroy();
                 }
             }
         }

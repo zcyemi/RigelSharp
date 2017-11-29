@@ -33,16 +33,16 @@ namespace RigelEditor.EGUI
         ///// </summary>
         //public Vector4 currentGroupAbsolute;
 
-        public Stack<Vector4> areaStack = new Stack<Vector4>();
+        public Stack<GUIAreaInfo> areaStack = new Stack<GUIAreaInfo>();
         public Stack<GUILayoutInfo> layoutStack = new Stack<GUILayoutInfo>();
         /// <summary>
         /// relative to baseRect
         /// </summary>
-        public Vector4 currentArea;
+        public GUIAreaInfo currentArea;
         public GUILayoutInfo currentLayout;
         public Vector4 GetNextDrawPos()
         {
-            var rect = currentArea;
+            var rect = currentArea.Rect;
             rect.X += currentLayout.Offset.X;
             rect.Y += currentLayout.Offset.Y;
 
@@ -86,8 +86,8 @@ namespace RigelEditor.EGUI
             currentLayout.SizeMax = Vector2.Zero;
             currentLayout.Verticle = true;
 
-            currentArea = baseRect;
-
+            currentArea.Rect = baseRect;
+            currentArea.ContentMax = baseRect.Size();
 
             //ObjPools
             poolSrollbar.OnFrame();
@@ -113,6 +113,12 @@ namespace RigelEditor.EGUI
     {
         public Vector4 Rect;
         public Vector4 Absolute;
+    }
+
+    public struct GUIAreaInfo
+    {
+        public Vector4 Rect;
+        public Vector2 ContentMax;
     }
 
 

@@ -9,11 +9,11 @@ using RigelCore;
 
 namespace RigelEditor.EGUI
 {
-    public enum GUIScrollType
+    public enum GUIScrollType: byte
     {
-        Vertical,
-        Horizontal,
-        All
+        Vertical = 1,
+        Horizontal =2,
+        All = 3
     }
 
     public class GUIObjScrollView : GUIObjBase
@@ -44,7 +44,8 @@ namespace RigelEditor.EGUI
                 ScrollInit = true;
             }
 
-            GUILayout.Space(ScrollPos.Y);
+            if ((ScrollType & GUIScrollType.Vertical) > 0) GUILayout.Space(ScrollPos.Y);
+            if ((ScrollType & GUIScrollType.Horizontal) > 0) GUILayout.Indent(ScrollPos.X);
 
             return ScrollPos;
         }
@@ -53,34 +54,35 @@ namespace RigelEditor.EGUI
         {
             var e = GUI.Event;
 
-            var curoffset = GUILayout.s_ctx.currentLayout.Offset;
+            var curoffset = GUILayout.s_ctx.currentArea.ContentMax;
+
+            //Console.WriteLine(curoffset);
 
             bool overflowH = (curoffset.X - ScrollPos.X) > RectAB.Z;
             bool overflowV = (curoffset.Y - ScrollPos.Y) > RectAB.W;
             if (!overflowH && !overflowV) return;
 
+            overflowV &= (ScrollType & GUIScrollType.Vertical) > 0;
+            overflowH &= (ScrollType & GUIScrollType.Horizontal) > 0;
+
 
             float contentV = (curoffset.Y - ScrollPos.Y);
             float scrollVmax = RectAB.W - contentV;
+
+            float ch = RectAB.W / contentV;
+            float chinv = 1.0f / ch;
+
+            bool containerContains = GUIUtility.RectContainsCheck(RectAB, e.Pointer);
+
+            bool scrollall = overflowV && overflowH;
 
             if (overflowV)
             {
                 var rectSBV = new Vector4(RectAB.Z - 10f, 0, 10, RectAB.W);
 
-                bool containsBar = false;
                 bool containsThumb = false;
                 float depthRestored = GUI.DepthIncrease();
 
-                if (!GUI.Event.Used)
-                {
-                    if (GUIUtility.RectContainsCheck(GUILayout.GetRectAbsolute(rectSBV), GUI.Event.Pointer))
-                    {
-                        containsBar = true;
-                    }
-                }
-
-
-                float ch = RectAB.W / contentV;
                 rectSBV.W *= ch;
                 rectSBV.Y = (-ScrollPos.Y) / contentV * RectAB.W;
 
@@ -97,28 +99,64 @@ namespace RigelEditor.EGUI
 
                 if (ScrollVertical.OnDrag(containsThumb))
                 {
-                    ScrollPos.Y -= GUI.Event.DragOffset.Y;
+                    ScrollPos.Y -= (int)(GUI.Event.DragOffset.Y * chinv);
                     ScrollPos.Y = MathUtil.Clamp(ScrollPos.Y, scrollVmax, 0);
                     thumbActive = true;
                 }
-                GUILayout.DrawRect(rectSBV, thumbActive ? GUIStyle.Current.ColorActive : RigelColor.White);
-            }
+                GUILayout.DrawRect(rectSBV, thumbActive ? GUIStyle.Current.ColorActive : GUIStyle.Current.BackgroundColor);
 
-
-
-            //update scrollpos
-            if (GUIUtility.RectContainsCheck(RectAB, e.Pointer))
-            {
-                if (e.EventType == RigelEGUIEventType.MouseWheel)
+                if (containerContains)
                 {
-                    if (overflowV)
+                    if (!e.Used && e.EventType == RigelEGUIEventType.MouseWheel)
                     {
-                        ScrollPos.Y += e.Delta > 0 ? 12 : -12;
+                        ScrollPos.Y += (int)(chinv * 12 * (e.Delta > 0 ? 1 : -1));
                         ScrollPos.Y = MathUtil.Clamp(ScrollPos.Y, scrollVmax, 0);
                         e.Use();
                     }
                 }
             }
+
+            if (overflowH)
+            {
+
+                float contentH = (curoffset.X - ScrollPos.X);
+                float scrollHmax = RectAB.Z - contentH;
+
+                float contentHPercent = RectAB.Z / contentH;
+                float contentHPercentInv = 1.0f / contentHPercent;
+
+                var rectSBH = new Vector4((-ScrollPos.X) * contentHPercent, (RectAB.W - 10f), RectAB.Z * contentHPercent, 10);
+                float depthRestored = GUI.DepthIncrease();
+
+                bool thumbActive = false;
+                if (!GUI.Event.Used)
+                {
+                    if (GUIUtility.RectContainsCheck(GUILayout.GetRectAbsolute(rectSBH), GUI.Event.Pointer))
+                    {
+                        thumbActive = true;
+                    }
+                }
+
+                if (ScrollHorizontal.OnDrag(thumbActive))
+                {
+                    ScrollPos.X -= (int)(GUI.Event.DragOffset.X * contentHPercentInv);
+                    ScrollPos.X = MathUtil.Clamp(ScrollPos.X, scrollHmax, 0);
+                    thumbActive = true;
+                }
+                GUILayout.DrawRect(rectSBH, thumbActive ? GUIStyle.Current.ColorActive : GUIStyle.Current.BackgroundColor);
+
+                if (containerContains)
+                {
+                    if (!overflowV && !e.Used && e.EventType == RigelEGUIEventType.MouseWheel)
+                    {
+                        ScrollPos.X += (int)(contentHPercentInv * 12 * (e.Delta > 0 ? 1 : -1));
+                        ScrollPos.X = MathUtil.Clamp(ScrollPos.X, scrollHmax, 0);
+                        e.Use();
+                    }
+                }
+            }
+
+
         }
     }
 }
