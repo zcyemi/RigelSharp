@@ -365,6 +365,146 @@ namespace RigelEditor.EGUI
 
             return glyph.AdvancedX;
         }
+
+        public static int DrawCharWithRect(Vector4 recta,Vector2 pos,uint c, Vector4 color)
+        {
+            return DrawCharWithRectA(recta, pos + recta.Pos(), c, color);
+        }
+
+        public static int DrawCharWithRectA(Vector4 recta,Vector2 posa, uint c, Vector4 color)
+        {
+            if (c < 33) return 6;
+
+            var glyph = Context.Font.GetGlyphInfo(c);
+
+            Vector4 charrect = new Vector4(posa, glyph.PixelWidth, glyph.PixelHeight);
+            charrect.X += glyph.LineOffsetX;
+            charrect.Y += glyph.LineOffsetY;
+
+            float x2 = charrect.X + charrect.Z;
+            float y2 = charrect.Y + charrect.W;
+
+            float rectx2 = recta.X + recta.Z;
+            float recty2 = recta.Y + recta.W;
+
+            if(x2 <= recta.X || charrect.X >= rectx2 || y2 <= recta.Y || charrect.Y >= recty2)
+            {
+                return glyph.AdvancedX;
+            }
+
+            bool clip = false;
+            Vector4 clipsize = Vector4.Zero;
+            if(charrect.X < recta.X)
+            {
+                clipsize.X = recta.X - charrect.X;
+                charrect.X = recta.X;
+                clip = true;
+            }
+            if(x2 > rectx2)
+            {
+                clipsize.Z = x2 - rectx2;
+                x2 = rectx2;
+                clip = true;
+            }
+
+            if(charrect.Y < recta.Y)
+            {
+                clipsize.Y = recta.Y - charrect.Y;
+                charrect.Y = recta.Y;
+                clip = true;
+            }
+
+            if(y2 > recty2)
+            {
+                clipsize.W = y2 - recty2;
+                y2 = recty2;
+                clip = true;
+            }
+
+            if (clip)
+            {
+                clipsize *= Context.Font.UVUnit;
+
+                Vector2 uv0 = glyph.UV[0];
+                Vector2 uv1 = glyph.UV[1];
+                Vector2 uv2 = glyph.UV[2];
+                Vector2 uv3 = glyph.UV[3];
+
+                uv0.X += clipsize.X;
+                uv1.X += clipsize.X;
+                uv2.X -= clipsize.Z;
+                uv3.X -= clipsize.Z;
+
+                uv0.Y += clipsize.Y;
+                uv3.Y += clipsize.Y;
+                uv1.Y -= clipsize.W;
+                uv2.Y -= clipsize.W;
+
+                //LT
+                BufferText.Add(new RigelEGUIVertex()
+                {
+                    Position = new Vector4(charrect.X, charrect.Y, s_depthz, 1),
+                    Color = color,
+                    UV = uv0
+                });
+                //LB
+                BufferText.Add(new RigelEGUIVertex()
+                {
+                    Position = new Vector4(charrect.X, y2, s_depthz, 1),
+                    Color = color,
+                    UV = uv1
+                });
+                //RB
+                BufferText.Add(new RigelEGUIVertex()
+                {
+                    Position = new Vector4(x2, y2, s_depthz, 1),
+                    Color = color,
+                    UV = uv2
+                });
+                //RT
+                BufferText.Add(new RigelEGUIVertex()
+                {
+                    Position = new Vector4(x2, charrect.Y, s_depthz, 1),
+                    Color = color,
+                    UV = uv3
+                });
+
+            }
+            else
+            {
+                //LT
+                BufferText.Add(new RigelEGUIVertex()
+                {
+                    Position = new Vector4(charrect.X, charrect.Y, s_depthz, 1),
+                    Color = color,
+                    UV = glyph.UV[0]
+                });
+                //LB
+                BufferText.Add(new RigelEGUIVertex()
+                {
+                    Position = new Vector4(charrect.X, y2, s_depthz, 1),
+                    Color = color,
+                    UV = glyph.UV[1]
+                });
+                //RB
+                BufferText.Add(new RigelEGUIVertex()
+                {
+                    Position = new Vector4(x2, y2, s_depthz, 1),
+                    Color = color,
+                    UV = glyph.UV[2]
+                });
+                //RT
+                BufferText.Add(new RigelEGUIVertex()
+                {
+                    Position = new Vector4(x2, charrect.Y, s_depthz, 1),
+                    Color = color,
+                    UV = glyph.UV[3]
+                });
+            }
+
+            return glyph.AdvancedX;
+        }
+
         public static void DrawRect(Vector4 rect, bool absolute = false, params GUIOption[] options)
         {
             DrawRect(rect, Context.BackgroundColor, absolute, options);

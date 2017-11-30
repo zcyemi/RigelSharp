@@ -24,7 +24,7 @@ namespace RigelEditor.EGUI
     }
 
 
-    public static class GUILayout
+    public static partial class GUILayout
     {
         //reference to GUI.s_ctx
         public static GUICtx s_ctx;

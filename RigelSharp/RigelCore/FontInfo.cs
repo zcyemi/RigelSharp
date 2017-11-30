@@ -109,6 +109,8 @@ namespace RigelCore
         private GlyphInfo[] m_glyphInfo = new GlyphInfo[128];
         private int[] m_charWidth = new int[128];
 
+        public float UVUnit { get { return m_glyphUV; } }
+
         private int m_ascender;
 
         public FontInfo(string fontpath, uint pixelsize = 13)

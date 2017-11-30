@@ -40,6 +40,7 @@ namespace RigelEditor.EGUI
         private bool m_sampleInput = false;
         private bool m_sampleDialog = false;
         private bool m_sampleLayout = false;
+        private bool m_sampleDrawChar = false;
 
         public GUITestContent()
         {
@@ -48,6 +49,8 @@ namespace RigelEditor.EGUI
 
         public override void OnGUI()
         {
+            SampleDrawChar();
+
             SampleLayouting();
 
             SampleGUIComponent();
@@ -57,6 +60,19 @@ namespace RigelEditor.EGUI
             SampleInput();
             SampleDialog();
 
+        }
+
+        private void SampleDrawChar()
+        {
+            var rect = new Vector4(20, 500, 20, 20);
+
+            GUI.DrawRect(rect,RigelColor.Black,true);
+            GUI.DrawCharWithRect(rect, new Vector2(-3,-3), 'R', RigelColor.White);
+
+            rect.X += 21;
+            rect.Z = 10;
+            GUI.DrawRect(rect, RigelColor.Black, true);
+            GUI.DrawCharWithRect(rect, new Vector2(0,10), 'W', RigelColor.White);
         }
 
         private void SampleLayouting()
