@@ -366,12 +366,91 @@ namespace RigelEditor.EGUI
             return glyph.AdvancedX;
         }
 
-        public static int DrawCharWithRect(Vector4 recta,Vector2 pos,uint c, Vector4 color)
+        /// <summary>
+        /// Draw text inside rect,rect is clipped by currentGroup
+        /// </summary>
+        /// <param name="rect"></param>
+        /// <param name="content"></param>
+        /// <param name="color"></param>
+        public static void DrawText(Vector4 rect,string content,Vector4 color)
         {
-            return DrawCharWithRectA(recta, pos + recta.Pos(), c, color);
+            Vector2 startpos = rect.Pos() + GUI.Context.currentGroup.Absolute.Pos();
+            bool valid =GUIUtility.RectClip(ref rect, GUI.Context.currentGroup.Absolute);
+            if(valid)
+                DrawTextA(rect, startpos - rect.Pos(), content, color);
         }
 
-        public static int DrawCharWithRectA(Vector4 recta,Vector2 posa, uint c, Vector4 color)
+        /// <summary>
+        /// Draw text inside [reacta] with offset value [pos].
+        /// </summary>
+        /// <param name="recta"></param>
+        /// <param name="pos"></param>
+        /// <param name="content"></param>
+        /// <param name="color"></param>
+        public static void DrawTextA(Vector4 recta,Vector2 pos,string content,Vector4 color)
+        {
+            DrawRect(recta, RigelCore.RigelColor.Red, true);
+
+            int count = 0;
+            Vector2 startpos = pos;
+
+            if (pos.Y >= recta.W) return;
+            if ((pos.Y + Context.Font.FontPixelSize) <= 0) return;
+
+            bool yclip = true;
+            if(pos.Y > recta.Y && (pos.Y + Context.Font.FontPixelSize) < recta.W)
+            {
+                yclip = false;
+            }
+
+            bool bnoclip = false;
+
+            foreach(var c in content)
+            {
+                if(c < 33)
+                {
+                    startpos.X += 6;
+                    continue;
+                }
+                var cw = Context.Font.GetCharWidth(c);
+                if (startpos.X + cw < 0)
+                {
+                    startpos.X += cw;
+                    continue;
+                }
+                if (!bnoclip)
+                {
+                    if (startpos.X >= 0) bnoclip = true;
+                    startpos.X += DrawCharWithRect(recta, startpos, c, color);
+                    count++;
+                }
+                else
+                {
+                    if (startpos.X >= recta.Z)
+                    {
+                        return;
+                    }
+                    if(!yclip && startpos.X + cw <= recta.Z)
+                    {
+                        startpos.X += DrawCharWithRect(recta, startpos, c, color,true);
+                        count++;
+                    }
+                    else
+                    {
+                        startpos.X += DrawCharWithRect(recta, startpos, c, color);
+                        count++;
+                    }
+                }
+            }
+        }
+
+
+        public static int DrawCharWithRect(Vector4 recta,Vector2 pos,uint c, Vector4 color,bool noclip = false)
+        {
+            return DrawCharWithRectA(recta, pos + recta.Pos(), c, color,noclip);
+        }
+
+        public static int DrawCharWithRectA(Vector4 recta,Vector2 posa, uint c, Vector4 color, bool noclip = false)
         {
             if (c < 33) return 6;
 
@@ -392,37 +471,32 @@ namespace RigelEditor.EGUI
                 return glyph.AdvancedX;
             }
 
-            bool clip = false;
-            Vector4 clipsize = Vector4.Zero;
-            if(charrect.X < recta.X)
-            {
-                clipsize.X = recta.X - charrect.X;
-                charrect.X = recta.X;
-                clip = true;
-            }
-            if(x2 > rectx2)
-            {
-                clipsize.Z = x2 - rectx2;
-                x2 = rectx2;
-                clip = true;
-            }
 
-            if(charrect.Y < recta.Y)
+            if (!noclip)
             {
-                clipsize.Y = recta.Y - charrect.Y;
-                charrect.Y = recta.Y;
-                clip = true;
-            }
+                Vector4 clipsize = Vector4.Zero;
+                if (charrect.X < recta.X)
+                {
+                    clipsize.X = recta.X - charrect.X;
+                    charrect.X = recta.X;
+                }
+                if (x2 > rectx2)
+                {
+                    clipsize.Z = x2 - rectx2;
+                    x2 = rectx2;
+                }
 
-            if(y2 > recty2)
-            {
-                clipsize.W = y2 - recty2;
-                y2 = recty2;
-                clip = true;
-            }
+                if (charrect.Y < recta.Y)
+                {
+                    clipsize.Y = recta.Y - charrect.Y;
+                    charrect.Y = recta.Y;
+                }
 
-            if (clip)
-            {
+                if (y2 > recty2)
+                {
+                    clipsize.W = y2 - recty2;
+                    y2 = recty2;
+                }
                 clipsize *= Context.Font.UVUnit;
 
                 Vector2 uv0 = glyph.UV[0];

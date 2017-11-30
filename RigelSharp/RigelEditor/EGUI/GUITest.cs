@@ -73,6 +73,16 @@ namespace RigelEditor.EGUI
             rect.Z = 10;
             GUI.DrawRect(rect, RigelColor.Black, true);
             GUI.DrawCharWithRect(rect, new Vector2(0,10), 'W', RigelColor.White);
+
+            rect.Y += 20;
+            rect.Z = 30;
+            rect.W = 20;
+            GUI.DrawTextA(rect,new Vector2(-5,0), "ABCDEFGHOLS", GUI.Context.Color);
+
+            GUI.BeginGroup(new Vector4(200, 250, 50, 50), RigelColor.Black, false);
+
+            GUI.DrawText(new Vector4(-25, -7, 50, 30), "QWERTYUIOP", RigelColor.White);
+            GUI.EndGroup();
         }
 
         private void SampleLayouting()
