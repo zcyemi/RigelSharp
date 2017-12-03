@@ -571,7 +571,39 @@ namespace RigelEditor.EGUI
 
             var tabview = GUI.GetTabView(rectab);
 
-            return tabview.Draw(rect,index, tabnames, draw);
+            int ret = tabview.Draw(rect,index, tabnames, draw);
+            AutoCaculateOffset(rect.Z, rect.W);
+            return ret;
+        }
+
+        public static int TabViewVertical(int index, List<string> tabnames, Action<int> draw,int tabWidth, params GUIOption[] options)
+        {
+            var sizeRemain = GUILayout.SizeRemain;
+            var rect = new Vector4(CurrentLayout.Offset, SizeRemain.X, SizeRemain.Y);
+            if (options != null)
+            {
+                foreach (var opt in options)
+                {
+                    if (opt.type == GUIOption.GUIOptionType.width)
+                    {
+                        rect.Z = opt.IntValue;
+                        continue;
+                    }
+                    if (opt.type == GUIOption.GUIOptionType.height)
+                    {
+                        rect.W = opt.IntValue;
+                    }
+                }
+            }
+            var rectab = GetRectAbsolute(rect);
+
+            var tabview = GUI.GetTabView(rectab,(tv)=> {
+                tv.SetVerticalMode(tabWidth);
+            });
+
+            int ret = tabview.Draw(rect, index, tabnames, draw);
+            AutoCaculateOffset(rect.Z, rect.W);
+            return ret;
         }
 
 

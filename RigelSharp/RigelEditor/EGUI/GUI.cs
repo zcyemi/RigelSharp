@@ -750,9 +750,9 @@ namespace RigelEditor.EGUI
             return Context.poolTextInput.Get(GUIUtilityInternal.GetHash(rect, GUIObjectType.TextInput));
         }
 
-        public static GUIObjectTabView GetTabView(Vector4 rect)
+        public static GUIObjectTabView GetTabView(Vector4 rect,Action<GUIObjectTabView> createFunction = null)
         {
-            return Context.poolTabView.Get(GUIUtilityInternal.GetHash(rect, GUIObjectType.TabView));
+            return Context.poolTabView.Get(GUIUtilityInternal.GetHash(rect, GUIObjectType.TabView),createFunction);
         }
 
         #endregion
