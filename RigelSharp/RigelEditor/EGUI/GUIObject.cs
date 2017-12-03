@@ -15,6 +15,7 @@ namespace RigelEditor.EGUI
         ScrollBar = 1,
         DragRegion = 2,
         TextInput = 3,
+        TabView = 4,
     }
 
     internal static class GUIUtilityInternal

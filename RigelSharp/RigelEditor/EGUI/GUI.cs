@@ -389,7 +389,8 @@ namespace RigelEditor.EGUI
         /// <param name="color"></param>
         public static void DrawTextA(Vector4 recta,Vector2 pos,string content,Vector4 color)
         {
-            DrawRect(recta, RigelCore.RigelColor.Red, true);
+            //debug draw
+            //DrawRect(recta, RigelCore.RigelColor.Red, true);
 
             int count = 0;
             Vector2 startpos = pos;
@@ -747,6 +748,11 @@ namespace RigelEditor.EGUI
         public static GUIObjTextInput GetTextInput(Vector4 rect)
         {
             return Context.poolTextInput.Get(GUIUtilityInternal.GetHash(rect, GUIObjectType.TextInput));
+        }
+
+        public static GUIObjectTabView GetTabView(Vector4 rect)
+        {
+            return Context.poolTabView.Get(GUIUtilityInternal.GetHash(rect, GUIObjectType.TabView));
         }
 
         #endregion

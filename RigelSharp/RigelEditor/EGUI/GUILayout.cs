@@ -79,17 +79,23 @@ namespace RigelEditor.EGUI
         }
 
 
+        public static void BeginAreaR(Vector4 rect,Vector4? color ,params GUIOption[] options)
+        {
+            rect = GetRectAbsolute(rect);
+            BeginArea(rect, color, options);
+        }
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="rect"> absolute rect</param>
         /// <param name="color"></param>
         /// <param name="options">GUIOptionType.Border</param>
-        public static void BeginArea(Vector4 rect, Vector4? color = null, params GUIOption[] options)
+        public static void BeginArea(Vector4 recta, Vector4? color = null, params GUIOption[] options)
         {
             if (color != null)
             {
-                GUI.DrawRect(rect, (Vector4)color, true);
+                GUI.DrawRect(recta, (Vector4)color, true);
             }
 
             if (options != null)
@@ -97,13 +103,13 @@ namespace RigelEditor.EGUI
                 var optborder = options.FirstOrDefault((x) => { return x.type == GUIOption.GUIOptionType.border; });
                 if (optborder != null)
                 {
-                    GUI.DrawBorder(rect, 1, optborder.Vector4Value, true);
+                    GUI.DrawBorder(recta, 1, optborder.Vector4Value, true);
                 }
             }
 
             s_ctx.areaStack.Push(s_ctx.currentArea);
-            s_ctx.currentArea.Rect = rect;
-            s_ctx.currentArea.ContentMax = rect.Size();
+            s_ctx.currentArea.Rect = recta;
+            s_ctx.currentArea.ContentMax = recta.Size();
 
             var curlayout = s_ctx.currentLayout;
             layoutStack.Push(curlayout);
@@ -541,6 +547,32 @@ namespace RigelEditor.EGUI
             return content;
         }
 
+
+        public static int TabView(int index,List<string> tabnames,Action<int> draw,params GUIOption[] options)
+        {
+            var sizeRemain = GUILayout.SizeRemain;
+            var rect = new Vector4(CurrentLayout.Offset, SizeRemain.X, SizeRemain.Y);
+            if(options != null)
+            {
+                foreach(var opt in options)
+                {
+                    if(opt.type == GUIOption.GUIOptionType.width)
+                    {
+                        rect.Z = opt.IntValue;
+                        continue;
+                    }
+                    if(opt.type == GUIOption.GUIOptionType.height)
+                    {
+                        rect.W = opt.IntValue;
+                    }
+                }
+            }
+            var rectab = GetRectAbsolute(rect);
+
+            var tabview = GUI.GetTabView(rectab);
+
+            return tabview.Draw(rect,index, tabnames, draw);
+        }
 
 
         #endregion

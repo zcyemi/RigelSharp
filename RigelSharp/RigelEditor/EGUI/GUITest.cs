@@ -22,11 +22,7 @@ namespace RigelEditor.EGUI
                 s_content = new GUITestContent();
 
                 var dockmgr = RigelEditorApp.Instance.EditorGUI.DockManager;
-                if (dockmgr.FindDockContent<GUITestContent>() == null)
-                {
-                    dockmgr.AddNewContent(s_content);
-                }
-
+                dockmgr.AddNewContent(s_content);
             }
         }
 
@@ -40,7 +36,6 @@ namespace RigelEditor.EGUI
         private bool m_sampleInput = false;
         private bool m_sampleDialog = false;
         private bool m_sampleLayout = false;
-        private bool m_sampleDrawChar = false;
 
         public GUITestContent()
         {

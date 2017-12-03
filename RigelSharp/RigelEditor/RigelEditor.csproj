@@ -91,9 +91,11 @@
     <Compile Include="EGUI\GUIMenu.cs" />
     <Compile Include="EGUI\GUIMessageBox.cs" />
     <Compile Include="EGUI\GUIObject.cs" />
+    <Compile Include="EGUI\GUIObjectTabView.cs" />
     <Compile Include="EGUI\GUIObjTextInput.cs" />
     <Compile Include="EGUI\GUIOption.cs" />
     <Compile Include="EGUI\GUIObjScrollView.cs" />
+    <Compile Include="EGUI\GUISamples.cs" />
     <Compile Include="EGUI\GUITest.cs" />
     <Compile Include="EGUI\GUITextProcessor.cs" />
     <Compile Include="EGUI\GUITextureStorage.cs" />
