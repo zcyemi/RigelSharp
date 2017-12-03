@@ -243,7 +243,11 @@ namespace RigelEditor.EGUI
         {
             AutoCaculateOffset(w, s_svLineHeight.Value);
         }
-        internal static void AutoCaculateOffsetH(int h)
+        internal static void AutoCaculateOffsetW(float w)
+        {
+            AutoCaculateOffset(w, s_svLineHeight.Value);
+        }
+        internal static void AutoCaculateOffsetH(float h)
         {
             AutoCaculateOffset(s_svLineIndent.Value, h);
         }
@@ -352,6 +356,148 @@ namespace RigelEditor.EGUI
                 }
             }
         }
+
+        #region Text
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="color"></param>
+        /// <param name="options">
+        /// GUIOption.AlignH
+        /// GUIOption.AlignV
+        /// GUIOption.Width
+        /// GUIOption.Border
+        /// </param>
+        /// <returns></returns>
+        public static int TextN(string content,Vector4? color =null,Vector4? bgcolor = null,int padding = 3,params GUIOption[] options)
+        {
+            Vector2 pos = Vector2.Zero;
+            pos.X = padding;
+            
+
+
+            int textWidth = Context.Font.GetTextWidth(content);
+            int textWidthN = textWidth + padding * 2;
+            var rect = new Vector4(s_ctx.currentLayout.Offset, textWidthN, s_svLineHeight.Value);
+
+
+            bool adaptiveW = true;
+            if(options != null)
+            {
+                var optWidth = options.FirstOrDefault((o) => { return o.type == GUIOption.GUIOptionType.width; });
+                if(optWidth != null)
+                {
+                    rect.Z = optWidth.IntValue;
+                    adaptiveW = true;
+                }
+            }
+
+            var rectcliped = rect;
+            bool valid = GUIUtility.RectClip(ref rectcliped, Context.currentArea.Rect);
+            if (!valid)
+            {
+                AutoCaculateOffset(textWidthN, s_svLineHeight.Value + 1);
+                return textWidthN;
+            }
+
+
+            pos.Y = (int)((rect.W - Context.Font.FontPixelSize - padding) / 2);
+            if (pos.Y < 0) pos.Y = padding;
+
+            GUIOption optBorder = null;
+
+            if (options != null)
+            {
+                foreach (var opt in options)
+                {
+                    if (opt == GUIOption.AlignHRight)
+                    {
+                        pos.X = (int)(rect.Z - textWidth- padding);
+                        if (pos.X < 0) pos.X = padding;
+                        adaptiveW = false;
+                        continue;
+                    }else if(opt == GUIOption.AlignHLeft)
+                    {
+                        pos.X = padding;
+                        adaptiveW = false;
+                        continue;
+                    }
+                    if(opt == GUIOption.AlignVTop)
+                    {
+                        pos.Y = padding;   
+                        continue;
+                    }
+                    else if(opt == GUIOption.AlignVBottom)
+                    {
+                        pos.Y = rect.W - Context.Font.FontPixelSize - padding;
+                        if(pos.Y < 0) pos.Y = padding;
+                        continue;
+                    }
+
+                    if(opt.type == GUIOption.GUIOptionType.border)
+                    {
+                        optBorder = opt;
+                    }
+                }
+            }
+
+            if (adaptiveW)
+            {
+                pos.X = (int)((rect.Z - textWidth) / 2);
+                if (pos.X < 0) pos.X = padding;
+            }
+
+            if(bgcolor != null)
+            {
+                GUI.DrawRect(rectcliped, (Vector4)bgcolor,true);
+            }
+
+            GUI._ImplDrawTextA(rectcliped, pos, content, color?? Context.Color);
+
+            if(optBorder != null)
+                GUI.DrawBorder(rectcliped, 1, optBorder.Vector4Value, true);
+
+            var areaRect = Context.currentArea.Rect;
+
+            if(rectcliped.X +rectcliped.Z < areaRect.X + areaRect.Z)
+            {
+                AutoCaculateOffset(rectcliped.Z,rectcliped.W +1);
+            }
+            else
+            {
+                AutoCaculateOffset(textWidthN, s_svLineHeight.Value + 1);
+            }
+            
+            return textWidthN;
+        }
+
+
+        public static int TextN(string content, params GUIOption[] options)
+        {
+            return TextN(content, null, null, 3, options);
+        }
+
+        public static int TextN(Vector4 color, string content, params GUIOption[] options)
+        {
+            return TextN(content, color, null, 3, options);
+        }
+
+        public static int TextN(Vector4 color, Vector4 bgcolor, string content, params GUIOption[] options)
+        {
+            return TextN(content, color, bgcolor, 3, options);
+        }
+
+        public static int TextN(string content, int padding, params GUIOption[] options)
+        {
+            return TextN(content, null, null, padding, options);
+        }
+
+
+        #endregion
+
 
 
         public static void TextBlock(string content, params GUIOption[] options)
@@ -572,6 +718,8 @@ namespace RigelEditor.EGUI
             var tabview = GUI.GetTabView(rectab);
 
             int ret = tabview.Draw(rect,index, tabnames, draw);
+            GUI.DrawBorder(rectab, 1, GUIStyle.Current.BackgroundColorS1,true);
+
             AutoCaculateOffset(rect.Z, rect.W);
             return ret;
         }
@@ -602,6 +750,8 @@ namespace RigelEditor.EGUI
             });
 
             int ret = tabview.Draw(rect, index, tabnames, draw);
+            GUI.DrawBorder(rectab, 1, GUIStyle.Current.BackgroundColorS1, true);
+
             AutoCaculateOffset(rect.Z, rect.W);
             return ret;
         }

@@ -62,21 +62,21 @@ namespace RigelEditor.EGUI
             var rect = new Vector4(20, 500, 20, 20);
 
             GUI.DrawRect(rect,RigelColor.Black,true);
-            GUI.DrawCharWithRect(rect, new Vector2(-3,-3), 'R', RigelColor.White);
+            GUI._ImplDrawCharWithRect(rect, new Vector2(-3,-3), 'R', RigelColor.White);
 
             rect.X += 21;
             rect.Z = 10;
             GUI.DrawRect(rect, RigelColor.Black, true);
-            GUI.DrawCharWithRect(rect, new Vector2(0,10), 'W', RigelColor.White);
+            GUI._ImplDrawCharWithRect(rect, new Vector2(0,10), 'W', RigelColor.White);
 
             rect.Y += 20;
             rect.Z = 30;
             rect.W = 20;
-            GUI.DrawTextA(rect,new Vector2(-5,0), "ABCDEFGHOLS", GUI.Context.Color);
+            GUI._ImplDrawTextA(rect,new Vector2(-5,0), "ABCDEFGHOLS", GUI.Context.Color);
 
             GUI.BeginGroup(new Vector4(200, 250, 50, 50), RigelColor.Black, false);
 
-            GUI.DrawText(new Vector4(-25, -7, 50, 30), "QWERTYUIOP", RigelColor.White);
+            GUI.Text(new Vector4(-25, -7, 50, 30), "QWERTYUIOP", RigelColor.White);
             GUI.EndGroup();
         }
 

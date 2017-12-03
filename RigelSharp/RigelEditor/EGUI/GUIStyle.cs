@@ -41,6 +41,8 @@ namespace RigelEditor.EGUI
 
         public Vector4 BackgroundColor = RigelColor.RGBA(30, 30, 30, 255);
         public Vector4 BackgroundColorS = RigelColor.RGBA(42, 42, 42, 255);
+        public Vector4 BackgroundColorS1 = RigelColor.RGBA(58, 58, 58, 255);
         public Vector4 Color = RigelColor.RGBA(241, 241, 241, 255);
+
     }
 }
