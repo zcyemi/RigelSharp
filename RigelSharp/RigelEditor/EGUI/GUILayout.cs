@@ -672,7 +672,7 @@ namespace RigelEditor.EGUI
         }
 
 
-        #region 
+        #region Widget
 
         public static string TextInput(string content,params GUIOption[] options)
         {
@@ -723,7 +723,6 @@ namespace RigelEditor.EGUI
             AutoCaculateOffset(rect.Z, rect.W);
             return ret;
         }
-
         public static int TabViewVertical(int index, List<string> tabnames, Action<int> draw,int tabWidth, params GUIOption[] options)
         {
             var sizeRemain = GUILayout.SizeRemain;
@@ -756,6 +755,51 @@ namespace RigelEditor.EGUI
             return ret;
         }
 
+
+        public static T EnumPopup<T>(T selected) where T : struct, IConvertible
+        {
+            return selected;
+        }
+
+        public static int IntPopup(int selected,string[] values)
+        {
+            return selected;
+        }
+
+        public static void RadioGroup()
+        {
+
+        }
+
+        public static void Progressbar()
+        {
+
+        }
+
+        public static void SortableList()
+        {
+
+        }
+
+        public static void Spinner()
+        {
+
+        }
+
+        public static void ListView()
+        {
+
+        }
+
+        public static void Tags()
+        {
+
+        }
+
+        public static void ToolTip()
+        {
+
+        }
 
         #endregion
 

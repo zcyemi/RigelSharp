@@ -29,7 +29,9 @@ namespace RigelEditor.EGUI
             "Button",       //5
             "Styles",       //6
             "Layout",       //7
-
+            "DragDrop",     //8
+            "Dialogs",      //9
+            "Widget",       //10
         };
         private int m_sampleindex = 0;
 
@@ -53,6 +55,12 @@ namespace RigelEditor.EGUI
                         break;
                     case 7:
                         SampleLayout();
+                        break;
+                    case 8:
+                        SampleDragDrop();
+                        break;
+                    case 10:
+                        SampleWidget();
                         break;
                 }
             }, 75);
@@ -319,6 +327,26 @@ namespace RigelEditor.EGUI
 
             GUI.Context.BackgroundColor.Restore();
         }
-#endregion
+        #endregion
+
+        #region DragDrop
+        private void SampleDragDrop()
+        {
+
+        }
+        #endregion
+
+        #region Widget
+        private void SampleWidget()
+        {
+            GUILayout.Text("Slider");
+
+            GUILayout.Text("Toggle");
+
+            GUILayout.Text("Popup");
+
+
+        }
+        #endregion
     }
 }
