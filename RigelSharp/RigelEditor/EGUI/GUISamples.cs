@@ -21,18 +21,21 @@ namespace RigelEditor.EGUI
 
         private readonly List<string> m_tabnames = new List<string>()
         {
-            "Index",
-            "TabView",
-            "Text",
-            "ScrollView",
+            "Index",        //0
+            "TabView",      //1
+            "Text",         //2
+            "ScrollView",   //3
+            "Container",    //4
+            "Button",       //5
+            "Styles",       //6
+            "Layout",       //7
+
         };
         private int m_sampleindex = 0;
 
 
         public override void OnGUI()
         {
-
-
             m_sampleindex = GUILayout.TabViewVertical(m_sampleindex, m_tabnames, (index) => {
                 switch (index)
                 {
@@ -44,6 +47,12 @@ namespace RigelEditor.EGUI
                         break;
                     case 2:
                         SampleText();
+                        break;
+                    case 4:
+                        SampleContainer();
+                        break;
+                    case 7:
+                        SampleLayout();
                         break;
                 }
             }, 75);
@@ -109,7 +118,6 @@ namespace RigelEditor.EGUI
             GUILayout.Space(35);
 
             GUILayout.Text("GUI.DrawText (With Group)");
-
             GUI.BeginGroup(new Vector4(5, 140, 135, 50), RigelColor.White);
             {
                 GUI.Text(new Vector4(-10, -3, 140, 30), "HELLOWORLD!", GUIStyle.Current.ColorActive);
@@ -163,6 +171,153 @@ namespace RigelEditor.EGUI
             }
             GUILayout.EndHorizontal();
 
+        }
+        #endregion
+
+        #region Container
+
+        private void SampleContainer()
+        {
+            GUILayout.Text("GUI.Group");
+            {
+                GUI.BeginGroup(new Vector4(GUILayout.CurrentLayout.Offset, 100, 100), GUIStyle.Current.BackgroundColorS1);
+                {
+                    //Rect clipped
+                    GUI.DrawRect(new Vector4(-10, -20,30, 30), RigelColor.Red, false);
+
+                    //Text clipped
+                    GUI.Text(new Vector4(50, 30, 100, 30), "Text is clipped by the group rect.");
+                }
+                GUI.EndGroup();
+
+                GUILayout.Space(100);
+            }
+            
+
+
+            GUILayout.Text("GUILayout.Area");
+            {
+                //Area Absolutely
+                GUILayout.BeginArea(GUILayout.GetRectAbsolute(new Vector4(GUILayout.CurrentLayout.Offset,100,100)), GUIStyle.Current.BackgroundColorS1);
+                GUILayout.Text("Absolutely");
+                GUILayout.EndArea();
+
+                ////Area Relative
+                GUILayout.BeginAreaR(new Vector4(105, GUILayout.CurrentLayout.Offset.Y, 100, 100), GUIStyle.Current.BackgroundColorS1);
+                GUILayout.Text("Relative");
+                GUILayout.EndArea();
+
+                GUILayout.Space(100);
+            }
+
+            GUILayout.Text("GUILayout.Container");
+            {
+                var rect = new Vector4(GUILayout.CurrentLayout.Offset, 100, 100);
+                rect.X += 100;
+                var rectab = GUILayout.GetRectAbsolute(rect);
+
+                //container synchronize the rect of GUI.Group and GUILayout.Area
+
+                //Container Absolutely
+                GUILayout.BeginContainer(rectab, RigelColor.Green);
+                GUI.DrawRect(new Vector4(50, 50, 50, 50), RigelColor.Blue);
+                GUILayout.DrawRect(new Vector4(25, 25, 25, 25), RigelColor.Red);
+                GUILayout.EndContainer();
+
+                //Container Relative
+                GUILayout.BeginContainerRelative(new Vector4(GUILayout.CurrentLayout.Offset, 100, 100), RigelColor.Red);
+                GUILayout.DrawRect(new Vector4(25, 25, 25, 25), RigelColor.White);
+                GUI.DrawRect(new Vector4(50, 50, 50, 50), RigelColor.Black);
+                GUILayout.EndContainer();
+                GUILayout.Space(100);
+            }
+            
+        }
+
+        #endregion
+
+        #region Layout
+
+        [TODO("Bug","Wrong flow caculation!")]
+        private void SampleLayout()
+        {
+            GUILayout.Text("GUILayout Flow");
+            GUI.Context.BackgroundColor.Set(GUIStyle.Current.BackgroundColorS1);
+
+            GUILayout.Text("GUILayout.Horizontal");
+            {
+                GUILayout.BeginHorizontal();
+                {
+                    GUILayout.BeginVertical();
+                    {
+                        GUILayout.Button("V1-0");
+                        GUILayout.Button("V1-1");
+                        GUILayout.Button("V1-2");
+                    }
+                    GUILayout.EndVertical();
+
+                    GUILayout.BeginVertical();
+                    {
+                        GUILayout.Button("V0-0");
+                        GUILayout.Button("V0-1");
+                    }
+                    GUILayout.EndVertical();
+
+                    GUILayout.BeginVertical();
+                    {
+                        GUILayout.BeginHorizontal();
+                        {
+                            GUILayout.Button("V1-H0-0");
+                        }
+                        GUILayout.EndHorizontal();
+
+                        GUILayout.BeginHorizontal();
+                        {
+                            GUILayout.Button("V1-H1-0");
+                            GUILayout.Button("V1-H1-1");
+                        }
+                        GUILayout.EndHorizontal();
+                    }
+                    GUILayout.EndVertical();
+
+                }
+                GUILayout.EndHorizontal();
+                //wrong
+                GUILayout.Text("AAAAAA");
+            }
+
+            GUILayout.Text("GUILayout.Vertical");
+
+            GUILayout.BeginVertical();
+            {
+                GUILayout.BeginHorizontal();
+                {
+                    GUILayout.TextN("TestText");
+                    GUILayout.BeginVertical();
+                    GUILayout.Button("ButtonExtend");
+                    GUILayout.Button("ButtonExtend");
+                    GUILayout.EndVertical();
+                    GUILayout.Button("TestButton");
+                }
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
+                {
+                    GUILayout.Button("Width 100px", GUIOption.Width(100));
+                    GUILayout.Button("Height 40px", GUIOption.Height(40));
+                }
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
+                {
+                    GUILayout.Text("Test Text");
+                }
+                GUILayout.EndHorizontal();
+            }
+            GUILayout.EndVertical();
+
+
+            GUI.Context.BackgroundColor.Restore();
         }
 #endregion
     }
