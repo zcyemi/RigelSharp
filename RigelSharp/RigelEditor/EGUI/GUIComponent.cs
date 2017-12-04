@@ -96,7 +96,7 @@ namespace RigelEditor.EGUI
             GUILayout.BeginContainer(rect, GUIStyle.Current.BackgroundColor, GUIOption.Border());
             {
                 bool headerover = GUIUtility.RectContainsCheck(GUILayout.GetRectAbsolute(m_hedaerRect), GUI.Event.Pointer);
-                GUILayout.DrawRect(m_hedaerRect, headerover ? GUIStyle.Current.ColorActive : GUIStyle.Current.ColorActiveD);
+                GUILayout.Rect(m_hedaerRect, headerover ? GUIStyle.Current.ColorActive : GUIStyle.Current.ColorActiveD);
                 GUILayout.BeginHorizontal();
                 GUILayout.Text(m_title);
                 if (m_dialogCloseable)

@@ -59,8 +59,6 @@ namespace RigelEditor
 
         private FileSystem m_filesystem;
 
-        private Vector2 m_scrollpos;
-
         public EditorTestWindowedDialog() : base(true, true, true)
         {
             m_filesystem = new FileSystem(AppContext.BaseDirectory);

@@ -92,7 +92,7 @@ namespace RigelEditor.EGUI
                 mousecontain = true;
             }
 
-            GUI.DrawRect(rect, (mousecontain && !GUI.Event.Used) ? GUIStyle.Current.ColorActive : GUIStyle.Current.DockSepColor);
+            GUI.Rect(rect, (mousecontain && !GUI.Event.Used) ? GUIStyle.Current.ColorActive : GUIStyle.Current.DockSepColor);
         }
 
     }
@@ -639,18 +639,18 @@ namespace RigelEditor.EGUI
                     {
                         if (!activeChecked && GUIUtility.RectContainsCheck(GUI.GetRectAbsolute(rectbasic), pointer))
                         {
-                            GUI.DrawRect(rectbasic, GUIStyle.Current.ColorActive);
+                            GUI.Rect(rectbasic, GUIStyle.Current.ColorActive);
                             activeChecked = true;
                             dockPlace = GUIDockPlace.center;
                         }
                         else
                         {
-                            GUI.DrawRect(rectbasic, GUIStyle.Current.ColorActiveD);
+                            GUI.Rect(rectbasic, GUIStyle.Current.ColorActiveD);
                         }
                     }
                     else
                     {
-                        GUI.DrawRect(rectbasic, GUIStyle.Current.ColorDisabled);
+                        GUI.Rect(rectbasic, GUIStyle.Current.ColorDisabled);
                     }
 
                     //left
@@ -659,18 +659,18 @@ namespace RigelEditor.EGUI
                     {
                         if (!activeChecked && GUIUtility.RectContainsCheck(GUI.GetRectAbsolute(rect), pointer))
                         {
-                            GUI.DrawRect(rect, GUIStyle.Current.ColorActive);
+                            GUI.Rect(rect, GUIStyle.Current.ColorActive);
                             activeChecked = true;
                             dockPlace = GUIDockPlace.left;
                         }
                         else
                         {
-                            GUI.DrawRect(rect, GUIStyle.Current.ColorActiveD);
+                            GUI.Rect(rect, GUIStyle.Current.ColorActiveD);
                         }
                     }
                     else
                     {
-                        GUI.DrawRect(rect, GUIStyle.Current.ColorDisabled);
+                        GUI.Rect(rect, GUIStyle.Current.ColorDisabled);
                     }
 
                     //right
@@ -679,18 +679,18 @@ namespace RigelEditor.EGUI
                     {
                         if (!activeChecked && GUIUtility.RectContainsCheck(GUI.GetRectAbsolute(rect), pointer))
                         {
-                            GUI.DrawRect(rect, GUIStyle.Current.ColorActive);
+                            GUI.Rect(rect, GUIStyle.Current.ColorActive);
                             activeChecked = true;
                             dockPlace = GUIDockPlace.right;
                         }
                         else
                         {
-                            GUI.DrawRect(rect, GUIStyle.Current.ColorActiveD);
+                            GUI.Rect(rect, GUIStyle.Current.ColorActiveD);
                         }
                     }
                     else
                     {
-                        GUI.DrawRect(rect, GUIStyle.Current.ColorDisabled);
+                        GUI.Rect(rect, GUIStyle.Current.ColorDisabled);
                     }
 
                     //top
@@ -699,18 +699,18 @@ namespace RigelEditor.EGUI
                     {
                         if (!activeChecked && GUIUtility.RectContainsCheck(GUI.GetRectAbsolute(rect), pointer))
                         {
-                            GUI.DrawRect(rect, GUIStyle.Current.ColorActive);
+                            GUI.Rect(rect, GUIStyle.Current.ColorActive);
                             activeChecked = true;
                             dockPlace = GUIDockPlace.top;
                         }
                         else
                         {
-                            GUI.DrawRect(rect, GUIStyle.Current.ColorActiveD);
+                            GUI.Rect(rect, GUIStyle.Current.ColorActiveD);
                         }
                     }
                     else
                     {
-                        GUI.DrawRect(rect, GUIStyle.Current.ColorDisabled);
+                        GUI.Rect(rect, GUIStyle.Current.ColorDisabled);
                     }
 
                     //bottom
@@ -719,18 +719,18 @@ namespace RigelEditor.EGUI
                     {
                         if (!activeChecked && GUIUtility.RectContainsCheck(GUI.GetRectAbsolute(rect), pointer))
                         {
-                            GUI.DrawRect(rect, GUIStyle.Current.ColorActive);
+                            GUI.Rect(rect, GUIStyle.Current.ColorActive);
                             activeChecked = true;
                             dockPlace = GUIDockPlace.bottom;
                         }
                         else
                         {
-                            GUI.DrawRect(rect, GUIStyle.Current.ColorActiveD);
+                            GUI.Rect(rect, GUIStyle.Current.ColorActiveD);
                         }
                     }
                     else
                     {
-                        GUI.DrawRect(rect, GUIStyle.Current.ColorDisabled);
+                        GUI.Rect(rect, GUIStyle.Current.ColorDisabled);
                     }
                 }
                 GUI.EndDepthLayer();

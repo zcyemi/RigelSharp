@@ -95,7 +95,7 @@ namespace RigelEditor.EGUI
         {
             if (color != null)
             {
-                GUI.DrawRect(recta, (Vector4)color, true);
+                GUI.RectA(recta, (Vector4)color);
             }
 
             if (options != null)
@@ -419,7 +419,7 @@ namespace RigelEditor.EGUI
 
             if(bgcolor != null)
             {
-                GUI.DrawRect(rectcliped, (Vector4)bgcolor,true);
+                GUI.RectA(rectcliped, (Vector4)bgcolor);
             }
 
             GUI._ImplDrawTextA(rectcliped, pos, content, color?? Context.Color);
@@ -516,7 +516,7 @@ namespace RigelEditor.EGUI
         {
             SetLineHeight(height);
             var rect = new Vector4(s_ctx.currentLayout.Offset, s_ctx.currentArea.Rect.Z, height);
-            DrawRect(rect, GUIStyle.Current.MainMenuBGColor);
+            Rect(rect, GUIStyle.Current.MainMenuBGColor);
             BeginHorizontal();
 
         }
@@ -608,13 +608,21 @@ namespace RigelEditor.EGUI
             }
         }
 
-        public static void DrawRect(Vector4 rect, Vector4 color,params GUIOption[] options)
+
+        public static void Rect(Vector4 rect,Vector4 color)
         {
             GUIUtility.RectClip(ref rect, s_ctx.currentArea.Rect);
-            GUI.DrawRect(rect, color, true);
+            GUI._ImplDrawRectA(rect, color);
         }
-
-        public static void DrawRectOnFlow(Vector2 size, Vector4 color,params GUIOption[] options)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="size"></param>
+        /// <param name="color"></param>
+        /// <param name="options">
+        /// GUIOptionType.checkRectContains
+        /// </param>
+        public static void RectOnFlow(Vector2 size, Vector4 color,params GUIOption[] options)
         {
             var offset = s_ctx.currentLayout.Offset;
             Vector4 rect = new Vector4(offset, size.X,size.Y);
@@ -626,8 +634,9 @@ namespace RigelEditor.EGUI
                     optcheckcontains.value = GUIUtility.RectContainsCheck(rect, GUI.Event.Pointer);
                 }
             }
-            GUI.DrawRect(rect, color, true,GUIOption.NoClip);
+            GUI._ImplDrawRectA(rect, color);
         }
+
 
         public static void DrawTexture(Vector4 rect,RenderTextureIdentifier rt)
         {

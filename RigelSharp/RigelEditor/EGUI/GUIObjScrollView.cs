@@ -103,7 +103,7 @@ namespace RigelEditor.EGUI
                     ScrollPos.Y = MathUtil.Clamp(ScrollPos.Y, scrollVmax, 0);
                     thumbActive = true;
                 }
-                GUILayout.DrawRect(rectSBV, thumbActive ? GUIStyle.Current.ColorActive : GUIStyle.Current.BackgroundColor);
+                GUILayout.Rect(rectSBV, thumbActive ? GUIStyle.Current.ColorActive : GUIStyle.Current.BackgroundColor);
 
                 if (containerContains)
                 {
@@ -143,7 +143,7 @@ namespace RigelEditor.EGUI
                     ScrollPos.X = MathUtil.Clamp(ScrollPos.X, scrollHmax, 0);
                     thumbActive = true;
                 }
-                GUILayout.DrawRect(rectSBH, thumbActive ? GUIStyle.Current.ColorActive : GUIStyle.Current.BackgroundColor);
+                GUILayout.Rect(rectSBH, thumbActive ? GUIStyle.Current.ColorActive : GUIStyle.Current.BackgroundColor);
 
                 if (containerContains)
                 {

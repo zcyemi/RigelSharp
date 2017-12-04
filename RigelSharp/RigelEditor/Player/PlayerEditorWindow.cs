@@ -51,7 +51,7 @@ namespace RigelEditor.Player
             var rect = new Vector4(GUILayout.CurrentLayout.Offset,sr.X,sr.Y);
             var rectab = GUILayout.GetRectAbsolute(rect);
 
-            GUI.DrawRect(rectab, RigelColor.Black, true);
+            GUI.RectA(rectab, RigelColor.Black);
             GUILayout.DrawTexture(rectab, RenderTextureIdentifier.DefaultDepthStencilView);
 
         }

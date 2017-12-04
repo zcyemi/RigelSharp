@@ -210,5 +210,34 @@ namespace RigelEditor.EGUI
             return glyph.AdvancedX;
         }
 
+        public static void _ImplDrawRectA(Vector4 recta,Vector4 color)
+        {
+            BufferRect.Add(new RigelEGUIVertex()
+            {
+                Position = new Vector4(recta.X, recta.Y, s_depthz, 1),
+                Color = color,
+                UV = Vector2.Zero
+            });
+            BufferRect.Add(new RigelEGUIVertex()
+            {
+                Position = new Vector4(recta.X, recta.Y + recta.W, s_depthz, 1),
+                Color = color,
+                UV = Vector2.Zero
+            });
+            BufferRect.Add(new RigelEGUIVertex()
+            {
+                Position = new Vector4(recta.X + recta.Z, recta.Y + recta.W, s_depthz, 1),
+                Color = color,
+                UV = Vector2.Zero
+            });
+            BufferRect.Add(new RigelEGUIVertex()
+            {
+                Position = new Vector4(recta.X + recta.Z, recta.Y, s_depthz, 1),
+                Color = color,
+                UV = Vector2.Zero
+            });
+
+            DepthIncrease();
+        }
     }
 }

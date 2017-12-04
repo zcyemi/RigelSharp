@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using SharpDX;
+using RigelCore;
 
 namespace RigelEditor.EGUI
 {
@@ -33,7 +34,7 @@ namespace RigelEditor.EGUI
             var groupStack = s_ctx.groupStack;
             if (absolute)
             {
-                if (color != null) DrawRect(rect, (Vector4)color, true);
+                if (color != null) RectA(rect, (Vector4)color);
                 s_ctx.currentGroup.Absolute = rect;
                 rect.X -= s_ctx.currentGroup.Rect.X;
                 rect.Y -= s_ctx.currentGroup.Rect.Y;
@@ -51,7 +52,7 @@ namespace RigelEditor.EGUI
                 rect.Z = MathUtil.Clamp(rect.Z, 0, root.Z - rect.X);
                 rect.W = MathUtil.Clamp(rect.W, 0, root.W - rect.Y);
 
-                if (color != null) DrawRect(rect, (Vector4)color);
+                if (color != null) Rect(rect, (Vector4)color);
                 s_ctx.currentGroup.Rect = rect;
 
                 var groupab = s_ctx.currentGroup.Absolute;
@@ -136,20 +137,20 @@ namespace RigelEditor.EGUI
 
                 if (Event.Used && !clicked)
                 {
-                    DrawRect(rect, color, absolute);
+                    Rect(rect, color, absolute);
                 }
                 else if (Event.Button == MouseButton.Left)
                 {
-                    DrawRect(rect, GUIStyle.Current.ColorActiveD, absolute);
+                    Rect(rect, GUIStyle.Current.ColorActiveD, absolute);
                 }
                 else
                 {
-                    DrawRect(rect, GUIStyle.Current.ColorActive, absolute);
+                    Rect(rect, GUIStyle.Current.ColorActive, absolute);
                 }
             }
             else
             {
-                DrawRect(rect, color, absolute);
+                Rect(rect, color, absolute);
             }
 
 
@@ -394,82 +395,80 @@ namespace RigelEditor.EGUI
             if (valid)
                 _ImplDrawTextA(rect, startpos - rect.Pos(), content, color?? Context.Color);
         }
-
         public static void TextA(Vector4 recta,string content,Vector4? color = null)
         {
             GUI._ImplDrawTextA(recta, Vector2.Zero, content, color ?? Context.Color);
         }
-
         public static void TextA(Vector4 recta,Vector2 pos, string content, Vector4? color = null)
         {
             GUI._ImplDrawTextA(recta, pos, content, color ?? Context.Color);
         }
-
-
 #endregion
 
-        public static void DrawRect(Vector4 rect, bool absolute = false, params GUIOption[] options)
-        {
-            DrawRect(rect, Context.BackgroundColor, absolute, options);
-        }
+        #region Rect
         /// <summary>
-        /// 
+        /// Draw rect relative to current group.
         /// </summary>
         /// <param name="rect"></param>
         /// <param name="color"></param>
-        /// <param name="absolute"></param>
-        /// <param name="options">border noClip</param>
-        public static void DrawRect(Vector4 rect, Vector4 color, bool absolute = false, params GUIOption[] options)
+        /// <param name="noclip"></param>
+        /// <param name="bordersize"></param>
+        /// <param name="options">
+        /// GUIOptions.Border
+        /// </param>
+        public static void Rect(Vector4 rect,Vector4 color, int bordersize,bool noclip = false,params GUIOption[] options)
         {
-            GUIOption optBorder = null;
-            if (options != null)
+            if (noclip)
             {
-                var noclip = options.FirstOrDefault((x) => { return x.type == GUIOption.GUIOptionType.noClip; });
-                if (noclip == null)
-                {
-                    var valid = GUIUtility.RectClip(ref rect, absolute ? s_ctx.baseRect : s_ctx.currentGroup.Absolute);
-                    if (!valid) return;
-                }
-                else
-                {
-                    rect = rect.Move(absolute ? s_ctx.baseRect.Pos() : s_ctx.currentGroup.Absolute.Pos());
-                }
-
-                optBorder = options.FirstOrDefault((x) => { return x.type == GUIOption.GUIOptionType.border; });
+                RectA(GetRectAbsolute(rect), color, bordersize, options);
+                return;
             }
 
-            BufferRect.Add(new RigelEGUIVertex()
-            {
-                Position = new Vector4(rect.X, rect.Y, s_depthz, 1),
-                Color = color,
-                UV = Vector2.Zero
-            });
-            BufferRect.Add(new RigelEGUIVertex()
-            {
-                Position = new Vector4(rect.X, rect.Y + rect.W, s_depthz, 1),
-                Color = color,
-                UV = Vector2.Zero
-            });
-            BufferRect.Add(new RigelEGUIVertex()
-            {
-                Position = new Vector4(rect.X + rect.Z, rect.Y + rect.W, s_depthz, 1),
-                Color = color,
-                UV = Vector2.Zero
-            });
-            BufferRect.Add(new RigelEGUIVertex()
-            {
-                Position = new Vector4(rect.X + rect.Z, rect.Y, s_depthz, 1),
-                Color = color,
-                UV = Vector2.Zero
-            });
-
-            if (optBorder != null)
-            {
-                DrawBorder(rect, 1, (Vector4)optBorder.value, true);
-            }
-
-            DepthIncrease();
+            GUIUtility.RectClip(ref rect, s_ctx.currentGroup.Absolute);
+            RectA(rect, color, bordersize, options);
         }
+        public static void Rect(Vector4 rect,Vector4 color,int bordersize, params GUIOption[] options)
+        {
+            Rect(rect, color, bordersize, false, options);
+        }
+        public static void Rect(Vector4 rect, Vector4 color, params GUIOption[] options)
+        {
+            Rect(rect, color, 1, false, options);
+        }
+        [TODO("Refactoring","remove this method")]
+        public static void Rect(Vector4 rect, Vector4 color, bool absolutely, params GUIOption[] options)
+        {
+            if (absolutely)
+            {
+                RectA(rect, color, 1, options);
+            }
+            else
+            {
+                Rect(rect, color, 1, false, options);
+            }
+        }
+
+        /// <summary>
+        /// Draw rect absolutely
+        /// </summary>
+        /// <param name="recta"></param>
+        /// <param name="color"></param>
+        /// <param name="bordersize"></param>
+        /// <param name="options"></param>
+        public static void RectA(Vector4 recta,Vector4 color,int bordersize = 1,params GUIOption[] options)
+        {
+            _ImplDrawRectA(recta, color);
+
+            if(options != null)
+            {
+                var optBorder = options.FirstOrDefault((o) => { return o.type == GUIOption.GUIOptionType.border; });
+                //draw border
+            }
+        }
+
+#endregion
+
+
         public static void DrawTexture(Vector4 rect, uint textureid)
         {
 
@@ -511,14 +510,14 @@ namespace RigelEditor.EGUI
 
             rect.X -= thickhalf;
             rect.Y -= thickhalf;
-            if (color != null)
-            {
-                DrawRect(rect, (Vector4)color, absolute);
-            }
-            else
-            {
-                DrawRect(rect, absolute);
-            }
+            //if (color != null)
+            //{
+            //    DrawRect(rect, (Vector4)color, absolute);
+            //}
+            //else
+            //{
+            //    DrawRect(rect, absolute);
+            //}
         }
 
         public static string TextField(Vector4 rect, string content)
@@ -556,7 +555,7 @@ namespace RigelEditor.EGUI
         #region Input
         public static bool Toggle(Vector4 rect, bool value, string label)
         {
-            DrawRect(rect);
+            
             return value;
         }
 

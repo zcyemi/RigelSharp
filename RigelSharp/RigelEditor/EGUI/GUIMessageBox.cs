@@ -37,7 +37,7 @@ namespace RigelEditor.EGUI
             GUILayout.BeginArea(rect,GUIStyle.Current.DockContentColor,GUIOption.Border(null));
             {
                 rect.W = GUILayout.s_svLineHeight;
-                GUI.DrawRect(rect, GUIStyle.Current.ColorActiveD);
+                GUI.Rect(rect, GUIStyle.Current.ColorActiveD);
                 GUILayout.Text(title);
                 GUILayout.Text(info, (Vector4?)null, GUIOption.Width(480));
 
