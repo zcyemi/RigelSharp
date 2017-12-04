@@ -64,6 +64,7 @@ namespace RigelEditor.EGUI
         //objpool
         internal GUIObjPool<GUIObjScrollView> poolSrollbar = new GUIObjPool<GUIObjScrollView>();
         internal GUIObjPool<GUIObjTextInput> poolTextInput = new GUIObjPool<GUIObjTextInput>();
+        internal GUIObjPool<GUIObjectTabView> poolTabView = new GUIObjPool<GUIObjectTabView>();
 
         internal GUITextureStorage m_texStorage = new GUITextureStorage();
         internal GUITextureStorage TextureStorage { get { return m_texStorage; } }

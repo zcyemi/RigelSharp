@@ -30,6 +30,9 @@ namespace RigelEditor.EGUI
             expended = 7,
             grid =  8,
             
+            /// <summary>
+            /// 
+            /// </summary>
             alignHorizonal = 20,
             alignVertical = 21,
 

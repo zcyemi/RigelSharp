@@ -15,6 +15,7 @@ namespace RigelEditor.EGUI
         ScrollBar = 1,
         DragRegion = 2,
         TextInput = 3,
+        TabView = 4,
     }
 
     internal static class GUIUtilityInternal
@@ -43,6 +44,7 @@ namespace RigelEditor.EGUI
         public bool Checked = false;
 
         public abstract void Reset();
+
     }
 
     internal class GUIObjPool<T> where T : GUIObjBase, new()
@@ -51,7 +53,7 @@ namespace RigelEditor.EGUI
         private Stack<T> m_pool = new Stack<T>();
 
 
-        public T Get(long hash)
+        public T Get(long hash,Action<T> createFunction = null)
         {
             if (m_objects.ContainsKey(hash))
             {
@@ -70,6 +72,10 @@ namespace RigelEditor.EGUI
                 else
                 {
                     obj = m_pool.Pop();
+                }
+                if (createFunction != null)
+                {
+                    createFunction(obj);
                 }
                 m_objects.Add(hash, obj);
                 obj.Checked = true;

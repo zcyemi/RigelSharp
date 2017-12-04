@@ -10,7 +10,7 @@ namespace RigelEditor.EGUI
 {
 
 
-    public static class GUI
+    public static partial class GUI
     {
         public static GUICtx s_ctx;
         public static GUICtx Context
@@ -365,6 +365,49 @@ namespace RigelEditor.EGUI
 
             return glyph.AdvancedX;
         }
+
+        #region Text
+        //  |               | Rect Absolute  |  Rect Relative    |
+        //  | Current Group |       -        |      GUI.Text     |
+        //  | Root Group    |   GUI.TextA    |          -        |
+
+        /// <summary>
+        /// Draw text inside rect,rect is clipped by currentGroup
+        /// </summary>
+        /// <param name="rect"></param>
+        /// <param name="content"></param>
+        /// <param name="color"></param>
+        public static void Text(Vector4 rect,string content,Vector4? color= null)
+        {
+            //Vector2 pos = Vector2.Zero;
+            //pos.Y = (int)((rect.W - GUI.Context.Font.FontPixelSize) * 0.5f);
+            //if (pos.Y < 0) pos.Y = 0;
+
+            //var rectdraw = rect;
+            //GUIUtility.RectClip(ref rectdraw, GUI.Context.currentGroup.Rect);
+
+
+            
+
+            Vector2 startpos = rect.Pos() + GUI.Context.currentGroup.Absolute.Pos();
+            bool valid = GUIUtility.RectClip(ref rect, GUI.Context.currentGroup.Absolute);
+            if (valid)
+                _ImplDrawTextA(rect, startpos - rect.Pos(), content, color?? Context.Color);
+        }
+
+        public static void TextA(Vector4 recta,string content,Vector4? color = null)
+        {
+            GUI._ImplDrawTextA(recta, Vector2.Zero, content, color ?? Context.Color);
+        }
+
+        public static void TextA(Vector4 recta,Vector2 pos, string content, Vector4? color = null)
+        {
+            GUI._ImplDrawTextA(recta, pos, content, color ?? Context.Color);
+        }
+
+
+#endregion
+
         public static void DrawRect(Vector4 rect, bool absolute = false, params GUIOption[] options)
         {
             DrawRect(rect, Context.BackgroundColor, absolute, options);
@@ -533,6 +576,11 @@ namespace RigelEditor.EGUI
         public static GUIObjTextInput GetTextInput(Vector4 rect)
         {
             return Context.poolTextInput.Get(GUIUtilityInternal.GetHash(rect, GUIObjectType.TextInput));
+        }
+
+        public static GUIObjectTabView GetTabView(Vector4 rect,Action<GUIObjectTabView> createFunction = null)
+        {
+            return Context.poolTabView.Get(GUIUtilityInternal.GetHash(rect, GUIObjectType.TabView),createFunction);
         }
 
         #endregion

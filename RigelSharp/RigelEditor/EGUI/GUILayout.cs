@@ -24,7 +24,7 @@ namespace RigelEditor.EGUI
     }
 
 
-    public static class GUILayout
+    public static partial class GUILayout
     {
         //reference to GUI.s_ctx
         public static GUICtx s_ctx;
@@ -79,17 +79,23 @@ namespace RigelEditor.EGUI
         }
 
 
+        public static void BeginAreaR(Vector4 rect,Vector4? color ,params GUIOption[] options)
+        {
+            rect = GetRectAbsolute(rect);
+            BeginArea(rect, color, options);
+        }
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="rect"> absolute rect</param>
         /// <param name="color"></param>
         /// <param name="options">GUIOptionType.Border</param>
-        public static void BeginArea(Vector4 rect, Vector4? color = null, params GUIOption[] options)
+        public static void BeginArea(Vector4 recta, Vector4? color = null, params GUIOption[] options)
         {
             if (color != null)
             {
-                GUI.DrawRect(rect, (Vector4)color, true);
+                GUI.DrawRect(recta, (Vector4)color, true);
             }
 
             if (options != null)
@@ -97,13 +103,13 @@ namespace RigelEditor.EGUI
                 var optborder = options.FirstOrDefault((x) => { return x.type == GUIOption.GUIOptionType.border; });
                 if (optborder != null)
                 {
-                    GUI.DrawBorder(rect, 1, optborder.Vector4Value, true);
+                    GUI.DrawBorder(recta, 1, optborder.Vector4Value, true);
                 }
             }
 
             s_ctx.areaStack.Push(s_ctx.currentArea);
-            s_ctx.currentArea.Rect = rect;
-            s_ctx.currentArea.ContentMax = rect.Size();
+            s_ctx.currentArea.Rect = recta;
+            s_ctx.currentArea.ContentMax = recta.Size();
 
             var curlayout = s_ctx.currentLayout;
             layoutStack.Push(curlayout);
@@ -237,7 +243,11 @@ namespace RigelEditor.EGUI
         {
             AutoCaculateOffset(w, s_svLineHeight.Value);
         }
-        internal static void AutoCaculateOffsetH(int h)
+        internal static void AutoCaculateOffsetW(float w)
+        {
+            AutoCaculateOffset(w, s_svLineHeight.Value);
+        }
+        internal static void AutoCaculateOffsetH(float h)
         {
             AutoCaculateOffset(s_svLineIndent.Value, h);
         }
@@ -346,6 +356,148 @@ namespace RigelEditor.EGUI
                 }
             }
         }
+
+        #region Text
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="color"></param>
+        /// <param name="options">
+        /// GUIOption.AlignH
+        /// GUIOption.AlignV
+        /// GUIOption.Width
+        /// GUIOption.Border
+        /// </param>
+        /// <returns></returns>
+        public static int TextN(string content,Vector4? color =null,Vector4? bgcolor = null,int padding = 3,params GUIOption[] options)
+        {
+            Vector2 pos = Vector2.Zero;
+            pos.X = padding;
+            
+
+
+            int textWidth = Context.Font.GetTextWidth(content);
+            int textWidthN = textWidth + padding * 2;
+            var rect = new Vector4(s_ctx.currentLayout.Offset, textWidthN, s_svLineHeight.Value);
+
+
+            bool adaptiveW = true;
+            if(options != null)
+            {
+                var optWidth = options.FirstOrDefault((o) => { return o.type == GUIOption.GUIOptionType.width; });
+                if(optWidth != null)
+                {
+                    rect.Z = optWidth.IntValue;
+                    adaptiveW = true;
+                }
+            }
+
+            var rectcliped = rect;
+            bool valid = GUIUtility.RectClip(ref rectcliped, Context.currentArea.Rect);
+            if (!valid)
+            {
+                AutoCaculateOffset(textWidthN, s_svLineHeight.Value + 1);
+                return textWidthN;
+            }
+
+
+            pos.Y = (int)((rect.W - Context.Font.FontPixelSize - padding) / 2);
+            if (pos.Y < 0) pos.Y = padding;
+
+            GUIOption optBorder = null;
+
+            if (options != null)
+            {
+                foreach (var opt in options)
+                {
+                    if (opt == GUIOption.AlignHRight)
+                    {
+                        pos.X = (int)(rect.Z - textWidth- padding);
+                        if (pos.X < 0) pos.X = padding;
+                        adaptiveW = false;
+                        continue;
+                    }else if(opt == GUIOption.AlignHLeft)
+                    {
+                        pos.X = padding;
+                        adaptiveW = false;
+                        continue;
+                    }
+                    if(opt == GUIOption.AlignVTop)
+                    {
+                        pos.Y = padding;   
+                        continue;
+                    }
+                    else if(opt == GUIOption.AlignVBottom)
+                    {
+                        pos.Y = rect.W - Context.Font.FontPixelSize - padding;
+                        if(pos.Y < 0) pos.Y = padding;
+                        continue;
+                    }
+
+                    if(opt.type == GUIOption.GUIOptionType.border)
+                    {
+                        optBorder = opt;
+                    }
+                }
+            }
+
+            if (adaptiveW)
+            {
+                pos.X = (int)((rect.Z - textWidth) / 2);
+                if (pos.X < 0) pos.X = padding;
+            }
+
+            if(bgcolor != null)
+            {
+                GUI.DrawRect(rectcliped, (Vector4)bgcolor,true);
+            }
+
+            GUI._ImplDrawTextA(rectcliped, pos, content, color?? Context.Color);
+
+            if(optBorder != null)
+                GUI.DrawBorder(rectcliped, 1, optBorder.Vector4Value, true);
+
+            var areaRect = Context.currentArea.Rect;
+
+            if(rectcliped.X +rectcliped.Z < areaRect.X + areaRect.Z)
+            {
+                AutoCaculateOffset(rectcliped.Z,rectcliped.W +1);
+            }
+            else
+            {
+                AutoCaculateOffset(textWidthN, s_svLineHeight.Value + 1);
+            }
+            
+            return textWidthN;
+        }
+
+
+        public static int TextN(string content, params GUIOption[] options)
+        {
+            return TextN(content, null, null, 3, options);
+        }
+
+        public static int TextN(Vector4 color, string content, params GUIOption[] options)
+        {
+            return TextN(content, color, null, 3, options);
+        }
+
+        public static int TextN(Vector4 color, Vector4 bgcolor, string content, params GUIOption[] options)
+        {
+            return TextN(content, color, bgcolor, 3, options);
+        }
+
+        public static int TextN(string content, int padding, params GUIOption[] options)
+        {
+            return TextN(content, null, null, padding, options);
+        }
+
+
+        #endregion
+
 
 
         public static void TextBlock(string content, params GUIOption[] options)
@@ -520,7 +672,7 @@ namespace RigelEditor.EGUI
         }
 
 
-        #region 
+        #region Widget
 
         public static string TextInput(string content,params GUIOption[] options)
         {
@@ -542,6 +694,112 @@ namespace RigelEditor.EGUI
         }
 
 
+        public static int TabView(int index,List<string> tabnames,Action<int> draw,params GUIOption[] options)
+        {
+            var sizeRemain = GUILayout.SizeRemain;
+            var rect = new Vector4(CurrentLayout.Offset, SizeRemain.X, SizeRemain.Y);
+            if(options != null)
+            {
+                foreach(var opt in options)
+                {
+                    if(opt.type == GUIOption.GUIOptionType.width)
+                    {
+                        rect.Z = opt.IntValue;
+                        continue;
+                    }
+                    if(opt.type == GUIOption.GUIOptionType.height)
+                    {
+                        rect.W = opt.IntValue;
+                    }
+                }
+            }
+            var rectab = GetRectAbsolute(rect);
+
+            var tabview = GUI.GetTabView(rectab);
+
+            int ret = tabview.Draw(rect,index, tabnames, draw);
+            GUI.DrawBorder(rectab, 1, GUIStyle.Current.BackgroundColorS1,true);
+
+            AutoCaculateOffset(rect.Z, rect.W);
+            return ret;
+        }
+        public static int TabViewVertical(int index, List<string> tabnames, Action<int> draw,int tabWidth, params GUIOption[] options)
+        {
+            var sizeRemain = GUILayout.SizeRemain;
+            var rect = new Vector4(CurrentLayout.Offset, SizeRemain.X, SizeRemain.Y);
+            if (options != null)
+            {
+                foreach (var opt in options)
+                {
+                    if (opt.type == GUIOption.GUIOptionType.width)
+                    {
+                        rect.Z = opt.IntValue;
+                        continue;
+                    }
+                    if (opt.type == GUIOption.GUIOptionType.height)
+                    {
+                        rect.W = opt.IntValue;
+                    }
+                }
+            }
+            var rectab = GetRectAbsolute(rect);
+
+            var tabview = GUI.GetTabView(rectab,(tv)=> {
+                tv.SetVerticalMode(tabWidth);
+            });
+
+            int ret = tabview.Draw(rect, index, tabnames, draw);
+            GUI.DrawBorder(rectab, 1, GUIStyle.Current.BackgroundColorS1, true);
+
+            AutoCaculateOffset(rect.Z, rect.W);
+            return ret;
+        }
+
+
+        public static T EnumPopup<T>(T selected) where T : struct, IConvertible
+        {
+            return selected;
+        }
+
+        public static int IntPopup(int selected,string[] values)
+        {
+            return selected;
+        }
+
+        public static void RadioGroup()
+        {
+
+        }
+
+        public static void Progressbar()
+        {
+
+        }
+
+        public static void SortableList()
+        {
+
+        }
+
+        public static void Spinner()
+        {
+
+        }
+
+        public static void ListView()
+        {
+
+        }
+
+        public static void Tags()
+        {
+
+        }
+
+        public static void ToolTip()
+        {
+
+        }
 
         #endregion
 

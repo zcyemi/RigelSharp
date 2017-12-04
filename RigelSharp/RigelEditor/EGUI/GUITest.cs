@@ -22,11 +22,7 @@ namespace RigelEditor.EGUI
                 s_content = new GUITestContent();
 
                 var dockmgr = RigelEditorApp.Instance.EditorGUI.DockManager;
-                if (dockmgr.FindDockContent<GUITestContent>() == null)
-                {
-                    dockmgr.AddNewContent(s_content);
-                }
-
+                dockmgr.AddNewContent(s_content);
             }
         }
 
@@ -48,6 +44,8 @@ namespace RigelEditor.EGUI
 
         public override void OnGUI()
         {
+            SampleDrawChar();
+
             SampleLayouting();
 
             SampleGUIComponent();
@@ -57,6 +55,29 @@ namespace RigelEditor.EGUI
             SampleInput();
             SampleDialog();
 
+        }
+
+        private void SampleDrawChar()
+        {
+            var rect = new Vector4(20, 500, 20, 20);
+
+            GUI.DrawRect(rect,RigelColor.Black,true);
+            GUI._ImplDrawCharWithRect(rect, new Vector2(-3,-3), 'R', RigelColor.White);
+
+            rect.X += 21;
+            rect.Z = 10;
+            GUI.DrawRect(rect, RigelColor.Black, true);
+            GUI._ImplDrawCharWithRect(rect, new Vector2(0,10), 'W', RigelColor.White);
+
+            rect.Y += 20;
+            rect.Z = 30;
+            rect.W = 20;
+            GUI._ImplDrawTextA(rect,new Vector2(-5,0), "ABCDEFGHOLS", GUI.Context.Color);
+
+            GUI.BeginGroup(new Vector4(200, 250, 50, 50), RigelColor.Black, false);
+
+            GUI.Text(new Vector4(-25, -7, 50, 30), "QWERTYUIOP", RigelColor.White);
+            GUI.EndGroup();
         }
 
         private void SampleLayouting()
