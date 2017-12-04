@@ -39,7 +39,7 @@ namespace RigelEditor.EGUI
                 rect.W = GUILayout.s_svLineHeight;
                 GUI.DrawRect(rect, GUIStyle.Current.ColorActiveD);
                 GUILayout.Text(title);
-                GUILayout.Text(info,null,GUIOption.Width(480));
+                GUILayout.Text(info, (Vector4?)null, GUIOption.Width(480));
 
                 var off = GUILayout.s_ctx.currentLayout.Offset;
 

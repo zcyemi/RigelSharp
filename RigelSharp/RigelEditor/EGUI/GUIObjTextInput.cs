@@ -77,7 +77,7 @@ namespace RigelEditor.EGUI
             {
                 labelwidth = (int)(rect.Z * 0.4f);
                 labelwidth = MathUtil.Clamp(labelwidth, 40, 100);
-                GUILayout.Text(label, null,GUIOption.Width(labelwidth));
+                GUILayout.Text(label, (Vector4?)null, GUIOption.Width(labelwidth));
 
                 GUILayout.Indent(10);
             }

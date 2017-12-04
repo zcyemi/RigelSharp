@@ -191,7 +191,6 @@ namespace RigelEditor.EGUI
         {
             s_ctx.currentLayout.Offset.Y += height;
         }
-
         public static void Indent()
         {
             s_ctx.currentLayout.Offset.X += s_svLineIndent.Value;
@@ -268,7 +267,11 @@ namespace RigelEditor.EGUI
         /// </summary>
         /// <param name="label"></param>
         /// <param name="color"></param>
-        /// <param name="options">GUIOptionType.Width GUIOptionType.expended GUIOptionType.Grid</param>
+        /// <param name="options">
+        /// GUIOptionType.Width 
+        /// GUIOptionType.expended 
+        /// GUIOptionType.Grid
+        /// </param>
         /// <returns></returns>
         public static bool Button(string label, Vector4 color, params GUIOption[] options)
         {
@@ -323,43 +326,7 @@ namespace RigelEditor.EGUI
             return clicked;
         }
 
-        public static void Text(string content,Vector4? color = null,params GUIOption[] options)
-        {
-            GUIOption optwidth = null;
-            if(options != null)
-            {
-                foreach(var opt in options)
-                {
-                    if(opt.type == GUIOption.GUIOptionType.width)
-                    {
-                        optwidth = opt;
-                    }
-                }
-            }
-            bool adaptive = optwidth == null;
-
-            var curarea = s_ctx.currentArea;
-            var rect = new Vector4(s_ctx.currentLayout.Offset, adaptive ? curarea.Rect.Z : (int)optwidth.value, s_svLineHeight.Value);
-            bool valid = GUIUtility.RectClip(ref rect, curarea.Rect);
-            int width = 0;
-            if (valid)
-            {
-                if (adaptive)
-                {
-                    width = GUI.DrawText(rect, content, color ??s_ctx.Color, true, GUIOption.Adaptive);
-                    AutoCaculateOffsetW(width);
-                }
-                else
-                {
-                    width = GUI.DrawText(rect, content, s_ctx.Color, true, options);
-                    AutoCaculateOffsetW((int)rect.Z);
-                }
-            }
-        }
-
         #region Text
-
-
         /// <summary>
         /// 
         /// </summary>
@@ -372,7 +339,7 @@ namespace RigelEditor.EGUI
         /// GUIOption.Border
         /// </param>
         /// <returns></returns>
-        public static int TextN(string content,Vector4? color =null,Vector4? bgcolor = null,int padding = 3,params GUIOption[] options)
+        public static int Text(string content,Vector4? color,Vector4? bgcolor,int padding = 3,params GUIOption[] options)
         {
             Vector2 pos = Vector2.Zero;
             pos.X = padding;
@@ -473,29 +440,26 @@ namespace RigelEditor.EGUI
             
             return textWidthN;
         }
-
-
-        public static int TextN(string content, params GUIOption[] options)
+        public static void Text(string content,Vector4? color,params GUIOption[] options)
         {
-            return TextN(content, null, null, 3, options);
+            Text(content, color, null, 3, options);
         }
-
-        public static int TextN(Vector4 color, string content, params GUIOption[] options)
+        public static int Text(string content, params GUIOption[] options)
         {
-            return TextN(content, color, null, 3, options);
+            return Text(content, null, null, 3, options);
         }
-
-        public static int TextN(Vector4 color, Vector4 bgcolor, string content, params GUIOption[] options)
+        public static int Text(string content, Vector4 color, params GUIOption[] options)
         {
-            return TextN(content, color, bgcolor, 3, options);
+            return Text(content, color, null, 3, options);
         }
-
-        public static int TextN(string content, int padding, params GUIOption[] options)
+        public static int Text( string content, Vector4 color, Vector4 bgcolor, params GUIOption[] options)
         {
-            return TextN(content, null, null, padding, options);
+            return Text(content, color, bgcolor, 3, options);
         }
-
-
+        public static int Text(string content, int padding, params GUIOption[] options)
+        {
+            return Text(content, null, null, padding, options);
+        }
         #endregion
 
 

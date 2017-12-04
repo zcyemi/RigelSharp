@@ -38,7 +38,8 @@ namespace RigelEditor.EGUI
 
         public override void OnGUI()
         {
-            m_sampleindex = GUILayout.TabViewVertical(m_sampleindex, m_tabnames, (index) => {
+            m_sampleindex = GUILayout.TabViewVertical(m_sampleindex, m_tabnames, (index) =>
+            {
                 switch (index)
                 {
                     case 0:
@@ -52,6 +53,9 @@ namespace RigelEditor.EGUI
                         break;
                     case 4:
                         SampleContainer();
+                        break;
+                    case 5:
+
                         break;
                     case 7:
                         SampleLayout();
@@ -90,7 +94,7 @@ namespace RigelEditor.EGUI
             m_sampleTabIndex = GUILayout.TabView(m_sampleTabIndex, m_sampleTabNames, (index) =>
             {
                 GUILayout.Button("TabItems " + index);
-            },GUIOption.Width(300), GUIOption.Height(100));
+            }, GUIOption.Width(300), GUIOption.Height(100));
 
             GUILayout.Space(10);
 
@@ -98,7 +102,7 @@ namespace RigelEditor.EGUI
             m_sampleTabIndex = GUILayout.TabViewVertical(m_sampleTabIndex, m_sampleTabNames, (index) =>
             {
                 GUILayout.Button("TabItems " + index);
-            },50, GUIOption.Width(300), GUIOption.Height(100));
+            }, 50, GUIOption.Width(300), GUIOption.Height(100));
         }
         #endregion
 
@@ -108,7 +112,7 @@ namespace RigelEditor.EGUI
             //GUI
             GUILayout.Text("GUI.DrawChar");
             var rect = GUI.GetRectAbsolute(new Vector4(5, 30, 20, 20));
-            GUI.DrawRect(rect, RigelColor.White,true);
+            GUI.DrawRect(rect, RigelColor.White, true);
             GUI.TextA(rect, new Vector2(-3, -3), "R", RigelColor.Black);
             rect.X += 25;
             GUI.DrawRect(rect, RigelColor.White, true);
@@ -120,7 +124,7 @@ namespace RigelEditor.EGUI
 
             rect = new Vector4(rect.X - 25, rect.Y + 50, 50, 30);
             GUI.DrawRect(rect, RigelColor.White, true);
-            GUI.TextA(rect, new Vector2(-5, -3), "ABCDEFGHI",RigelColor.Black);
+            GUI.TextA(rect, new Vector2(-5, -3), "ABCDEFGHI", RigelColor.Black);
             GUI.TextA(rect, new Vector2(5, 20), "ZXVBNMGHGJ", RigelColor.Black);
 
             GUILayout.Space(35);
@@ -140,28 +144,28 @@ namespace RigelEditor.EGUI
             GUILayout.Text("GUILayout Text");
             GUILayout.BeginHorizontal();
             {
-                GUILayout.TextN("DefaultText");
-                GUILayout.TextN("Text with Border", null, null, 3, GUIOption.Border(GUIStyle.Current.ColorActiveD));
-                GUILayout.TextN(GUIStyle.Current.ColorActiveD, "TextWithColor");
-                GUILayout.TextN(GUI.Context.Color, GUIStyle.Current.ColorActiveD, "TextWithBG");
+                GUILayout.Text("DefaultText");
+                GUILayout.Text("Text with Border", null, null, 3, GUIOption.Border(GUIStyle.Current.ColorActiveD));
+                GUILayout.Text("TextWithColor", GUIStyle.Current.ColorActiveD);
+                GUILayout.Text("TextWithBG", GUI.Context.Color, GUIStyle.Current.ColorActiveD);
             }
             GUILayout.EndHorizontal();
 
             GUILayout.Text("Text Width");
             GUILayout.BeginHorizontal();
             {
-                GUILayout.TextN(GUI.Context.Color, GUIStyle.Current.ColorActiveD, "100px", GUIOption.Width(100));
-                GUILayout.TextN(GUI.Context.Color, GUIStyle.Current.ColorActiveD, "50px", GUIOption.Width(50));
-                GUILayout.TextN(GUI.Context.Color, GUIStyle.Current.ColorActiveD, "20px", GUIOption.Width(10));
+                GUILayout.Text("100px", GUI.Context.Color, GUIStyle.Current.ColorActiveD, GUIOption.Width(100));
+                GUILayout.Text("50px", GUI.Context.Color, GUIStyle.Current.ColorActiveD, GUIOption.Width(50));
+                GUILayout.Text("20px", GUI.Context.Color, GUIStyle.Current.ColorActiveD, GUIOption.Width(10));
             }
             GUILayout.EndHorizontal();
 
             GUILayout.Text("Horizontal Alignment");
             GUILayout.BeginHorizontal();
             {
-                GUILayout.TextN(GUI.Context.Color, GUIStyle.Current.ColorActiveD, "Align Center", GUIOption.Width(100),GUIOption.AlignHCenter);
-                GUILayout.TextN(GUI.Context.Color, GUIStyle.Current.ColorActiveD, "Align Left", GUIOption.Width(100), GUIOption.AlignHLeft);
-                GUILayout.TextN(GUI.Context.Color, GUIStyle.Current.ColorActiveD, "Align Right", GUIOption.Width(100), GUIOption.AlignHRight);
+                GUILayout.Text("Align Center", GUI.Context.Color, GUIStyle.Current.ColorActiveD, GUIOption.Width(100), GUIOption.AlignHCenter);
+                GUILayout.Text("Align Center", GUI.Context.Color, GUIStyle.Current.ColorActiveD, GUIOption.Width(100), GUIOption.AlignHLeft);
+                GUILayout.Text("Align Right", GUI.Context.Color, GUIStyle.Current.ColorActiveD, GUIOption.Width(100), GUIOption.AlignHRight);
             }
             GUILayout.EndHorizontal();
 
@@ -169,11 +173,11 @@ namespace RigelEditor.EGUI
             GUILayout.BeginHorizontal();
             {
                 GUILayout.SetLineHeight(30);
-                GUILayout.TextN(GUI.Context.Color, GUIStyle.Current.ColorActiveD, "Line Height 30", GUIOption.Width(100), GUIOption.AlignHCenter);
+                GUILayout.Text("Line Height 30", GUI.Context.Color, GUIStyle.Current.ColorActiveD, GUIOption.Width(100), GUIOption.AlignHCenter);
 
-                GUILayout.TextN(GUI.Context.Color, GUIStyle.Current.ColorActiveD, "Align Top", GUIOption.Width(100), GUIOption.AlignVTop);
-                GUILayout.TextN(GUI.Context.Color, GUIStyle.Current.ColorActiveD, "Align Center", GUIOption.Width(100), GUIOption.AlignVCenter);
-                GUILayout.TextN(GUI.Context.Color, GUIStyle.Current.ColorActiveD, "Align Bottom", GUIOption.Width(100), GUIOption.AlignVBottom);
+                GUILayout.Text("Align Top", GUI.Context.Color, GUIStyle.Current.ColorActiveD, GUIOption.Width(100), GUIOption.AlignVTop);
+                GUILayout.Text("Align Center", GUI.Context.Color, GUIStyle.Current.ColorActiveD, GUIOption.Width(100), GUIOption.AlignVCenter);
+                GUILayout.Text("Align Bottom", GUI.Context.Color, GUIStyle.Current.ColorActiveD, GUIOption.Width(100), GUIOption.AlignVBottom);
 
                 GUILayout.RestoreLineHeight();
             }
@@ -191,7 +195,7 @@ namespace RigelEditor.EGUI
                 GUI.BeginGroup(new Vector4(GUILayout.CurrentLayout.Offset, 100, 100), GUIStyle.Current.BackgroundColorS1);
                 {
                     //Rect clipped
-                    GUI.DrawRect(new Vector4(-10, -20,30, 30), RigelColor.Red, false);
+                    GUI.DrawRect(new Vector4(-10, -20, 30, 30), RigelColor.Red, false);
 
                     //Text clipped
                     GUI.Text(new Vector4(50, 30, 100, 30), "Text is clipped by the group rect.");
@@ -200,13 +204,13 @@ namespace RigelEditor.EGUI
 
                 GUILayout.Space(100);
             }
-            
+
 
 
             GUILayout.Text("GUILayout.Area");
             {
                 //Area Absolutely
-                GUILayout.BeginArea(GUILayout.GetRectAbsolute(new Vector4(GUILayout.CurrentLayout.Offset,100,100)), GUIStyle.Current.BackgroundColorS1);
+                GUILayout.BeginArea(GUILayout.GetRectAbsolute(new Vector4(GUILayout.CurrentLayout.Offset, 100, 100)), GUIStyle.Current.BackgroundColorS1);
                 GUILayout.Text("Absolutely");
                 GUILayout.EndArea();
 
@@ -239,14 +243,21 @@ namespace RigelEditor.EGUI
                 GUILayout.EndContainer();
                 GUILayout.Space(100);
             }
-            
+
         }
 
         #endregion
 
+        #region Button
+        private void SampleButton()
+        {
+
+        }
+        #endregion
+
         #region Layout
 
-        [TODO("Bug","Wrong flow caculation!")]
+        [TODO("Bug", "Wrong flow caculation!")]
         private void SampleLayout()
         {
             GUILayout.Text("GUILayout Flow");
@@ -300,7 +311,7 @@ namespace RigelEditor.EGUI
             {
                 GUILayout.BeginHorizontal();
                 {
-                    GUILayout.TextN("TestText");
+                    GUILayout.Text("TestText");
                     GUILayout.BeginVertical();
                     GUILayout.Button("ButtonExtend");
                     GUILayout.Button("ButtonExtend");
