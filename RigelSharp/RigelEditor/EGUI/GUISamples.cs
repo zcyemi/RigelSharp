@@ -56,7 +56,7 @@ namespace RigelEditor.EGUI
                         SampleContainer();
                         break;
                     case 5:
-
+                        SampleButton();
                         break;
                     case 7:
                         SampleLayout();
@@ -269,7 +269,11 @@ namespace RigelEditor.EGUI
         #region Button
         private void SampleButton()
         {
-
+            var recta = new Vector4(GUI.Context.currentGroup.Absolute.Pos(),50,20);
+            GUI.ButtonA(recta, "ButtonA");
+            recta.X += 55;
+            recta.Z = 100;
+            GUI.ButtonA(recta, "ButtonA");
         }
         #endregion
 

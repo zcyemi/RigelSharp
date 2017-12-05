@@ -112,7 +112,6 @@ namespace RigelEditor.EGUI
             }
 
             
-
             float depthz = GUI.Depth;
             GUI.DepthIncrease();
 
@@ -153,10 +152,71 @@ namespace RigelEditor.EGUI
                 Rect(rect, color, absolute);
             }
 
-
             GUI.SetDepth(depthz);
 
             return clicked;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="recta"></param>
+        /// <param name="label"></param>
+        /// <param name="color"></param>
+        /// <param name="texcolor"></param>
+        /// <param name="options">
+        /// GUIOption.GUIOptionType.checkRectContains
+        /// </param>
+        /// <returns></returns>
+        public static bool ButtonA(Vector4 recta,string label,Vector4 color,Vector4? texcolor,params GUIOption[] options)
+        {
+            float depthz = GUI.Depth;
+            GUI.DepthIncrease();
+            TextA(recta, new Vector2(3, 3), label, texcolor);
+
+            depthz = GUI.SetDepth(depthz);
+            bool clicked = false;
+            if (GUIUtility.RectContainsCheck(recta, Event.Pointer))
+            {
+                if (options != null)
+                {
+                    var optCheckRC = options.FirstOrDefault((o) => { return o.type == GUIOption.GUIOptionType.checkRectContains; });
+                    if (optCheckRC != null) optCheckRC.value = true;
+                }
+                if (!Event.Used && Event.EventType == RigelEGUIEventType.MouseClick)
+                {
+                    Event.Use();
+                    clicked = true;
+                }
+
+                if (Event.Used && !clicked)
+                {
+                    GUI.RectA(recta, color);
+                }
+                else if (Event.Button == MouseButton.Left)
+                {
+                    GUI.RectA(recta, GUIStyle.Current.ColorActiveD);
+                }
+                else
+                {
+                    GUI.RectA(recta, GUIStyle.Current.ColorActive);
+                }
+            }
+            else
+            {
+                GUI.RectA(recta, color);
+            }
+            GUI.SetDepth(depthz);
+
+            return clicked;
+        }
+        public static bool ButtonA(Vector4 recta, string label,Vector4 color,params GUIOption[] options)
+        {
+            return ButtonA(recta, label, color, null, options);
+        }
+        public static bool ButtonA(Vector4 recta, string label, params GUIOption[] options)
+        {
+            return ButtonA(recta, label, GUIStyle.Current.ButtonColor, null, options);
         }
 
         public static void Label(Vector4 position, string text, bool absolute = false)
