@@ -473,52 +473,44 @@ namespace RigelEditor.EGUI
         {
 
         }
-
-        public static void DrawBorder(Vector4 rect, int thickness, Vector4? color, bool absolute = false)
-        {
-            var p0 = rect.Pos();
-            var p2 = p0 + rect.Size();
-            var p1 = p0; p1.Y = p2.Y;
-            var p3 = p0; p3.X = p2.X;
-
-            DrawLineAxisAligned(p0, p1, thickness, color, absolute);
-            DrawLineAxisAligned(p1, p2, thickness, color, absolute);
-            DrawLineAxisAligned(p3, p2, thickness, color, absolute);
-            DrawLineAxisAligned(p0, p3, thickness, color, absolute);
-        }
-
         public static void DrawLine(Vector2 startp, Vector2 endp, int thickness, bool absolute = false)
         {
 
         }
 
-        public static void DrawLineAxisAligned(Vector2 startp, Vector2 endp, int thickness, Vector4? color, bool absolute = false)
+
+        public static void Border(Vector4 rect,int thickness,Vector4? color)
         {
-            var rect = new Vector4(startp, endp.X - startp.X, endp.Y - startp.Y);
+            var offset = GUI.Context.currentGroup.Absolute.Pos();
+            rect.X += offset.X;
+            rect.Y += offset.Y;
 
-            float thickhalf = thickness / 2.0f;
-            if (rect.Z > rect.W)
-            {
-                rect.W = thickness;
-                rect.Z += thickhalf;
-            }
-            else
-            {
-                rect.Z = thickness;
-                rect.W += thickhalf;
-            }
-
-            rect.X -= thickhalf;
-            rect.Y -= thickhalf;
-            //if (color != null)
-            //{
-            //    DrawRect(rect, (Vector4)color, absolute);
-            //}
-            //else
-            //{
-            //    DrawRect(rect, absolute);
-            //}
+            BorderA(rect, thickness, color);
         }
+        public static void BorderA(Vector4 rectA,int thickness,Vector4? color)
+        {
+            var p0 = rectA.Pos();
+            var p2 = p0 + rectA.Size();
+            var p1 = p0; p1.Y = p2.Y;
+            var p3 = p0; p3.X = p2.X;
+
+            LineAxisAlignedA(p0, p1, thickness, color);
+            LineAxisAlignedA(p1, p2, thickness, color);
+            LineAxisAlignedA(p3, p2, thickness, color);
+            LineAxisAlignedA(p0, p3, thickness, color);
+        }
+        public static void LineAxisAligned(Vector2 startp, Vector2 endp, int thickness = 1, Vector4? color = null)
+        {
+            var pos = GUI.Context.currentGroup.Absolute.Pos();
+            startp += pos;
+            endp += pos;
+        }
+        public static void LineAxisAlignedA(Vector2 startpA,Vector2 endpA,int thickness = 1,Vector4? color = null)
+        {
+            GUI._ImplDrawLineAxisAligned(startpA, endpA, thickness, color);
+        }
+
+
 
         public static string TextField(Vector4 rect, string content)
         {

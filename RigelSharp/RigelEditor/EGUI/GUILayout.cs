@@ -103,7 +103,7 @@ namespace RigelEditor.EGUI
                 var optborder = options.FirstOrDefault((x) => { return x.type == GUIOption.GUIOptionType.border; });
                 if (optborder != null)
                 {
-                    GUI.DrawBorder(recta, 1, optborder.Vector4Value, true);
+                    GUI.BorderA(recta, 1, optborder.Vector4Value);
                 }
             }
 
@@ -425,7 +425,7 @@ namespace RigelEditor.EGUI
             GUI._ImplDrawTextA(rectcliped, pos, content, color?? Context.Color);
 
             if(optBorder != null)
-                GUI.DrawBorder(rectcliped, 1, optBorder.Vector4Value, true);
+                GUI.BorderA(rectcliped, 1, optBorder.Vector4Value);
 
             var areaRect = Context.currentArea.Rect;
 
@@ -496,20 +496,20 @@ namespace RigelEditor.EGUI
 
         public static void Line(int thickness, Vector4? color, int margin = 2)
         {
-            GUILayout.Space(margin);
-            var endpos = new Vector2(thickness, thickness);
-            var startpos = s_ctx.currentLayout.Offset;
-            if (s_ctx.currentLayout.Verticle)
-            {
-                endpos.X = s_ctx.currentArea.Rect.Z;
-            }
-            else
-            {
-                endpos.Y = s_ctx.currentArea.Rect.W;
-            }
-            GUI.DrawLineAxisAligned(startpos, endpos, thickness, color);
+            //GUILayout.Space(margin);
+            //var endpos = new Vector2(thickness, thickness);
+            //var startpos = s_ctx.currentLayout.Offset;
+            //if (s_ctx.currentLayout.Verticle)
+            //{
+            //    endpos.X = s_ctx.currentArea.Rect.Z;
+            //}
+            //else
+            //{
+            //    endpos.Y = s_ctx.currentArea.Rect.W;
+            //}
+            //GUI.LineAxisAligned(startpos, endpos, thickness, color);
 
-            GUILayout.Space(margin);
+            //GUILayout.Space(margin);
         }
 
         public static void BeginToolBar(int height)
@@ -691,7 +691,7 @@ namespace RigelEditor.EGUI
             var tabview = GUI.GetTabView(rectab);
 
             int ret = tabview.Draw(rect,index, tabnames, draw);
-            GUI.DrawBorder(rectab, 1, GUIStyle.Current.BackgroundColorS1,true);
+            GUI.BorderA(rectab, 1, GUIStyle.Current.BackgroundColorS1);
 
             AutoCaculateOffset(rect.Z, rect.W);
             return ret;
@@ -722,7 +722,7 @@ namespace RigelEditor.EGUI
             });
 
             int ret = tabview.Draw(rect, index, tabnames, draw);
-            GUI.DrawBorder(rectab, 1, GUIStyle.Current.BackgroundColorS1, true);
+            GUI.BorderA(rectab, 1, GUIStyle.Current.BackgroundColorS1);
 
             AutoCaculateOffset(rect.Z, rect.W);
             return ret;

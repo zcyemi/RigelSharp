@@ -239,5 +239,27 @@ namespace RigelEditor.EGUI
 
             DepthIncrease();
         }
+
+        public static void _ImplDrawLineAxisAligned(Vector2 startpA,Vector2 endpA,int thickness,Vector4? color)
+        {
+            var rect = new Vector4(startpA, endpA.X - startpA.X, endpA.Y - startpA.Y);
+
+            float thickhalf = thickness / 2.0f;
+            if (rect.Z > rect.W)
+            {
+                rect.W = thickness;
+                rect.Z += thickhalf;
+            }
+            else
+            {
+                rect.Z = thickness;
+                rect.W += thickhalf;
+            }
+
+            rect.X -= thickhalf;
+            rect.Y -= thickhalf;
+
+            _ImplDrawRectA(rect, color ?? GUIStyle.Current.BorderColor);
+        }
     }
 }
