@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 
 using RigelCore;
-using SharpDX;
 
 namespace RigelEditor.EGUI
 {
