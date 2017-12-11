@@ -125,8 +125,8 @@ namespace RigelEditor.EGUI
                 {
                     m_pos += GUI.Event.DragOffset;
 
-                    m_pos.X = MathUtil.Clamp(m_pos.X, 0, GUI.Context.baseRect.Z);
-                    m_pos.Y = MathUtil.Clamp(m_pos.Y, 0, GUI.Context.baseRect.W);
+                    m_pos.X = Mathf.Clamp(m_pos.X, 0, GUI.Context.baseRect.Z);
+                    m_pos.Y = Mathf.Clamp(m_pos.Y, 0, GUI.Context.baseRect.W);
                     onmove = true;
                 }
                 if (m_dialogRezieable && !onmove)
@@ -140,8 +140,8 @@ namespace RigelEditor.EGUI
                     if (m_dragResizeHV.OnDrag(rectResize))
                     {
                         m_size += GUI.Event.DragOffset;
-                        m_size.Y = MathUtil.Clamp(m_size.Y, m_dialogMinSize.Y, m_dialogMaxSize.Y);
-                        m_size.X = MathUtil.Clamp(m_size.X, m_dialogMinSize.X, m_dialogMaxSize.X);
+                        m_size.Y = Mathf.Clamp(m_size.Y, m_dialogMinSize.Y, m_dialogMaxSize.Y);
+                        m_size.X = Mathf.Clamp(m_size.X, m_dialogMinSize.X, m_dialogMaxSize.X);
                     }
                 }
             }

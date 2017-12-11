@@ -120,11 +120,25 @@ namespace RigelCore
                 return Vector2.zeroVector;
             }
         }
+        public static Vector2 Zero
+        {
+            get
+            {
+                return Vector2.zeroVector;
+            }
+        }
 
         /// <summary>
         ///   <para>Shorthand for writing Vector2(1, 1).</para>
         /// </summary>
         public static Vector2 one
+        {
+            get
+            {
+                return Vector2.oneVector;
+            }
+        }
+        public static Vector2 One
         {
             get
             {
@@ -1236,6 +1250,22 @@ namespace RigelCore
             }
         }
 
+
+        public Vector2 Pos()
+        {
+            return new Vector2(x, y);
+        }
+
+        public Vector2 Size()
+        {
+            return new Vector2(z, w);
+        }
+
+        public float X { get { return x; } set { x = value; } }
+        public float Y { get { return y; } set { y = value; } }
+        public float Z { get { return z; } set { z = value; } }
+        public float W { get { return w; } set { w = value; } }
+
         /// <summary>
         ///   <para>Returns this vector with a magnitude of 1 (Read Only).</para>
         /// </summary>
@@ -1353,6 +1383,14 @@ namespace RigelCore
             this.y = y;
             this.z = 0f;
             this.w = 0f;
+        }
+
+        public Vector4(Vector2 v, float z, float w)
+        {
+            this.x = v.x;
+            this.y = v.y;
+            this.z = z;
+            this.w = w;
         }
 
         /// <summary>

@@ -45,11 +45,11 @@ namespace RigelEditor.EGUI
             {
                 Vector4 root = s_ctx.currentGroup.Rect;
 
-                rect.X = MathUtil.Clamp(rect.X, 0, root.Z);
-                rect.Y = MathUtil.Clamp(rect.Y, 0, root.W);
+                rect.x =Mathf.Clamp(rect.x, 0, root.z);
+                rect.y = Mathf.Clamp(rect.y, 0, root.w);
 
-                rect.Z = MathUtil.Clamp(rect.Z, 0, root.Z - rect.X);
-                rect.W = MathUtil.Clamp(rect.W, 0, root.W - rect.Y);
+                rect.z = Mathf.Clamp(rect.z, 0, root.z - rect.x);
+                rect.w = Mathf.Clamp(rect.w, 0, root.w - rect.y);
 
                 if (color != null) Rect(rect, (Vector4)color);
                 s_ctx.currentGroup.Rect = rect;

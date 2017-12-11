@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using SharpDX;
+using RigelCore;
+
 
 namespace RigelEditor.EGUI
 {
@@ -22,10 +23,10 @@ namespace RigelEditor.EGUI
             if (rb.X < 0 || rb.Y < 0) return false;
             if (rect.X > group.Z || rect.Y > group.W) return false;
 
-            rect.X = MathUtil.Clamp(rect.X, 0, group.Z);
-            rect.Y = MathUtil.Clamp(rect.Y, 0, group.W);
-            rb.X = MathUtil.Clamp(rb.X, rect.X, group.Z);
-            rb.Y = MathUtil.Clamp(rb.Y, rect.Y, group.W);
+            rect.X = Mathf.Clamp(rect.X, 0, group.Z);
+            rect.Y = Mathf.Clamp(rect.Y, 0, group.W);
+            rb.X = Mathf.Clamp(rb.X, rect.X, group.Z);
+            rb.Y = Mathf.Clamp(rb.Y, rect.Y, group.W);
 
             rect.Z = rb.X - rect.X;
             rect.W = rb.Y - rect.Y;
@@ -46,10 +47,10 @@ namespace RigelEditor.EGUI
             if (rb.X < 0 || rb.Y < 0) return false;
             if (rect.X > group.Z || rect.Y > group.W) return false;
 
-            rect.X = MathUtil.Clamp(rect.X, 0, group.Z);
-            rect.Y = MathUtil.Clamp(rect.Y, 0, group.W);
-            rb.X = MathUtil.Clamp(rb.X, rect.X, group.Z);
-            rb.Y = MathUtil.Clamp(rb.Y, rect.Y, group.W);
+            rect.X = Mathf.Clamp(rect.X, 0, group.Z);
+            rect.Y = Mathf.Clamp(rect.Y, 0, group.W);
+            rb.X = Mathf.Clamp(rb.X, rect.X, group.Z);
+            rb.Y = Mathf.Clamp(rb.Y, rect.Y, group.W);
 
             rect.Z = rb.X - rect.X;
             rect.W = rb.Y - rect.Y;
@@ -122,5 +123,6 @@ namespace RigelEditor.EGUI
             v.W = szy;
             return v;
         }
+
     }
 }

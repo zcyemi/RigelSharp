@@ -25,11 +25,11 @@ namespace RigelEditor.EGUI
     public struct RigelEGUIVertex
     {
         [FieldOffset(0)]
-        public Vector4 Position;
+        public RigelCore.Vector4 Position;
         [FieldOffset(16)]
-        public Vector4 Color;
+        public RigelCore.Vector4 Color;
         [FieldOffset(32)]
-        public Vector2 UV;
+        public RigelCore.Vector2 UV;
     }
 
     internal class GUIGraphicsBind:IDisposable

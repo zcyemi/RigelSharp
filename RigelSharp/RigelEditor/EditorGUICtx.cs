@@ -27,7 +27,7 @@ namespace RigelEditor.EGUI
         private GUIGraphicsBind m_graphicsBind = null;
         private FontInfo m_font = null;
         private bool m_lastFrameDrag = false;
-        private Vector2 m_LastPointerDrag;
+        private RigelCore.Vector2 m_LastPointerDrag;
 
         private GUIDockMgr m_dockMgr;
 
