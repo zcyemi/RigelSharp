@@ -15,7 +15,14 @@ namespace RigelEditor.EGUI
 
         private static EditorGUICtx s_eguictx;
 
+        private static IGUIEventHandler s_eventHandler = null;
+
         private static List<GUIDrawStage> s_drawStages;
+
+        public static void Init(IGUIEventHandler eventHandler)
+        {
+            s_eventHandler = eventHandler;
+        }
 
         public static void Init(EditorGUICtx eguictx)
         {
