@@ -34,15 +34,15 @@ namespace RigelEditor.Platforms
         {
             handlerUserResize       = (sender, e) =>
             {
-                EventUpdate(new GUIEvent(RigelEGUIEventType.Resize, e));
+                PostProcessEvent(new GUIEvent(RigelEGUIEventType.Resize, e));
             };
             handlerKeyDown          = (s, e) =>
             {
-                EventUpdate(new GUIEvent(RigelEGUIEventType.KeyDown, e));
+                PostProcessEvent(new GUIEvent(RigelEGUIEventType.KeyDown, e));
             };
             handlerKeyUp            = (s, e) =>
             {
-                EventUpdate(new GUIEvent(RigelEGUIEventType.KeyUp, e));
+                PostProcessEvent(new GUIEvent(RigelEGUIEventType.KeyUp, e));
             };
             handlerKeyPress         = (s, e) =>
             {
@@ -52,33 +52,33 @@ namespace RigelEditor.Platforms
             {
                 if (e.Button == System.Windows.Forms.MouseButtons.Left)
                 {
-                    EventUpdate(new GUIEvent(RigelEGUIEventType.MouseDragUpdate, e));
+                    PostProcessEvent(new GUIEvent(RigelEGUIEventType.MouseDragUpdate, e));
                 }
                 else
                 {
-                    EventUpdate(new GUIEvent(RigelEGUIEventType.MouseMove, e));
+                    PostProcessEvent(new GUIEvent(RigelEGUIEventType.MouseMove, e));
                 }
             };
             handlerMouseDown        = (s, e) =>
             {
                 var t = e;
-                EventUpdate(new GUIEvent(RigelEGUIEventType.MouseDown, e));
+                PostProcessEvent(new GUIEvent(RigelEGUIEventType.MouseDown, e));
             };
             handlerMouseUp          = (s, e) =>
             {
-                EventUpdate(new GUIEvent(RigelEGUIEventType.MouseUp, e));
+                PostProcessEvent(new GUIEvent(RigelEGUIEventType.MouseUp, e));
             };
             handlerMouseClick       = (s, e) =>
             {
-                EventUpdate(new GUIEvent(RigelEGUIEventType.MouseClick, e));
+                PostProcessEvent(new GUIEvent(RigelEGUIEventType.MouseClick, e));
             };
             handlerMouseDoubleClick = (s, e) =>
             {
-                EventUpdate(new GUIEvent(RigelEGUIEventType.MouseDoubleClick, e));
+                PostProcessEvent(new GUIEvent(RigelEGUIEventType.MouseDoubleClick, e));
             };
             handlerMouseWheel       = (s, e) =>
             {
-                EventUpdate(new GUIEvent(RigelEGUIEventType.MouseWheel, e));
+                PostProcessEvent(new GUIEvent(RigelEGUIEventType.MouseWheel, e));
             };
             handlerDragEnter        = (s, e) =>
             {
@@ -88,6 +88,43 @@ namespace RigelEditor.Platforms
             {
                 EditorUtility.Log("event drag drop");
             };
+        }
+
+
+        private bool m_lastFrameDrag = false;
+        private RigelCore.Vector2 m_LastPointerDrag;
+
+        private void PostProcessEvent(GUIEvent guievent)
+        {
+            //process drag
+            if (guievent.EventType == RigelEGUIEventType.MouseDragUpdate)
+            {
+                if (m_lastFrameDrag == false)
+                {
+                    guievent.EventType = RigelEGUIEventType.MouseDragEnter;
+                    m_lastFrameDrag = true;
+                }
+            }
+            else if (m_lastFrameDrag == true && (guievent.EventType & RigelEGUIEventType.MouseEvent) > 0)
+            {
+                m_lastFrameDrag = false;
+                guievent.EventType = RigelEGUIEventType.MouseDragLeave;
+            }
+
+            if (guievent.IsMouseDragEvent())
+            {
+                if (guievent.EventType == RigelEGUIEventType.MouseDragUpdate)
+                {
+                    guievent.DragOffset = guievent.Pointer - m_LastPointerDrag;
+                }
+                m_LastPointerDrag = guievent.Pointer;
+            }
+
+            guievent.RenderWidth = m_form.ClientSize.Width;
+            guievent.RenderHeight = m_form.ClientSize.Height;
+
+            //dispatcher event
+            EventUpdate(guievent);
         }
 
 

@@ -22,8 +22,8 @@ namespace RigelEditor.EGUI
 
         public static GUIEvent Event { get; set; }
 
-        internal static List<RigelEGUIVertex> BufferRect { get { return DrawTarget.bufferRect; } }
-        internal static List<RigelEGUIVertex> BufferText { get { return DrawTarget.bufferText; } }
+        internal static IGUIBuffer BufferRect { get { return DrawTarget.bufferRect; } }
+        internal static IGUIBuffer BufferText { get { return DrawTarget.bufferText; } }
 
         private static float s_depthz;
         public static float Depth { get { return s_depthz; } }
@@ -396,30 +396,35 @@ namespace RigelEditor.EGUI
             float x2 = Math.Min(rect.X+ rect.Z,x1 + glyph.PixelWidth);
             float y2 = Math.Min(rect.Y+ rect.W,y1 + glyph.PixelHeight);
 
-            BufferText.Add(new RigelEGUIVertex()
-            {
-                Position = new Vector4(x1, y1, s_depthz, 1),
-                Color = color,
-                UV = glyph.UV[0]
-            });
-            BufferText.Add(new RigelEGUIVertex()
-            {
-                Position = new Vector4(x1, y2, s_depthz, 1),
-                Color = color,
-                UV = glyph.UV[1]
-            });
-            BufferText.Add(new RigelEGUIVertex()
-            {
-                Position = new Vector4(x2, y2, s_depthz, 1),
-                Color = color,
-                UV = glyph.UV[2]
-            });
-            BufferText.Add(new RigelEGUIVertex()
-            {
-                Position = new Vector4(x2, y1, s_depthz, 1),
-                Color = color,
-                UV = glyph.UV[3]
-            });
+            BufferText.AddVertices(new Vector4(x1, y1, s_depthz, 1), color, glyph.UV[0]);
+            BufferText.AddVertices(new Vector4(x1, y2, s_depthz, 1), color, glyph.UV[1]);
+            BufferText.AddVertices(new Vector4(x2, y2, s_depthz, 1), color, glyph.UV[2]);
+            BufferText.AddVertices(new Vector4(x2, y1, s_depthz, 1), color, glyph.UV[3]);
+
+            //BufferText.Add(new RigelEGUIVertex()
+            //{
+            //    Position = new Vector4(x1, y1, s_depthz, 1),
+            //    Color = color,
+            //    UV = glyph.UV[0]
+            //});
+            //BufferText.Add(new RigelEGUIVertex()
+            //{
+            //    Position = new Vector4(x1, y2, s_depthz, 1),
+            //    Color = color,
+            //    UV = glyph.UV[1]
+            //});
+            //BufferText.Add(new RigelEGUIVertex()
+            //{
+            //    Position = new Vector4(x2, y2, s_depthz, 1),
+            //    Color = color,
+            //    UV = glyph.UV[2]
+            //});
+            //BufferText.Add(new RigelEGUIVertex()
+            //{
+            //    Position = new Vector4(x2, y1, s_depthz, 1),
+            //    Color = color,
+            //    UV = glyph.UV[3]
+            //});
 
             DepthIncrease();
 

@@ -18,20 +18,21 @@ using Device = SharpDX.Direct3D11.Device;
 using RigelEditor;
 using RigelCore;
 
+using RigelEditor.Platforms;
+
 namespace RigelEditor.EGUI
 {
 
-    public partial class EditorGUICtx:IDisposable,IEditorModule
+    public partial class EditorGUIManager:IDisposable,IEditorModule
     {
         private RenderForm m_form;
-        private GUIGraphicsBind m_graphicsBind = null;
         private FontInfo m_font = null;
         private bool m_lastFrameDrag = false;
         private RigelCore.Vector2 m_LastPointerDrag;
 
         private GUIDockMgr m_dockMgr;
 
-        internal GUIGraphicsBind GraphicsBind { get { return m_graphicsBind; } }
+        
         internal FontInfo Font { get { return m_font; } }
         public int ClientWidth { get; private set; }
         public int ClientHeight { get; private set; }
@@ -39,7 +40,12 @@ namespace RigelEditor.EGUI
         public RenderForm Form { get { return m_form; } }
         public GUIDockMgr DockManager { get { return m_dockMgr; } }
 
-        public EditorGUICtx()
+
+        private GUIEventHandlerSharpDX m_eventHandler;
+        private GUIGraphicsBindSharpDX m_graphicsBind;
+        internal IGUIGraphicsBind GraphicsBind { get { return m_graphicsBind; } }
+
+        public EditorGUIManager()
         {
 
         }
@@ -48,49 +54,13 @@ namespace RigelEditor.EGUI
         {
             //basis
             m_form = RigelEditorApp.Instance.Form;
-            m_graphicsBind = new GUIGraphicsBind(EditorGraphicsManager.Instance.Graphics);
-            m_font = new FontInfo("arial.ttf");
-            m_graphicsBind.CrateFontTexture(m_font);
+            
 
             m_dockMgr = new GUIDockMgr();
 
-            GUIInit();
+            m_eventHandler = new GUIEventHandlerSharpDX();
+            m_eventHandler.RegisterEvent(m_form);
 
-            RegisterEvent();
-        }
-
-
-        private void OnWindowEvent(GUIEvent guievent)
-        {
-            if(guievent.EventType == RigelEGUIEventType.MouseDragUpdate)
-            {
-                if(m_lastFrameDrag == false)
-                {
-                    guievent.EventType = RigelEGUIEventType.MouseDragEnter;
-                    m_lastFrameDrag = true;
-                }
-            }
-            else if (m_lastFrameDrag == true && (guievent.EventType & RigelEGUIEventType.MouseEvent) > 0)
-            {
-                m_lastFrameDrag = false;
-                guievent.EventType = RigelEGUIEventType.MouseDragLeave;
-            }
-
-            if (guievent.IsMouseDragEvent())
-            {
-                if(guievent.EventType == RigelEGUIEventType.MouseDragUpdate)
-                {
-                    guievent.DragOffset = guievent.Pointer - m_LastPointerDrag;
-                }
-                m_LastPointerDrag = guievent.Pointer;
-            }
-            GUIUpdate(guievent);
-
-        }
-
-
-        private void GUIInit()
-        {
             ClientWidth = m_form.Width;
             ClientHeight = m_form.Height;
 
@@ -103,9 +73,15 @@ namespace RigelEditor.EGUI
 
             //RigelEGUI.InternalResetContext(this);
 
-            GUIInternal.Init(this);
 
+            m_graphicsBind = new GUIGraphicsBindSharpDX(EditorGraphicsManager.Instance.Graphics);
+            m_font = new FontInfo("arial.ttf");
+            m_graphicsBind.CrateFontTexture(m_font);
+
+            GUIInternal.Init(m_eventHandler,m_graphicsBind,m_font);
         }
+
+
         private void GUIRelease()
         {
             //m_windows.Clear();
@@ -113,37 +89,20 @@ namespace RigelEditor.EGUI
 
             GUIInternal.Release();
         }
-        private void GUIUpdate(GUIEvent guievent)
+
+
+        public void Update()
         {
-
-            GUIInternal.Update(guievent);
-
             m_graphicsBind.Update();
-
-            //RigelUtility.Log("------------- New Frame -----------");
-            //RigelEGUI.InternalFrameBegin(guievent);
-
-            //GUIUpdateMainBegin(guievent);
-            ////GUIUpdateWindow(guievent);
-            //GUIUpdateMainEnd(guievent);
-
-
-            ////draw end
-            //RigelEGUI.InternalFrameEnd();
-
         }
 
         public void Dispose()
         {
+            m_eventHandler.UnRegister();
+            m_eventHandler = null;
+
             if(m_graphicsBind != null) m_graphicsBind.Dispose();
             m_form = null;
-        }
-
-        
-
-        public void Update()
-        {
-
         }
 
 

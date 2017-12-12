@@ -57,11 +57,11 @@ namespace RigelEditor.EGUI
                 float lastDepth = GUI.Depth;
                 if(m_drawTarget.bufferRect.Count > 0)
                 {
-                    lastDepth = Math.Min(lastDepth,m_drawTarget.bufferRect[rectCount - 1].Position.Z);
+                    lastDepth = Math.Min(lastDepth,m_drawTarget.bufferRect.VerticesZ(rectCount - 1));
                 }
                 if(m_drawTarget.bufferText.Count > 0)
                 {
-                    lastDepth = Math.Min(lastDepth, m_drawTarget.bufferText[textCount - 1].Position.Z);
+                    lastDepth = Math.Min(lastDepth, m_drawTarget.bufferText.VerticesZ(textCount - 1));
                 }
                 GUI.SetDepth(lastDepth);
             }
@@ -76,9 +76,9 @@ namespace RigelEditor.EGUI
             m_needSyncBuffer = true;
         }
 
-        public override void SyncBuffer(EditorGUICtx eguictx)
+        public override void SyncBuffer(IGUIGraphicsBind guibind)
         {
-            var bind = eguictx.GraphicsBind;
+            var bind = guibind;
 
             if (!m_needSyncBuffer)
             {
@@ -92,35 +92,7 @@ namespace RigelEditor.EGUI
                 return;
             }
 
-            {
-                var rectCount = m_drawTarget.bufferRect.Count;
-                if(rectCount != 0)
-                {
-                    var cursize = bind.BufferMainRect.BufferDataCount;
-                    if (cursize != m_lastBufferSizeRect) bind.NeedRebuildCommandList = true;
-                    var newsize = cursize + rectCount;
-                    bind.BufferMainRect.CheckAndExtendsWithSize(newsize);
-                    m_drawTarget.bufferRect.CopyTo(0, bind.BufferMainRect.BufferData, cursize, rectCount);
-                    bind.BufferMainRect.InternalSetBufferDataCount(newsize);
-
-                    m_lastBufferSizeRect = newsize;
-                }
-            }
-
-            {
-                var textCount = m_drawTarget.bufferText.Count;
-                if(textCount != 0)
-                {
-                    var cursize = bind.BufferMainText.BufferDataCount;
-                    if (cursize != m_lastBufferSizeText) bind.NeedRebuildCommandList = true;
-                    var newsize = cursize + textCount;
-                    bind.BufferMainText.CheckAndExtendsWithSize(newsize);
-                    m_drawTarget.bufferText.CopyTo(0, bind.BufferMainText.BufferData, cursize, textCount);
-                    bind.BufferMainText.InternalSetBufferDataCount(newsize);
-
-                    m_lastBufferSizeText = newsize;
-                }
-            }
+            bind.SyncDrawTarget(this,m_drawTarget);
 
             //remove bufferdata
             var compstack = GUI.Context.componentStack;

@@ -26,7 +26,7 @@ namespace RigelEditor
         private RenderForm m_windowForm;
 
         public RenderForm Form { get { return m_windowForm; } }
-        public EditorGUICtx EditorGUI { get; private set; }
+        public EditorGUIManager EditorGUI { get; private set; }
 
 
         public RigelEditorApp()
@@ -47,7 +47,7 @@ namespace RigelEditor
             //var consolewin = RigelEGUIWindow.GetWindow<RigelEditorConsoleWindow>();
 
             EditorModuleManager.Instance.Init();
-            EditorGUI = EditorModuleManager.Instance.FindModule<EditorGUICtx>();
+            EditorGUI = EditorModuleManager.Instance.FindModule<EditorGUIManager>();
         }
 
         public void EnterRunloop() {
