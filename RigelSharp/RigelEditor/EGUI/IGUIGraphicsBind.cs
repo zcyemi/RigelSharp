@@ -15,5 +15,6 @@ namespace RigelEditor.EGUI
         bool NeedRebuildCommandList { get; set; }
 
         void SyncDrawTarget(GUIDrawStage stage, GUIDrawTarget drawtarget);
+        void UpdateGUIParams(int width, int height);
     }
 }

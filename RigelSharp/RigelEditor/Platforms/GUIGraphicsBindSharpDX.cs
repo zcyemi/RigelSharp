@@ -310,12 +310,18 @@ namespace RigelEditor.Platforms
 
         }
 
+
+        private int m_lastWidth, m_lastHeight;
         public void UpdateGUIParams(int width, int height)
         {
+            if (m_lastWidth == width && m_lastHeight == height) return;
+
             m_matrixgui = Matrix.OrthoOffCenterLH(0, width, height, 0, GUI_CLIP_PLANE_NEAR, GUI_CLIP_PLANE_FAR);
             m_matrixgui.Transpose();
 
             m_guiparamsChanged = true;
+            m_lastWidth = width;
+            m_lastHeight = height;
         }
 
         public void CrateFontTexture(FontInfo font)
@@ -429,6 +435,8 @@ namespace RigelEditor.Platforms
         {
             if (m_guiparamsChanged)
             {
+                Console.WriteLine("guiparams changed");
+
                 m_graphics.ImmediateContext.UpdateSubresource(ref m_matrixgui, m_gConstBuffer);
                 m_guiparamsChanged = false;
             }
@@ -637,11 +645,13 @@ namespace RigelEditor.Platforms
             {
                 //rect
                 var rectCount = drawtarget.bufferRect.Count;
+                if(rectCount != BufferMainRect.BufferDataCount) NeedRebuildCommandList = true;
                 BufferMainRect.CheckAndExtendsWithSize(rectCount);
                 drawtarget.bufferRect.CopyTo(BufferMainRect.BufferData);
                 BufferMainRect.InternalSetBufferDataCount(rectCount);
                 //text
                 var textCount = drawtarget.bufferText.Count;
+                if (textCount != BufferMainText.BufferDataCount) NeedRebuildCommandList = true;
                 BufferMainText.CheckAndExtendsWithSize(textCount);
                 drawtarget.bufferText.CopyTo(BufferMainText.BufferData);
                 BufferMainText.InternalSetBufferDataCount(textCount);
@@ -661,6 +671,7 @@ namespace RigelEditor.Platforms
                     {
                         var cursize = BufferMainRect.BufferDataCount;
                         var newsize = cursize + rectCount;
+                        if (newsize != BufferMainRect.BufferDataCount) NeedRebuildCommandList = true;
                         BufferMainRect.CheckAndExtendsWithSize(newsize);
                         drawtarget.bufferRect.CopyTo(0, BufferMainRect.BufferData, cursize, rectCount);
                         BufferMainRect.InternalSetBufferDataCount(newsize);
@@ -674,6 +685,7 @@ namespace RigelEditor.Platforms
                     {
                         var cursize = BufferMainText.BufferDataCount;
                         var newsize = cursize + textCount;
+                        if (newsize != BufferMainText.BufferDataCount) NeedRebuildCommandList = true;
                         BufferMainText.CheckAndExtendsWithSize(newsize);
                         drawtarget.bufferText.CopyTo(0, BufferMainText.BufferData, cursize, textCount);
                         BufferMainText.InternalSetBufferDataCount(newsize);

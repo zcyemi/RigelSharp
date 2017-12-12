@@ -50,6 +50,9 @@ namespace RigelEditor.EGUI
 
         public static void Update(GUIEvent guievent)
         {
+            s_graphicsBind.UpdateGUIParams(guievent.RenderWidth, guievent.RenderHeight);
+
+
             //init frame
             GUI.Context.Frame(guievent, guievent.RenderWidth, guievent.RenderHeight);
 
