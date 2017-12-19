@@ -16,7 +16,8 @@ using Buffer = SharpDX.Direct3D11.Buffer;
 using Device = SharpDX.Direct3D11.Device;
 
 using RigelEditor;
-using RigelCore;
+using Rigel;
+using Rigel.EGUI;
 
 using RigelEditor.Platforms;
 
@@ -28,7 +29,7 @@ namespace RigelEditor.EGUI
         private RenderForm m_form;
         private FontInfo m_font = null;
         private bool m_lastFrameDrag = false;
-        private RigelCore.Vector2 m_LastPointerDrag;
+        private Rigel.Vector2 m_LastPointerDrag;
 
         private GUIDockMgr m_dockMgr;
 

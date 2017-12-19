@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using SharpDX;
 using RigelEditor.EGUI;
+using Rigel.EGUI;
 
 namespace RigelEditor
 {

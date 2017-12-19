@@ -9,7 +9,7 @@
     <ProjectGuid>{F29A7E2D-8106-44A3-A404-64870126BE84}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RigelCore</RootNamespace>
+    <RootNamespace>Rigel</RootNamespace>
     <AssemblyName>RigelCore</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

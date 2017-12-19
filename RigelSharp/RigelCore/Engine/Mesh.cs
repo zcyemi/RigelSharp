@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 using SharpDX;
-using RigelCore;
+using Rigel;
 
-namespace RigelCore.Engine
+namespace Rigel.Engine
 {
     public class Mesh
     {

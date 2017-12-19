@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using RigelEditor.EGUI;
 
 using SharpDX.Windows;
+using Rigel.EGUI;
 
 namespace RigelEditor.Platforms
 {
@@ -92,7 +93,7 @@ namespace RigelEditor.Platforms
 
 
         private bool m_lastFrameDrag = false;
-        private RigelCore.Vector2 m_LastPointerDrag;
+        private Rigel.Vector2 m_LastPointerDrag;
 
         private void PostProcessEvent(GUIEvent guievent)
         {

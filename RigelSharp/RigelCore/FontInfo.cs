@@ -7,9 +7,8 @@ using System.Threading.Tasks;
 using SharpFont;
 using SharpDX;
 
-using RigelCore;
 
-namespace RigelCore
+namespace Rigel
 {
 
     public class FontInfo : IDisposable,IFontInfo

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace RigelCore
+namespace Rigel
 {
     public struct Mathf
     {

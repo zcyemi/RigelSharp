@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct3D11;
 
-using RigelCore;
-using RigelCore.Engine;
+using Rigel;
+using Rigel.Engine;
 
-namespace RigelCore.Rendering
+namespace Rigel.Rendering
 {
     public static class Graphics
     {

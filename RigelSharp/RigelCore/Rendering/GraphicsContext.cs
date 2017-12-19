@@ -13,10 +13,10 @@ using SharpDX.Win32;
 using Buffer = SharpDX.Direct3D11.Buffer;
 using Device = SharpDX.Direct3D11.Device;
 
-using RigelCore;
-using RigelCore.Engine;
+using Rigel;
+using Rigel.Engine;
 
-namespace RigelCore.Rendering
+namespace Rigel.Rendering
 {
     public class GraphicsContext : IDisposable
     {
