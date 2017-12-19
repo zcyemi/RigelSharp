@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using SharpDX;
+using RigelCore;
 
 namespace RigelEditor.EGUI
 {
@@ -800,6 +800,9 @@ namespace RigelEditor.EGUI
         public Vector2 Pointer { get; private set; } = Vector2.Zero;
         public Vector2 DragOffset { get; internal set; } = Vector2.Zero;
 
+        public int RenderWidth;
+        public int RenderHeight;
+
         public GUIEvent(RigelEGUIEventType eventtype,System.Windows.Forms.MouseEventArgs e)
         {
             EventType = eventtype;
@@ -879,70 +882,5 @@ namespace RigelEditor.EGUI
         MouseEventActive = MouseClick | MouseDoubleClick | MouseDown,
         MouseEventDrag = MouseDragEnter | MouseDragLeave | MouseDragUpdate,
         KeyEvent = KeyPress | KeyDown | KeyUp,
-    }
-
-    public partial class EditorGUICtx : IDisposable
-    {
-        private void RegisterEvent()
-        {
-            m_form.UserResized += (sender, e) => {
-                ClientWidth = m_form.ClientSize.Width;
-                ClientHeight = m_form.ClientSize.Height;
-                m_graphicsBind.UpdateGUIParams(ClientWidth,ClientHeight);
-
-                OnWindowEvent(new GUIEvent(RigelEGUIEventType.Resize, e));
-            };
-            m_form.KeyDown += (s, e) =>
-            {
-                OnWindowEvent(new GUIEvent(RigelEGUIEventType.KeyDown,e));
-            };
-            m_form.KeyUp += (s, e) =>
-            {
-                OnWindowEvent(new GUIEvent(RigelEGUIEventType.KeyUp,e));
-            };
-            m_form.KeyPress += (s, e) =>
-            {
-                //OnWindowEvent(new RigelEGUIEvent(RigelEGUIEventType.KeyPress,e));
-            };
-            m_form.MouseMove += (s, e) =>
-            {
-                if (e.Button == System.Windows.Forms.MouseButtons.Left)
-                {
-                    OnWindowEvent(new GUIEvent(RigelEGUIEventType.MouseDragUpdate, e));
-                }
-                else
-                {
-                    OnWindowEvent(new GUIEvent(RigelEGUIEventType.MouseMove, e));
-                }
-                
-            };
-            m_form.MouseDown += (s, e) =>
-            {
-                var t = e;
-                OnWindowEvent(new GUIEvent(RigelEGUIEventType.MouseDown,e));
-            };
-            m_form.MouseUp += (s, e) =>
-            {
-                OnWindowEvent(new GUIEvent(RigelEGUIEventType.MouseUp,e));
-            };
-            m_form.MouseClick += (s, e) => {
-                OnWindowEvent(new GUIEvent(RigelEGUIEventType.MouseClick,e));
-            };
-            m_form.MouseDoubleClick += (s, e) => {
-                OnWindowEvent(new GUIEvent(RigelEGUIEventType.MouseDoubleClick,e));
-            };
-            m_form.MouseWheel += (s, e) =>
-            {
-                OnWindowEvent(new GUIEvent(RigelEGUIEventType.MouseWheel,e));
-            };
-            m_form.DragEnter += (s, e) =>
-            {
-                EditorUtility.Log("event drag enter");
-            };
-            m_form.DragDrop += (s, e) =>
-            {
-                EditorUtility.Log("event drag drop");
-            };
-        }
     }
 }

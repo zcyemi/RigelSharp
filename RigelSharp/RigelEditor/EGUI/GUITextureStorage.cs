@@ -75,10 +75,15 @@ namespace RigelEditor.EGUI
         private Stack<GUITextureDraw> m_objpool = new Stack<GUITextureDraw>();
 
 
-        private List<RigelEGUIVertex> m_bufferData = new List<RigelEGUIVertex>();
-        public List<RigelEGUIVertex> BufferData { get { return m_bufferData; } }
+        private IGUIBuffer m_bufferData;
+        public IGUIBuffer BufferData { get { return m_bufferData; } }
 
         public bool Changed { get { return m_changed; } }
+
+        public GUITextureStorage()
+        {
+            m_bufferData = GUIInternal.GraphicsBind.CreateBuffer();
+        }
 
         public void OnFrame()
         {
@@ -177,23 +182,22 @@ namespace RigelEditor.EGUI
                 {
                     var rect = draw.m_rect;
 
-                    var vert = new RigelEGUIVertex();
-                    vert.Position = new Vector4(rect.X, rect.Y, draw.m_depth, 1);
-                    vert.UV = Vector2.Zero;
-                    vert.Color = Vector4.One;
-                    m_bufferData.Add(vert);
+                    var pos = new Vector4(rect.X, rect.Y, draw.m_depth, 1);
+                    var uv = Vector2.Zero;
+                    var color = Vector4.One;
+                    m_bufferData.AddVertices(pos, color, uv);
 
-                    vert.Position.Y += rect.W;
-                    vert.UV.Y = 1;
-                    m_bufferData.Add(vert);
+                    pos.Y += rect.W;
+                    uv.Y = 1;
+                    m_bufferData.AddVertices(pos, color, uv);
 
-                    vert.Position.X += rect.Z;
-                    vert.UV.X = 1;
-                    m_bufferData.Add(vert);
+                    pos.X += rect.Z;
+                    uv.X = 1;
+                    m_bufferData.AddVertices(pos,color,uv);
 
-                    vert.Position.Y -= rect.W;
-                    vert.UV.Y = 0;
-                    m_bufferData.Add(vert);
+                    pos.Y -= rect.W;
+                    uv.Y = 0;
+                    m_bufferData.AddVertices(pos,color,uv);
                 }
             }
         }

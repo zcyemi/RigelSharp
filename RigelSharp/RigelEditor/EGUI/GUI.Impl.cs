@@ -144,66 +144,20 @@ namespace RigelEditor.EGUI
                 uv1.Y -= clipsize.W;
                 uv2.Y -= clipsize.W;
 
-                //LT
-                BufferText.Add(new RigelEGUIVertex()
-                {
-                    Position = new Vector4(charrect.X, charrect.Y, s_depthz, 1),
-                    Color = color,
-                    UV = uv0
-                });
-                //LB
-                BufferText.Add(new RigelEGUIVertex()
-                {
-                    Position = new Vector4(charrect.X, y2, s_depthz, 1),
-                    Color = color,
-                    UV = uv1
-                });
-                //RB
-                BufferText.Add(new RigelEGUIVertex()
-                {
-                    Position = new Vector4(x2, y2, s_depthz, 1),
-                    Color = color,
-                    UV = uv2
-                });
-                //RT
-                BufferText.Add(new RigelEGUIVertex()
-                {
-                    Position = new Vector4(x2, charrect.Y, s_depthz, 1),
-                    Color = color,
-                    UV = uv3
-                });
+                BufferText.AddVertices(new Vector4(charrect.X, charrect.Y, s_depthz, 1),color, uv0);
+                BufferText.AddVertices(new Vector4(charrect.X, y2, s_depthz, 1), color, uv1);
+                BufferText.AddVertices(new Vector4(x2, y2, s_depthz, 1), color, uv2);
+                BufferText.AddVertices(new Vector4(x2, charrect.Y, s_depthz, 1), color, uv3);
 
             }
             else
             {
-                //LT
-                BufferText.Add(new RigelEGUIVertex()
-                {
-                    Position = new Vector4(charrect.X, charrect.Y, s_depthz, 1),
-                    Color = color,
-                    UV = glyph.UV[0]
-                });
-                //LB
-                BufferText.Add(new RigelEGUIVertex()
-                {
-                    Position = new Vector4(charrect.X, y2, s_depthz, 1),
-                    Color = color,
-                    UV = glyph.UV[1]
-                });
-                //RB
-                BufferText.Add(new RigelEGUIVertex()
-                {
-                    Position = new Vector4(x2, y2, s_depthz, 1),
-                    Color = color,
-                    UV = glyph.UV[2]
-                });
-                //RT
-                BufferText.Add(new RigelEGUIVertex()
-                {
-                    Position = new Vector4(x2, charrect.Y, s_depthz, 1),
-                    Color = color,
-                    UV = glyph.UV[3]
-                });
+
+                BufferText.AddVertices(new Vector4(charrect.X, charrect.Y, s_depthz, 1), color, glyph.UV[0]);
+                BufferText.AddVertices(new Vector4(charrect.X, y2, s_depthz, 1), color, glyph.UV[1]);
+                BufferText.AddVertices(new Vector4(x2, y2, s_depthz, 1), color, glyph.UV[2]);
+                BufferText.AddVertices(new Vector4(x2, charrect.Y, s_depthz, 1), color, glyph.UV[3]);
+
             }
 
             return glyph.AdvancedX;
@@ -211,30 +165,10 @@ namespace RigelEditor.EGUI
 
         public static void _ImplDrawRectA(Vector4 recta,Vector4 color)
         {
-            BufferRect.Add(new RigelEGUIVertex()
-            {
-                Position = new Vector4(recta.X, recta.Y, s_depthz, 1),
-                Color = color,
-                UV = Vector2.Zero
-            });
-            BufferRect.Add(new RigelEGUIVertex()
-            {
-                Position = new Vector4(recta.X, recta.Y + recta.W, s_depthz, 1),
-                Color = color,
-                UV = Vector2.Zero
-            });
-            BufferRect.Add(new RigelEGUIVertex()
-            {
-                Position = new Vector4(recta.X + recta.Z, recta.Y + recta.W, s_depthz, 1),
-                Color = color,
-                UV = Vector2.Zero
-            });
-            BufferRect.Add(new RigelEGUIVertex()
-            {
-                Position = new Vector4(recta.X + recta.Z, recta.Y, s_depthz, 1),
-                Color = color,
-                UV = Vector2.Zero
-            });
+            BufferRect.AddVertices(new Vector4(recta.X, recta.Y, s_depthz, 1), color, Vector2.zero);
+            BufferRect.AddVertices(new Vector4(recta.X, recta.Y + recta.W, s_depthz, 1), color, Vector2.zero);
+            BufferRect.AddVertices(new Vector4(recta.X + recta.Z, recta.Y + recta.W, s_depthz, 1), color, Vector2.zero);
+            BufferRect.AddVertices(new Vector4(recta.X + recta.Z, recta.Y, s_depthz, 1), color, Vector2.zero);
 
             DepthIncrease();
         }

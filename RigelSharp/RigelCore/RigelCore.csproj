@@ -91,6 +91,7 @@
     <Compile Include="Helper\DevHelper.cs" />
     <Compile Include="Helper\ReflectionHelper.cs" />
     <Compile Include="Helper\Singleton.cs" />
+    <Compile Include="IFontInfo.cs" />
     <Compile Include="ImageData.cs" />
     <Compile Include="Math.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
