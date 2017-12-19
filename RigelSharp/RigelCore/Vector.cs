@@ -546,6 +546,10 @@ namespace RigelCore
         /// </summary>
         public float z;
 
+        public float X { get { return x; } set { x = value; } }
+        public float Y { get { return y; } set { y = value; } }
+        public float Z { get { return z; } set { z = value; } }
+
         public static readonly Vector3 One = new Vector3(1f, 1f, 1f);
 
         private static readonly Vector3 zeroVector = new Vector3(0f, 0f, 0f);
@@ -1178,6 +1182,11 @@ namespace RigelCore
         ///   <para>W component of the vector.</para>
         /// </summary>
         public float w;
+
+        public float X { get { return x; } set { x = value; } }
+        public float Y { get { return y; } set { y = value; } }
+        public float Z { get { return z; } set { z = value; } }
+        public float W { get { return w; } set { w = value; } }
 
         public static readonly Vector4 Zero = new Vector4(0f, 0f, 0f, 0f);
         public static readonly Vector4 One = new Vector4(1f, 1f, 1f, 1f);
