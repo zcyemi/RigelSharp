@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using SharpDX;
 using RigelCore;
 
 namespace RigelEditor.EGUI
@@ -76,13 +75,13 @@ namespace RigelEditor.EGUI
             if (!string.IsNullOrEmpty(label))
             {
                 labelwidth = (int)(rect.Z * 0.4f);
-                labelwidth = MathUtil.Clamp(labelwidth, 40, 100);
-                GUILayout.Text(label, null,GUIOption.Width(labelwidth));
+                labelwidth = Mathf.Clamp(labelwidth, 40, 100);
+                GUILayout.Text(label, (Vector4?)null, GUIOption.Width(labelwidth));
 
                 GUILayout.Indent(10);
             }
 
-            GUILayout.DrawRectOnFlow(new Vector2(GUILayout.SizeRemain.X,GUILayout.s_svLineHeight),Focused ? GUIStyle.Current.BackgroundColorS: GUIStyle.Current.BackgroundColor);
+            GUILayout.RectOnFlow(new Vector2(GUILayout.SizeRemain.X,GUILayout.s_svLineHeight),Focused ? GUIStyle.Current.BackgroundColorS: GUIStyle.Current.BackgroundColor);
 
             var startpos = GUILayout.CurrentLayout.Offset;
             if (Focused)
@@ -101,7 +100,7 @@ namespace RigelEditor.EGUI
                 PointerRect = new Vector4(startpos.X + posx + 3, startpos.Y, 1, GUILayout.s_svLineHeight);
             }
             if(Focused)
-                GUILayout.DrawRect(PointerRect, GUIStyle.Current.Color);
+                GUILayout.Rect(PointerRect, GUIStyle.Current.Color);
 
             GUILayout.EndHorizontal();
             LastString = content;

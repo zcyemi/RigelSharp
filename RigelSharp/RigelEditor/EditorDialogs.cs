@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using RigelEditor.EGUI;
 
 using RigelCore;
-using SharpDX;
 
 namespace RigelEditor
 {
@@ -58,8 +57,6 @@ namespace RigelEditor
         }
 
         private FileSystem m_filesystem;
-
-        private Vector2 m_scrollpos;
 
         public EditorTestWindowedDialog() : base(true, true, true)
         {

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using SharpDX;
 using RigelCore;
 using RigelCore.Rendering;
 
@@ -95,7 +94,7 @@ namespace RigelEditor.EGUI
         {
             if (color != null)
             {
-                GUI.DrawRect(recta, (Vector4)color, true);
+                GUI.RectA(recta, (Vector4)color);
             }
 
             if (options != null)
@@ -103,7 +102,7 @@ namespace RigelEditor.EGUI
                 var optborder = options.FirstOrDefault((x) => { return x.type == GUIOption.GUIOptionType.border; });
                 if (optborder != null)
                 {
-                    GUI.DrawBorder(recta, 1, optborder.Vector4Value, true);
+                    GUI.BorderA(recta, 1, optborder.Vector4Value);
                 }
             }
 
@@ -191,7 +190,6 @@ namespace RigelEditor.EGUI
         {
             s_ctx.currentLayout.Offset.Y += height;
         }
-
         public static void Indent()
         {
             s_ctx.currentLayout.Offset.X += s_svLineIndent.Value;
@@ -268,7 +266,11 @@ namespace RigelEditor.EGUI
         /// </summary>
         /// <param name="label"></param>
         /// <param name="color"></param>
-        /// <param name="options">GUIOptionType.Width GUIOptionType.expended GUIOptionType.Grid</param>
+        /// <param name="options">
+        /// GUIOptionType.Width 
+        /// GUIOptionType.expended 
+        /// GUIOptionType.Grid
+        /// </param>
         /// <returns></returns>
         public static bool Button(string label, Vector4 color, params GUIOption[] options)
         {
@@ -323,43 +325,7 @@ namespace RigelEditor.EGUI
             return clicked;
         }
 
-        public static void Text(string content,Vector4? color = null,params GUIOption[] options)
-        {
-            GUIOption optwidth = null;
-            if(options != null)
-            {
-                foreach(var opt in options)
-                {
-                    if(opt.type == GUIOption.GUIOptionType.width)
-                    {
-                        optwidth = opt;
-                    }
-                }
-            }
-            bool adaptive = optwidth == null;
-
-            var curarea = s_ctx.currentArea;
-            var rect = new Vector4(s_ctx.currentLayout.Offset, adaptive ? curarea.Rect.Z : (int)optwidth.value, s_svLineHeight.Value);
-            bool valid = GUIUtility.RectClip(ref rect, curarea.Rect);
-            int width = 0;
-            if (valid)
-            {
-                if (adaptive)
-                {
-                    width = GUI.DrawText(rect, content, color ??s_ctx.Color, true, GUIOption.Adaptive);
-                    AutoCaculateOffsetW(width);
-                }
-                else
-                {
-                    width = GUI.DrawText(rect, content, s_ctx.Color, true, options);
-                    AutoCaculateOffsetW((int)rect.Z);
-                }
-            }
-        }
-
         #region Text
-
-
         /// <summary>
         /// 
         /// </summary>
@@ -372,7 +338,7 @@ namespace RigelEditor.EGUI
         /// GUIOption.Border
         /// </param>
         /// <returns></returns>
-        public static int TextN(string content,Vector4? color =null,Vector4? bgcolor = null,int padding = 3,params GUIOption[] options)
+        public static int Text(string content,Vector4? color,Vector4? bgcolor,int padding = 3,params GUIOption[] options)
         {
             Vector2 pos = Vector2.Zero;
             pos.X = padding;
@@ -452,13 +418,13 @@ namespace RigelEditor.EGUI
 
             if(bgcolor != null)
             {
-                GUI.DrawRect(rectcliped, (Vector4)bgcolor,true);
+                GUI.RectA(rectcliped, (Vector4)bgcolor);
             }
 
             GUI._ImplDrawTextA(rectcliped, pos, content, color?? Context.Color);
 
             if(optBorder != null)
-                GUI.DrawBorder(rectcliped, 1, optBorder.Vector4Value, true);
+                GUI.BorderA(rectcliped, 1, optBorder.Vector4Value);
 
             var areaRect = Context.currentArea.Rect;
 
@@ -473,29 +439,26 @@ namespace RigelEditor.EGUI
             
             return textWidthN;
         }
-
-
-        public static int TextN(string content, params GUIOption[] options)
+        public static void Text(string content,Vector4? color,params GUIOption[] options)
         {
-            return TextN(content, null, null, 3, options);
+            Text(content, color, null, 3, options);
         }
-
-        public static int TextN(Vector4 color, string content, params GUIOption[] options)
+        public static int Text(string content, params GUIOption[] options)
         {
-            return TextN(content, color, null, 3, options);
+            return Text(content, null, null, 3, options);
         }
-
-        public static int TextN(Vector4 color, Vector4 bgcolor, string content, params GUIOption[] options)
+        public static int Text(string content, Vector4 color, params GUIOption[] options)
         {
-            return TextN(content, color, bgcolor, 3, options);
+            return Text(content, color, null, 3, options);
         }
-
-        public static int TextN(string content, int padding, params GUIOption[] options)
+        public static int Text( string content, Vector4 color, Vector4 bgcolor, params GUIOption[] options)
         {
-            return TextN(content, null, null, padding, options);
+            return Text(content, color, bgcolor, 3, options);
         }
-
-
+        public static int Text(string content, int padding, params GUIOption[] options)
+        {
+            return Text(content, null, null, padding, options);
+        }
         #endregion
 
 
@@ -532,27 +495,27 @@ namespace RigelEditor.EGUI
 
         public static void Line(int thickness, Vector4? color, int margin = 2)
         {
-            GUILayout.Space(margin);
-            var endpos = new Vector2(thickness, thickness);
-            var startpos = s_ctx.currentLayout.Offset;
-            if (s_ctx.currentLayout.Verticle)
-            {
-                endpos.X = s_ctx.currentArea.Rect.Z;
-            }
-            else
-            {
-                endpos.Y = s_ctx.currentArea.Rect.W;
-            }
-            GUI.DrawLineAxisAligned(startpos, endpos, thickness, color);
+            //GUILayout.Space(margin);
+            //var endpos = new Vector2(thickness, thickness);
+            //var startpos = s_ctx.currentLayout.Offset;
+            //if (s_ctx.currentLayout.Verticle)
+            //{
+            //    endpos.X = s_ctx.currentArea.Rect.Z;
+            //}
+            //else
+            //{
+            //    endpos.Y = s_ctx.currentArea.Rect.W;
+            //}
+            //GUI.LineAxisAligned(startpos, endpos, thickness, color);
 
-            GUILayout.Space(margin);
+            //GUILayout.Space(margin);
         }
 
         public static void BeginToolBar(int height)
         {
             SetLineHeight(height);
             var rect = new Vector4(s_ctx.currentLayout.Offset, s_ctx.currentArea.Rect.Z, height);
-            DrawRect(rect, GUIStyle.Current.MainMenuBGColor);
+            Rect(rect, GUIStyle.Current.MainMenuBGColor);
             BeginHorizontal();
 
         }
@@ -644,13 +607,21 @@ namespace RigelEditor.EGUI
             }
         }
 
-        public static void DrawRect(Vector4 rect, Vector4 color,params GUIOption[] options)
+
+        public static void Rect(Vector4 rect,Vector4 color)
         {
             GUIUtility.RectClip(ref rect, s_ctx.currentArea.Rect);
-            GUI.DrawRect(rect, color, true);
+            GUI._ImplDrawRectA(rect, color);
         }
-
-        public static void DrawRectOnFlow(Vector2 size, Vector4 color,params GUIOption[] options)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="size"></param>
+        /// <param name="color"></param>
+        /// <param name="options">
+        /// GUIOptionType.checkRectContains
+        /// </param>
+        public static void RectOnFlow(Vector2 size, Vector4 color,params GUIOption[] options)
         {
             var offset = s_ctx.currentLayout.Offset;
             Vector4 rect = new Vector4(offset, size.X,size.Y);
@@ -662,8 +633,9 @@ namespace RigelEditor.EGUI
                     optcheckcontains.value = GUIUtility.RectContainsCheck(rect, GUI.Event.Pointer);
                 }
             }
-            GUI.DrawRect(rect, color, true,GUIOption.NoClip);
+            GUI._ImplDrawRectA(rect, color);
         }
+
 
         public static void DrawTexture(Vector4 rect,RenderTextureIdentifier rt)
         {
@@ -718,7 +690,7 @@ namespace RigelEditor.EGUI
             var tabview = GUI.GetTabView(rectab);
 
             int ret = tabview.Draw(rect,index, tabnames, draw);
-            GUI.DrawBorder(rectab, 1, GUIStyle.Current.BackgroundColorS1,true);
+            GUI.BorderA(rectab, 1, GUIStyle.Current.BackgroundColorS1);
 
             AutoCaculateOffset(rect.Z, rect.W);
             return ret;
@@ -749,7 +721,7 @@ namespace RigelEditor.EGUI
             });
 
             int ret = tabview.Draw(rect, index, tabnames, draw);
-            GUI.DrawBorder(rectab, 1, GUIStyle.Current.BackgroundColorS1, true);
+            GUI.BorderA(rectab, 1, GUIStyle.Current.BackgroundColorS1);
 
             AutoCaculateOffset(rect.Z, rect.W);
             return ret;

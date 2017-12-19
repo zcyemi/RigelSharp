@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using SharpDX;
 
 using RigelCore;
 
@@ -170,7 +169,7 @@ namespace RigelEditor.EGUI
 
             GUILayout.RestoreLineHeight();
 
-            GUI.DrawBorder(GUI.Context.currentArea.Rect, 1, GUIStyle.Current.ColorActiveD, true);
+            GUI.BorderA(GUI.Context.currentArea.Rect, 1, GUIStyle.Current.ColorActiveD);
             GUILayout.EndArea();
 
             if (itemuse)

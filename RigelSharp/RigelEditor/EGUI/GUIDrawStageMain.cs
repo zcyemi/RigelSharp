@@ -36,36 +36,13 @@ namespace RigelEditor.EGUI
             m_needUpdateBuffer = true;
         }
 
-        public override void SyncBuffer(EditorGUICtx eguictx)
+        public override void SyncBuffer(IGUIGraphicsBind guibind)
         {
             if (!m_needUpdateBuffer) return;
 
-            var bind = eguictx.GraphicsBind;
-            {
-                var rectCount = m_drawTarget.bufferRect.Count;
-                if (rectCount != m_lastBufferSizeRect) bind.NeedRebuildCommandList = true;
-                bind.BufferMainRect.CheckAndExtendsWithSize(rectCount);
-                m_drawTarget.bufferRect.CopyTo(bind.BufferMainRect.BufferData);
-                bind.BufferMainRect.InternalSetBufferDataCount(rectCount);
+            var bind = guibind;
 
-                m_lastBufferSizeRect = rectCount;
-            }
-
-            {
-                var textCount = m_drawTarget.bufferText.Count;
-
-                if (textCount != m_lastBufferSizeText) bind.NeedRebuildCommandList = true;
-                bind.BufferMainText.CheckAndExtendsWithSize(textCount);
-                m_drawTarget.bufferText.CopyTo(bind.BufferMainText.BufferData);
-                bind.BufferMainText.InternalSetBufferDataCount(textCount);
-
-                m_lastBufferSizeText = textCount;
-                
-            }
-
-            {
-                bind.BufferIndices.CheckAndExtendsWithSize(Math.Max(m_lastBufferSizeRect, m_lastBufferSizeText) / 4 * 6);
-            }
+            bind.SyncDrawTarget(this,m_drawTarget);
         }
 
 

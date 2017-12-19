@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 
 using RigelCore;
-using SharpDX;
 
 namespace RigelEditor.EGUI
 {
@@ -145,70 +144,55 @@ namespace RigelEditor.EGUI
                 uv1.Y -= clipsize.W;
                 uv2.Y -= clipsize.W;
 
-                //LT
-                BufferText.Add(new RigelEGUIVertex()
-                {
-                    Position = new Vector4(charrect.X, charrect.Y, s_depthz, 1),
-                    Color = color,
-                    UV = uv0
-                });
-                //LB
-                BufferText.Add(new RigelEGUIVertex()
-                {
-                    Position = new Vector4(charrect.X, y2, s_depthz, 1),
-                    Color = color,
-                    UV = uv1
-                });
-                //RB
-                BufferText.Add(new RigelEGUIVertex()
-                {
-                    Position = new Vector4(x2, y2, s_depthz, 1),
-                    Color = color,
-                    UV = uv2
-                });
-                //RT
-                BufferText.Add(new RigelEGUIVertex()
-                {
-                    Position = new Vector4(x2, charrect.Y, s_depthz, 1),
-                    Color = color,
-                    UV = uv3
-                });
+                BufferText.AddVertices(new Vector4(charrect.X, charrect.Y, s_depthz, 1),color, uv0);
+                BufferText.AddVertices(new Vector4(charrect.X, y2, s_depthz, 1), color, uv1);
+                BufferText.AddVertices(new Vector4(x2, y2, s_depthz, 1), color, uv2);
+                BufferText.AddVertices(new Vector4(x2, charrect.Y, s_depthz, 1), color, uv3);
 
             }
             else
             {
-                //LT
-                BufferText.Add(new RigelEGUIVertex()
-                {
-                    Position = new Vector4(charrect.X, charrect.Y, s_depthz, 1),
-                    Color = color,
-                    UV = glyph.UV[0]
-                });
-                //LB
-                BufferText.Add(new RigelEGUIVertex()
-                {
-                    Position = new Vector4(charrect.X, y2, s_depthz, 1),
-                    Color = color,
-                    UV = glyph.UV[1]
-                });
-                //RB
-                BufferText.Add(new RigelEGUIVertex()
-                {
-                    Position = new Vector4(x2, y2, s_depthz, 1),
-                    Color = color,
-                    UV = glyph.UV[2]
-                });
-                //RT
-                BufferText.Add(new RigelEGUIVertex()
-                {
-                    Position = new Vector4(x2, charrect.Y, s_depthz, 1),
-                    Color = color,
-                    UV = glyph.UV[3]
-                });
+
+                BufferText.AddVertices(new Vector4(charrect.X, charrect.Y, s_depthz, 1), color, glyph.UV[0]);
+                BufferText.AddVertices(new Vector4(charrect.X, y2, s_depthz, 1), color, glyph.UV[1]);
+                BufferText.AddVertices(new Vector4(x2, y2, s_depthz, 1), color, glyph.UV[2]);
+                BufferText.AddVertices(new Vector4(x2, charrect.Y, s_depthz, 1), color, glyph.UV[3]);
+
             }
 
             return glyph.AdvancedX;
         }
 
+        public static void _ImplDrawRectA(Vector4 recta,Vector4 color)
+        {
+            BufferRect.AddVertices(new Vector4(recta.X, recta.Y, s_depthz, 1), color, Vector2.zero);
+            BufferRect.AddVertices(new Vector4(recta.X, recta.Y + recta.W, s_depthz, 1), color, Vector2.zero);
+            BufferRect.AddVertices(new Vector4(recta.X + recta.Z, recta.Y + recta.W, s_depthz, 1), color, Vector2.zero);
+            BufferRect.AddVertices(new Vector4(recta.X + recta.Z, recta.Y, s_depthz, 1), color, Vector2.zero);
+
+            DepthIncrease();
+        }
+
+        public static void _ImplDrawLineAxisAligned(Vector2 startpA,Vector2 endpA,int thickness,Vector4? color)
+        {
+            var rect = new Vector4(startpA, endpA.X - startpA.X, endpA.Y - startpA.Y);
+
+            float thickhalf = thickness / 2.0f;
+            if (rect.Z > rect.W)
+            {
+                rect.W = thickness;
+                rect.Z += thickhalf;
+            }
+            else
+            {
+                rect.Z = thickness;
+                rect.W += thickhalf;
+            }
+
+            rect.X -= thickhalf;
+            rect.Y -= thickhalf;
+
+            _ImplDrawRectA(rect, color ?? GUIStyle.Current.BorderColor);
+        }
     }
 }

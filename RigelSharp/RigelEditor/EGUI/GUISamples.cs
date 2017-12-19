@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using SharpDX;
 using RigelCore;
 
 namespace RigelEditor.EGUI
@@ -32,13 +31,15 @@ namespace RigelEditor.EGUI
             "DragDrop",     //8
             "Dialogs",      //9
             "Widget",       //10
+            "Geometry",     //11
         };
         private int m_sampleindex = 0;
 
 
         public override void OnGUI()
         {
-            m_sampleindex = GUILayout.TabViewVertical(m_sampleindex, m_tabnames, (index) => {
+            m_sampleindex = GUILayout.TabViewVertical(m_sampleindex, m_tabnames, (index) =>
+            {
                 switch (index)
                 {
                     case 0:
@@ -53,6 +54,9 @@ namespace RigelEditor.EGUI
                     case 4:
                         SampleContainer();
                         break;
+                    case 5:
+                        SampleButton();
+                        break;
                     case 7:
                         SampleLayout();
                         break;
@@ -61,6 +65,9 @@ namespace RigelEditor.EGUI
                         break;
                     case 10:
                         SampleWidget();
+                        break;
+                    case 11:
+                        SampleGeometry();
                         break;
                 }
             }, 75);
@@ -90,7 +97,7 @@ namespace RigelEditor.EGUI
             m_sampleTabIndex = GUILayout.TabView(m_sampleTabIndex, m_sampleTabNames, (index) =>
             {
                 GUILayout.Button("TabItems " + index);
-            },GUIOption.Width(300), GUIOption.Height(100));
+            }, GUIOption.Width(300), GUIOption.Height(100));
 
             GUILayout.Space(10);
 
@@ -98,86 +105,100 @@ namespace RigelEditor.EGUI
             m_sampleTabIndex = GUILayout.TabViewVertical(m_sampleTabIndex, m_sampleTabNames, (index) =>
             {
                 GUILayout.Button("TabItems " + index);
-            },50, GUIOption.Width(300), GUIOption.Height(100));
+            }, 50, GUIOption.Width(300), GUIOption.Height(100));
         }
         #endregion
 
         #region Text
+        private int m_sampleTextTabIndex = 0;
+        private List<string> m_sampleTextTabList = new List<string>() { "Text", "TextBlock" };
+        private string m_sampleLongText = "A game engine is a software framework designed for the creation and development of video games.Developers use them to create games for consoles, mobile devices and personal computers.The core functionality typically provided by a game engine includes a rendering engine(renderer) for 2D or 3D graphics, a physics engine or collision detection(and collision response), sound, scripting";
         private void SampleText()
         {
-            //GUI
-            GUILayout.Text("GUI.DrawChar");
-            var rect = GUI.GetRectAbsolute(new Vector4(5, 30, 20, 20));
-            GUI.DrawRect(rect, RigelColor.White,true);
-            GUI.TextA(rect, new Vector2(-3, -3), "R", RigelColor.Black);
-            rect.X += 25;
-            GUI.DrawRect(rect, RigelColor.White, true);
-            GUI.TextA(rect, new Vector2(13, 10), "R", RigelColor.Black);
-
-            GUILayout.Space(30);
-
-            GUILayout.Text("GUI.DrawTextA");
-
-            rect = new Vector4(rect.X - 25, rect.Y + 50, 50, 30);
-            GUI.DrawRect(rect, RigelColor.White, true);
-            GUI.TextA(rect, new Vector2(-5, -3), "ABCDEFGHI",RigelColor.Black);
-            GUI.TextA(rect, new Vector2(5, 20), "ZXVBNMGHGJ", RigelColor.Black);
-
-            GUILayout.Space(35);
-
-            GUILayout.Text("GUI.DrawText (With Group)");
-            GUI.BeginGroup(new Vector4(5, 140, 135, 50), RigelColor.White);
+            m_sampleTextTabIndex = GUILayout.TabView(m_sampleTextTabIndex, m_sampleTextTabList, (index) =>
             {
-                GUI.Text(new Vector4(-10, -3, 140, 30), "HELLOWORLD!", GUIStyle.Current.ColorActive);
-                var rectg = new Vector4(50, 20, 100, 25);
-                GUI.DrawRect(rectg, RigelColor.Black);
-                GUI.Text(rectg, "HELLO WORLD!", GUIStyle.Current.ColorActive);
-            }
-            GUI.EndGroup();
+                if(index == 0)
+                {
+                    //GUI
+                    GUILayout.Text("GUI.DrawChar");
+                    var rect = GUI.GetRectAbsolute(new Vector4(5, 30, 20, 20));
+                    GUI.RectA(rect, RigelColor.White);
+                    GUI.TextA(rect, new Vector2(-3, -3), "R", RigelColor.Black);
+                    rect.X += 25;
+                    GUI.RectA(rect, RigelColor.White);
+                    GUI.TextA(rect, new Vector2(13, 10), "R", RigelColor.Black);
 
-            //GUILayout
-            GUILayout.Space(55);
-            GUILayout.Text("GUILayout Text");
-            GUILayout.BeginHorizontal();
-            {
-                GUILayout.TextN("DefaultText");
-                GUILayout.TextN("Text with Border", null, null, 3, GUIOption.Border(GUIStyle.Current.ColorActiveD));
-                GUILayout.TextN(GUIStyle.Current.ColorActiveD, "TextWithColor");
-                GUILayout.TextN(GUI.Context.Color, GUIStyle.Current.ColorActiveD, "TextWithBG");
-            }
-            GUILayout.EndHorizontal();
+                    GUILayout.Space(30);
 
-            GUILayout.Text("Text Width");
-            GUILayout.BeginHorizontal();
-            {
-                GUILayout.TextN(GUI.Context.Color, GUIStyle.Current.ColorActiveD, "100px", GUIOption.Width(100));
-                GUILayout.TextN(GUI.Context.Color, GUIStyle.Current.ColorActiveD, "50px", GUIOption.Width(50));
-                GUILayout.TextN(GUI.Context.Color, GUIStyle.Current.ColorActiveD, "20px", GUIOption.Width(10));
-            }
-            GUILayout.EndHorizontal();
+                    GUILayout.Text("GUI.DrawTextA");
 
-            GUILayout.Text("Horizontal Alignment");
-            GUILayout.BeginHorizontal();
-            {
-                GUILayout.TextN(GUI.Context.Color, GUIStyle.Current.ColorActiveD, "Align Center", GUIOption.Width(100),GUIOption.AlignHCenter);
-                GUILayout.TextN(GUI.Context.Color, GUIStyle.Current.ColorActiveD, "Align Left", GUIOption.Width(100), GUIOption.AlignHLeft);
-                GUILayout.TextN(GUI.Context.Color, GUIStyle.Current.ColorActiveD, "Align Right", GUIOption.Width(100), GUIOption.AlignHRight);
-            }
-            GUILayout.EndHorizontal();
+                    rect = new Vector4(rect.X - 25, rect.Y + 50, 50, 30);
+                    GUI.RectA(rect, RigelColor.White);
+                    GUI.TextA(rect, new Vector2(-5, -3), "ABCDEFGHI", RigelColor.Black);
+                    GUI.TextA(rect, new Vector2(5, 20), "ZXVBNMGHGJ", RigelColor.Black);
 
-            GUILayout.Text("Vertical Alignment");
-            GUILayout.BeginHorizontal();
-            {
-                GUILayout.SetLineHeight(30);
-                GUILayout.TextN(GUI.Context.Color, GUIStyle.Current.ColorActiveD, "Line Height 30", GUIOption.Width(100), GUIOption.AlignHCenter);
+                    GUILayout.Space(35);
 
-                GUILayout.TextN(GUI.Context.Color, GUIStyle.Current.ColorActiveD, "Align Top", GUIOption.Width(100), GUIOption.AlignVTop);
-                GUILayout.TextN(GUI.Context.Color, GUIStyle.Current.ColorActiveD, "Align Center", GUIOption.Width(100), GUIOption.AlignVCenter);
-                GUILayout.TextN(GUI.Context.Color, GUIStyle.Current.ColorActiveD, "Align Bottom", GUIOption.Width(100), GUIOption.AlignVBottom);
+                    GUILayout.Text("GUI.DrawText (With Group)");
+                    GUI.BeginGroup(new Vector4(5, 140, 135, 50), RigelColor.White);
+                    {
+                        GUI.Text(new Vector4(-10, -3, 140, 30), "HELLOWORLD!", GUIStyle.Current.ColorActive);
+                        var rectg = new Vector4(50, 20, 100, 25);
+                        GUI.Rect(rectg, RigelColor.Black);
+                        GUI.Text(rectg, "HELLO WORLD!", GUIStyle.Current.ColorActive);
+                    }
+                    GUI.EndGroup();
 
-                GUILayout.RestoreLineHeight();
-            }
-            GUILayout.EndHorizontal();
+                    //GUILayout
+                    GUILayout.Space(55);
+                    GUILayout.Text("GUILayout Text");
+                    GUILayout.BeginHorizontal();
+                    {
+                        GUILayout.Text("DefaultText");
+                        GUILayout.Text("Text with Border", null, null, 3, GUIOption.Border(GUIStyle.Current.ColorActiveD));
+                        GUILayout.Text("TextWithColor", GUIStyle.Current.ColorActiveD);
+                        GUILayout.Text("TextWithBG", GUI.Context.Color, GUIStyle.Current.ColorActiveD);
+                    }
+                    GUILayout.EndHorizontal();
+
+                    GUILayout.Text("Text Width");
+                    GUILayout.BeginHorizontal();
+                    {
+                        GUILayout.Text("100px", GUI.Context.Color, GUIStyle.Current.ColorActiveD, GUIOption.Width(100));
+                        GUILayout.Text("50px", GUI.Context.Color, GUIStyle.Current.ColorActiveD, GUIOption.Width(50));
+                        GUILayout.Text("20px", GUI.Context.Color, GUIStyle.Current.ColorActiveD, GUIOption.Width(10));
+                    }
+                    GUILayout.EndHorizontal();
+
+                    GUILayout.Text("Horizontal Alignment");
+                    GUILayout.BeginHorizontal();
+                    {
+                        GUILayout.Text("Align Center", GUI.Context.Color, GUIStyle.Current.ColorActiveD, GUIOption.Width(100), GUIOption.AlignHCenter);
+                        GUILayout.Text("Align Center", GUI.Context.Color, GUIStyle.Current.ColorActiveD, GUIOption.Width(100), GUIOption.AlignHLeft);
+                        GUILayout.Text("Align Right", GUI.Context.Color, GUIStyle.Current.ColorActiveD, GUIOption.Width(100), GUIOption.AlignHRight);
+                    }
+                    GUILayout.EndHorizontal();
+
+                    GUILayout.Text("Vertical Alignment");
+                    GUILayout.BeginHorizontal();
+                    {
+                        GUILayout.SetLineHeight(30);
+                        GUILayout.Text("Line Height 30", GUI.Context.Color, GUIStyle.Current.ColorActiveD, GUIOption.Width(100), GUIOption.AlignHCenter);
+
+                        GUILayout.Text("Align Top", GUI.Context.Color, GUIStyle.Current.ColorActiveD, GUIOption.Width(100), GUIOption.AlignVTop);
+                        GUILayout.Text("Align Center", GUI.Context.Color, GUIStyle.Current.ColorActiveD, GUIOption.Width(100), GUIOption.AlignVCenter);
+                        GUILayout.Text("Align Bottom", GUI.Context.Color, GUIStyle.Current.ColorActiveD, GUIOption.Width(100), GUIOption.AlignVBottom);
+
+                        GUILayout.RestoreLineHeight();
+                    }
+                    GUILayout.EndHorizontal();
+                }
+                else
+                {
+                    GUILayout.TextBlock(m_sampleLongText);
+                }
+            });
+            
 
         }
         #endregion
@@ -191,7 +212,7 @@ namespace RigelEditor.EGUI
                 GUI.BeginGroup(new Vector4(GUILayout.CurrentLayout.Offset, 100, 100), GUIStyle.Current.BackgroundColorS1);
                 {
                     //Rect clipped
-                    GUI.DrawRect(new Vector4(-10, -20,30, 30), RigelColor.Red, false);
+                    GUI.Rect(new Vector4(-10, -20, 30, 30), RigelColor.Red);
 
                     //Text clipped
                     GUI.Text(new Vector4(50, 30, 100, 30), "Text is clipped by the group rect.");
@@ -200,13 +221,13 @@ namespace RigelEditor.EGUI
 
                 GUILayout.Space(100);
             }
-            
+
 
 
             GUILayout.Text("GUILayout.Area");
             {
                 //Area Absolutely
-                GUILayout.BeginArea(GUILayout.GetRectAbsolute(new Vector4(GUILayout.CurrentLayout.Offset,100,100)), GUIStyle.Current.BackgroundColorS1);
+                GUILayout.BeginArea(GUILayout.GetRectAbsolute(new Vector4(GUILayout.CurrentLayout.Offset, 100, 100)), GUIStyle.Current.BackgroundColorS1);
                 GUILayout.Text("Absolutely");
                 GUILayout.EndArea();
 
@@ -228,25 +249,36 @@ namespace RigelEditor.EGUI
 
                 //Container Absolutely
                 GUILayout.BeginContainer(rectab, RigelColor.Green);
-                GUI.DrawRect(new Vector4(50, 50, 50, 50), RigelColor.Blue);
-                GUILayout.DrawRect(new Vector4(25, 25, 25, 25), RigelColor.Red);
+                GUI.Rect(new Vector4(50, 50, 50, 50), RigelColor.Blue);
+                GUILayout.Rect(new Vector4(25, 25, 25, 25), RigelColor.Red);
                 GUILayout.EndContainer();
 
                 //Container Relative
                 GUILayout.BeginContainerRelative(new Vector4(GUILayout.CurrentLayout.Offset, 100, 100), RigelColor.Red);
-                GUILayout.DrawRect(new Vector4(25, 25, 25, 25), RigelColor.White);
-                GUI.DrawRect(new Vector4(50, 50, 50, 50), RigelColor.Black);
+                GUILayout.Rect(new Vector4(25, 25, 25, 25), RigelColor.White);
+                GUI.Rect(new Vector4(50, 50, 50, 50), RigelColor.Black);
                 GUILayout.EndContainer();
                 GUILayout.Space(100);
             }
-            
+
         }
 
         #endregion
 
+        #region Button
+        private void SampleButton()
+        {
+            var recta = new Vector4(GUI.Context.currentGroup.Absolute.Pos(),50,20);
+            GUI.ButtonA(recta, "ButtonA");
+            recta.X += 55;
+            recta.Z = 100;
+            GUI.ButtonA(recta, "ButtonA");
+        }
+        #endregion
+
         #region Layout
 
-        [TODO("Bug","Wrong flow caculation!")]
+        [TODO("Bug", "Wrong flow caculation!")]
         private void SampleLayout()
         {
             GUILayout.Text("GUILayout Flow");
@@ -300,7 +332,7 @@ namespace RigelEditor.EGUI
             {
                 GUILayout.BeginHorizontal();
                 {
-                    GUILayout.TextN("TestText");
+                    GUILayout.Text("TestText");
                     GUILayout.BeginVertical();
                     GUILayout.Button("ButtonExtend");
                     GUILayout.Button("ButtonExtend");
@@ -348,5 +380,18 @@ namespace RigelEditor.EGUI
 
         }
         #endregion
+
+        #region Geometry
+        private void SampleGeometry()
+        {
+            GUILayout.Text("Rect");
+            GUI.Rect(new Vector4(5, 25, 20, 10), GUIStyle.Current.ColorActiveD);
+
+            var rect = new Vector4(GUI.Context.currentGroup.Absolute.Pos(), 20, 10);
+            rect.X += 30;
+            rect.Y += 25;
+            GUI.RectA(rect, GUIStyle.Current.ColorActiveD);
+        }
+#endregion
     }
 }

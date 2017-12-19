@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 
-using SharpDX;
 using RigelCore;
 using RigelCore.Rendering;
 
@@ -52,7 +51,7 @@ namespace RigelEditor.EGUI
         public Stack<int> depthLayer = new Stack<int>();
         public float s_depthStep = 0.0001f;
 
-        public FontInfo Font { get; set; }
+        public IFontInfo Font { get; set; }
 
         //Input
         public bool InputChanged = false;
@@ -123,19 +122,7 @@ namespace RigelEditor.EGUI
     }
 
 
-    public class GUIDrawTarget
-    {
-        public List<RigelEGUIVertex> bufferRect;
-        public List<RigelEGUIVertex> bufferText;
-        public float depth;
-
-        public GUIDrawTarget(float depth)
-        {
-            this.depth = depth;
-            bufferRect = new List<RigelEGUIVertex>();
-            bufferText = new List<RigelEGUIVertex>();
-        }
-    }
+    
 
     
 

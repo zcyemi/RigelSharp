@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using SharpDX;
+using RigelCore;
 
 namespace RigelEditor.EGUI
 {
@@ -22,8 +22,8 @@ namespace RigelEditor.EGUI
 
         public static GUIEvent Event { get; set; }
 
-        internal static List<RigelEGUIVertex> BufferRect { get { return DrawTarget.bufferRect; } }
-        internal static List<RigelEGUIVertex> BufferText { get { return DrawTarget.bufferText; } }
+        internal static IGUIBuffer BufferRect { get { return DrawTarget.bufferRect; } }
+        internal static IGUIBuffer BufferText { get { return DrawTarget.bufferText; } }
 
         private static float s_depthz;
         public static float Depth { get { return s_depthz; } }
@@ -33,7 +33,7 @@ namespace RigelEditor.EGUI
             var groupStack = s_ctx.groupStack;
             if (absolute)
             {
-                if (color != null) DrawRect(rect, (Vector4)color, true);
+                if (color != null) RectA(rect, (Vector4)color);
                 s_ctx.currentGroup.Absolute = rect;
                 rect.X -= s_ctx.currentGroup.Rect.X;
                 rect.Y -= s_ctx.currentGroup.Rect.Y;
@@ -45,13 +45,13 @@ namespace RigelEditor.EGUI
             {
                 Vector4 root = s_ctx.currentGroup.Rect;
 
-                rect.X = MathUtil.Clamp(rect.X, 0, root.Z);
-                rect.Y = MathUtil.Clamp(rect.Y, 0, root.W);
+                rect.x =Mathf.Clamp(rect.x, 0, root.z);
+                rect.y = Mathf.Clamp(rect.y, 0, root.w);
 
-                rect.Z = MathUtil.Clamp(rect.Z, 0, root.Z - rect.X);
-                rect.W = MathUtil.Clamp(rect.W, 0, root.W - rect.Y);
+                rect.z = Mathf.Clamp(rect.z, 0, root.z - rect.x);
+                rect.w = Mathf.Clamp(rect.w, 0, root.w - rect.y);
 
-                if (color != null) DrawRect(rect, (Vector4)color);
+                if (color != null) Rect(rect, (Vector4)color);
                 s_ctx.currentGroup.Rect = rect;
 
                 var groupab = s_ctx.currentGroup.Absolute;
@@ -111,7 +111,6 @@ namespace RigelEditor.EGUI
             }
 
             
-
             float depthz = GUI.Depth;
             GUI.DepthIncrease();
 
@@ -136,26 +135,87 @@ namespace RigelEditor.EGUI
 
                 if (Event.Used && !clicked)
                 {
-                    DrawRect(rect, color, absolute);
+                    Rect(rect, color, absolute);
                 }
                 else if (Event.Button == MouseButton.Left)
                 {
-                    DrawRect(rect, GUIStyle.Current.ColorActiveD, absolute);
+                    Rect(rect, GUIStyle.Current.ColorActiveD, absolute);
                 }
                 else
                 {
-                    DrawRect(rect, GUIStyle.Current.ColorActive, absolute);
+                    Rect(rect, GUIStyle.Current.ColorActive, absolute);
                 }
             }
             else
             {
-                DrawRect(rect, color, absolute);
+                Rect(rect, color, absolute);
             }
-
 
             GUI.SetDepth(depthz);
 
             return clicked;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="recta"></param>
+        /// <param name="label"></param>
+        /// <param name="color"></param>
+        /// <param name="texcolor"></param>
+        /// <param name="options">
+        /// GUIOption.GUIOptionType.checkRectContains
+        /// </param>
+        /// <returns></returns>
+        public static bool ButtonA(Vector4 recta,string label,Vector4 color,Vector4? texcolor,params GUIOption[] options)
+        {
+            float depthz = GUI.Depth;
+            GUI.DepthIncrease();
+            TextA(recta, new Vector2(3, 3), label, texcolor);
+
+            depthz = GUI.SetDepth(depthz);
+            bool clicked = false;
+            if (GUIUtility.RectContainsCheck(recta, Event.Pointer))
+            {
+                if (options != null)
+                {
+                    var optCheckRC = options.FirstOrDefault((o) => { return o.type == GUIOption.GUIOptionType.checkRectContains; });
+                    if (optCheckRC != null) optCheckRC.value = true;
+                }
+                if (!Event.Used && Event.EventType == RigelEGUIEventType.MouseClick)
+                {
+                    Event.Use();
+                    clicked = true;
+                }
+
+                if (Event.Used && !clicked)
+                {
+                    GUI.RectA(recta, color);
+                }
+                else if (Event.Button == MouseButton.Left)
+                {
+                    GUI.RectA(recta, GUIStyle.Current.ColorActiveD);
+                }
+                else
+                {
+                    GUI.RectA(recta, GUIStyle.Current.ColorActive);
+                }
+            }
+            else
+            {
+                GUI.RectA(recta, color);
+            }
+            GUI.SetDepth(depthz);
+
+            return clicked;
+        }
+        public static bool ButtonA(Vector4 recta, string label,Vector4 color,params GUIOption[] options)
+        {
+            return ButtonA(recta, label, color, null, options);
+        }
+        public static bool ButtonA(Vector4 recta, string label, params GUIOption[] options)
+        {
+            return ButtonA(recta, label, GUIStyle.Current.ButtonColor, null, options);
         }
 
         public static void Label(Vector4 position, string text, bool absolute = false)
@@ -336,30 +396,35 @@ namespace RigelEditor.EGUI
             float x2 = Math.Min(rect.X+ rect.Z,x1 + glyph.PixelWidth);
             float y2 = Math.Min(rect.Y+ rect.W,y1 + glyph.PixelHeight);
 
-            BufferText.Add(new RigelEGUIVertex()
-            {
-                Position = new Vector4(x1, y1, s_depthz, 1),
-                Color = color,
-                UV = glyph.UV[0]
-            });
-            BufferText.Add(new RigelEGUIVertex()
-            {
-                Position = new Vector4(x1, y2, s_depthz, 1),
-                Color = color,
-                UV = glyph.UV[1]
-            });
-            BufferText.Add(new RigelEGUIVertex()
-            {
-                Position = new Vector4(x2, y2, s_depthz, 1),
-                Color = color,
-                UV = glyph.UV[2]
-            });
-            BufferText.Add(new RigelEGUIVertex()
-            {
-                Position = new Vector4(x2, y1, s_depthz, 1),
-                Color = color,
-                UV = glyph.UV[3]
-            });
+            BufferText.AddVertices(new Vector4(x1, y1, s_depthz, 1), color, glyph.UV[0]);
+            BufferText.AddVertices(new Vector4(x1, y2, s_depthz, 1), color, glyph.UV[1]);
+            BufferText.AddVertices(new Vector4(x2, y2, s_depthz, 1), color, glyph.UV[2]);
+            BufferText.AddVertices(new Vector4(x2, y1, s_depthz, 1), color, glyph.UV[3]);
+
+            //BufferText.Add(new RigelEGUIVertex()
+            //{
+            //    Position = new Vector4(x1, y1, s_depthz, 1),
+            //    Color = color,
+            //    UV = glyph.UV[0]
+            //});
+            //BufferText.Add(new RigelEGUIVertex()
+            //{
+            //    Position = new Vector4(x1, y2, s_depthz, 1),
+            //    Color = color,
+            //    UV = glyph.UV[1]
+            //});
+            //BufferText.Add(new RigelEGUIVertex()
+            //{
+            //    Position = new Vector4(x2, y2, s_depthz, 1),
+            //    Color = color,
+            //    UV = glyph.UV[2]
+            //});
+            //BufferText.Add(new RigelEGUIVertex()
+            //{
+            //    Position = new Vector4(x2, y1, s_depthz, 1),
+            //    Color = color,
+            //    UV = glyph.UV[3]
+            //});
 
             DepthIncrease();
 
@@ -394,132 +459,122 @@ namespace RigelEditor.EGUI
             if (valid)
                 _ImplDrawTextA(rect, startpos - rect.Pos(), content, color?? Context.Color);
         }
-
         public static void TextA(Vector4 recta,string content,Vector4? color = null)
         {
             GUI._ImplDrawTextA(recta, Vector2.Zero, content, color ?? Context.Color);
         }
-
         public static void TextA(Vector4 recta,Vector2 pos, string content, Vector4? color = null)
         {
             GUI._ImplDrawTextA(recta, pos, content, color ?? Context.Color);
         }
-
-
 #endregion
 
-        public static void DrawRect(Vector4 rect, bool absolute = false, params GUIOption[] options)
-        {
-            DrawRect(rect, Context.BackgroundColor, absolute, options);
-        }
+        #region Rect
         /// <summary>
-        /// 
+        /// Draw rect relative to current group.
         /// </summary>
         /// <param name="rect"></param>
         /// <param name="color"></param>
-        /// <param name="absolute"></param>
-        /// <param name="options">border noClip</param>
-        public static void DrawRect(Vector4 rect, Vector4 color, bool absolute = false, params GUIOption[] options)
+        /// <param name="noclip"></param>
+        /// <param name="bordersize"></param>
+        /// <param name="options">
+        /// GUIOptions.Border
+        /// </param>
+        public static void Rect(Vector4 rect,Vector4 color, int bordersize,bool noclip = false,params GUIOption[] options)
         {
-            GUIOption optBorder = null;
-            if (options != null)
+            if (noclip)
             {
-                var noclip = options.FirstOrDefault((x) => { return x.type == GUIOption.GUIOptionType.noClip; });
-                if (noclip == null)
-                {
-                    var valid = GUIUtility.RectClip(ref rect, absolute ? s_ctx.baseRect : s_ctx.currentGroup.Absolute);
-                    if (!valid) return;
-                }
-                else
-                {
-                    rect = rect.Move(absolute ? s_ctx.baseRect.Pos() : s_ctx.currentGroup.Absolute.Pos());
-                }
-
-                optBorder = options.FirstOrDefault((x) => { return x.type == GUIOption.GUIOptionType.border; });
+                RectA(GetRectAbsolute(rect), color, bordersize, options);
+                return;
             }
 
-            BufferRect.Add(new RigelEGUIVertex()
-            {
-                Position = new Vector4(rect.X, rect.Y, s_depthz, 1),
-                Color = color,
-                UV = Vector2.Zero
-            });
-            BufferRect.Add(new RigelEGUIVertex()
-            {
-                Position = new Vector4(rect.X, rect.Y + rect.W, s_depthz, 1),
-                Color = color,
-                UV = Vector2.Zero
-            });
-            BufferRect.Add(new RigelEGUIVertex()
-            {
-                Position = new Vector4(rect.X + rect.Z, rect.Y + rect.W, s_depthz, 1),
-                Color = color,
-                UV = Vector2.Zero
-            });
-            BufferRect.Add(new RigelEGUIVertex()
-            {
-                Position = new Vector4(rect.X + rect.Z, rect.Y, s_depthz, 1),
-                Color = color,
-                UV = Vector2.Zero
-            });
-
-            if (optBorder != null)
-            {
-                DrawBorder(rect, 1, (Vector4)optBorder.value, true);
-            }
-
-            DepthIncrease();
+            GUIUtility.RectClip(ref rect, s_ctx.currentGroup.Absolute);
+            RectA(rect, color, bordersize, options);
         }
+        public static void Rect(Vector4 rect,Vector4 color,int bordersize, params GUIOption[] options)
+        {
+            Rect(rect, color, bordersize, false, options);
+        }
+        public static void Rect(Vector4 rect, Vector4 color, params GUIOption[] options)
+        {
+            Rect(rect, color, 1, false, options);
+        }
+        [TODO("Refactoring","remove this method")]
+        public static void Rect(Vector4 rect, Vector4 color, bool absolutely, params GUIOption[] options)
+        {
+            if (absolutely)
+            {
+                RectA(rect, color, 1, options);
+            }
+            else
+            {
+                Rect(rect, color, 1, false, options);
+            }
+        }
+
+        /// <summary>
+        /// Draw rect absolutely
+        /// </summary>
+        /// <param name="recta"></param>
+        /// <param name="color"></param>
+        /// <param name="bordersize"></param>
+        /// <param name="options"></param>
+        public static void RectA(Vector4 recta,Vector4 color,int bordersize = 1,params GUIOption[] options)
+        {
+            _ImplDrawRectA(recta, color);
+
+            if(options != null)
+            {
+                var optBorder = options.FirstOrDefault((o) => { return o.type == GUIOption.GUIOptionType.border; });
+                //draw border
+            }
+        }
+
+#endregion
+
+
         public static void DrawTexture(Vector4 rect, uint textureid)
         {
 
         }
-
-        public static void DrawBorder(Vector4 rect, int thickness, Vector4? color, bool absolute = false)
-        {
-            var p0 = rect.Pos();
-            var p2 = p0 + rect.Size();
-            var p1 = p0; p1.Y = p2.Y;
-            var p3 = p0; p3.X = p2.X;
-
-            DrawLineAxisAligned(p0, p1, thickness, color, absolute);
-            DrawLineAxisAligned(p1, p2, thickness, color, absolute);
-            DrawLineAxisAligned(p3, p2, thickness, color, absolute);
-            DrawLineAxisAligned(p0, p3, thickness, color, absolute);
-        }
-
         public static void DrawLine(Vector2 startp, Vector2 endp, int thickness, bool absolute = false)
         {
 
         }
 
-        public static void DrawLineAxisAligned(Vector2 startp, Vector2 endp, int thickness, Vector4? color, bool absolute = false)
+
+        public static void Border(Vector4 rect,int thickness,Vector4? color)
         {
-            var rect = new Vector4(startp, endp.X - startp.X, endp.Y - startp.Y);
+            var offset = GUI.Context.currentGroup.Absolute.Pos();
+            rect.X += offset.X;
+            rect.Y += offset.Y;
 
-            float thickhalf = thickness / 2.0f;
-            if (rect.Z > rect.W)
-            {
-                rect.W = thickness;
-                rect.Z += thickhalf;
-            }
-            else
-            {
-                rect.Z = thickness;
-                rect.W += thickhalf;
-            }
-
-            rect.X -= thickhalf;
-            rect.Y -= thickhalf;
-            if (color != null)
-            {
-                DrawRect(rect, (Vector4)color, absolute);
-            }
-            else
-            {
-                DrawRect(rect, absolute);
-            }
+            BorderA(rect, thickness, color);
         }
+        public static void BorderA(Vector4 rectA,int thickness,Vector4? color)
+        {
+            var p0 = rectA.Pos();
+            var p2 = p0 + rectA.Size();
+            var p1 = p0; p1.Y = p2.Y;
+            var p3 = p0; p3.X = p2.X;
+
+            LineAxisAlignedA(p0, p1, thickness, color);
+            LineAxisAlignedA(p1, p2, thickness, color);
+            LineAxisAlignedA(p3, p2, thickness, color);
+            LineAxisAlignedA(p0, p3, thickness, color);
+        }
+        public static void LineAxisAligned(Vector2 startp, Vector2 endp, int thickness = 1, Vector4? color = null)
+        {
+            var pos = GUI.Context.currentGroup.Absolute.Pos();
+            startp += pos;
+            endp += pos;
+        }
+        public static void LineAxisAlignedA(Vector2 startpA,Vector2 endpA,int thickness = 1,Vector4? color = null)
+        {
+            GUI._ImplDrawLineAxisAligned(startpA, endpA, thickness, color);
+        }
+
+
 
         public static string TextField(Vector4 rect, string content)
         {
@@ -556,7 +611,7 @@ namespace RigelEditor.EGUI
         #region Input
         public static bool Toggle(Vector4 rect, bool value, string label)
         {
-            DrawRect(rect);
+            
             return value;
         }
 

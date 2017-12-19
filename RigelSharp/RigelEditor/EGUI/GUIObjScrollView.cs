@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using SharpDX;
 using RigelCore;
 
 namespace RigelEditor.EGUI
@@ -100,17 +99,17 @@ namespace RigelEditor.EGUI
                 if (ScrollVertical.OnDrag(containsThumb))
                 {
                     ScrollPos.Y -= (int)(GUI.Event.DragOffset.Y * chinv);
-                    ScrollPos.Y = MathUtil.Clamp(ScrollPos.Y, scrollVmax, 0);
+                    ScrollPos.Y = Mathf.Clamp(ScrollPos.Y, scrollVmax, 0);
                     thumbActive = true;
                 }
-                GUILayout.DrawRect(rectSBV, thumbActive ? GUIStyle.Current.ColorActive : GUIStyle.Current.BackgroundColor);
+                GUILayout.Rect(rectSBV, thumbActive ? GUIStyle.Current.ColorActive : GUIStyle.Current.BackgroundColor);
 
                 if (containerContains)
                 {
                     if (!e.Used && e.EventType == RigelEGUIEventType.MouseWheel)
                     {
                         ScrollPos.Y += (int)(chinv * 12 * (e.Delta > 0 ? 1 : -1));
-                        ScrollPos.Y = MathUtil.Clamp(ScrollPos.Y, scrollVmax, 0);
+                        ScrollPos.Y = Mathf.Clamp(ScrollPos.Y, scrollVmax, 0);
                         e.Use();
                     }
                 }
@@ -140,17 +139,17 @@ namespace RigelEditor.EGUI
                 if (ScrollHorizontal.OnDrag(thumbActive))
                 {
                     ScrollPos.X -= (int)(GUI.Event.DragOffset.X * contentHPercentInv);
-                    ScrollPos.X = MathUtil.Clamp(ScrollPos.X, scrollHmax, 0);
+                    ScrollPos.X = Mathf.Clamp(ScrollPos.X, scrollHmax, 0);
                     thumbActive = true;
                 }
-                GUILayout.DrawRect(rectSBH, thumbActive ? GUIStyle.Current.ColorActive : GUIStyle.Current.BackgroundColor);
+                GUILayout.Rect(rectSBH, thumbActive ? GUIStyle.Current.ColorActive : GUIStyle.Current.BackgroundColor);
 
                 if (containerContains)
                 {
                     if (!overflowV && !e.Used && e.EventType == RigelEGUIEventType.MouseWheel)
                     {
                         ScrollPos.X += (int)(contentHPercentInv * 12 * (e.Delta > 0 ? 1 : -1));
-                        ScrollPos.X = MathUtil.Clamp(ScrollPos.X, scrollHmax, 0);
+                        ScrollPos.X = Mathf.Clamp(ScrollPos.X, scrollHmax, 0);
                         e.Use();
                     }
                 }

@@ -142,7 +142,7 @@ namespace RigelCore.Rendering
                 {
                     case CommandDataType.ClearRenderTarget:
 
-                        deferred.ClearRenderTargetView(cmd.ParamRTId.GetRawRenderTexture<RenderTargetView>(context),new Color(cmd.ParamVec4));
+                        deferred.ClearRenderTargetView(cmd.ParamRTId.GetRawRenderTexture<RenderTargetView>(context),new SharpDX.Color(0,0,0,0));
                         break;
                     case CommandDataType.Draw:
 

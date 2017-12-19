@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using SharpDX;
 using RigelCore;
 
 namespace RigelEditor.EGUI
@@ -61,12 +60,12 @@ namespace RigelEditor.EGUI
         {
             var rect = new Vector4(20, 500, 20, 20);
 
-            GUI.DrawRect(rect,RigelColor.Black,true);
+            GUI.RectA(rect,RigelColor.Black);
             GUI._ImplDrawCharWithRect(rect, new Vector2(-3,-3), 'R', RigelColor.White);
 
             rect.X += 21;
             rect.Z = 10;
-            GUI.DrawRect(rect, RigelColor.Black, true);
+            GUI.RectA(rect, RigelColor.Black);
             GUI._ImplDrawCharWithRect(rect, new Vector2(0,10), 'W', RigelColor.White);
 
             rect.Y += 20;
@@ -86,7 +85,7 @@ namespace RigelEditor.EGUI
             {
                 GUI.BeginGroup(new Vector4(GUILayout.CurrentLayout.Offset, 100, 100));
 
-                GUI.DrawRect(new Vector4(0, 0, 20, 20), RigelColor.Red, false);
+                GUI.Rect(new Vector4(0, 0, 20, 20), RigelColor.Red);
 
                 GUI.EndGroup();
 
@@ -95,15 +94,15 @@ namespace RigelEditor.EGUI
                 var rectab = GUILayout.GetRectAbsolute(rect);
                 GUILayout.BeginContainer(rectab, RigelColor.Green);
 
-                GUI.DrawRect(new Vector4(50, 50, 50, 50), RigelColor.Blue);
-                GUILayout.DrawRect(new Vector4(25, 25, 25, 25), RigelColor.Red);
+                GUI.Rect(new Vector4(50, 50, 50, 50), RigelColor.Blue);
+                GUILayout.Rect(new Vector4(25, 25, 25, 25), RigelColor.Red);
 
                 GUILayout.EndContainer();
 
                 GUILayout.BeginContainerRelative(new Vector4(GUILayout.CurrentLayout.Offset, 100, 100), RigelColor.Red);
 
-                GUILayout.DrawRect(new Vector4(25, 25, 25, 25), RigelColor.White);
-                GUI.DrawRect(new Vector4(50, 50, 50, 50), RigelColor.Black);
+                GUILayout.Rect(new Vector4(25, 25, 25, 25), RigelColor.White);
+                GUI.Rect(new Vector4(50, 50, 50, 50), RigelColor.Black);
                 GUILayout.EndContainer();
                 GUILayout.Space(200);
             }
