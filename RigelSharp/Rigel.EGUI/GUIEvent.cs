@@ -786,7 +786,7 @@ namespace Rigel.EGUI
     public class GUIEvent
     {
         public bool Used { get;private set; } = false;
-        public RigelEGUIEventType EventType { get; internal set; } = RigelEGUIEventType.None;
+        public RigelEGUIEventType EventType { get; set; } = RigelEGUIEventType.None;
         public bool Alt { get; private set; } = false;
         public bool Control { get; private set; } = false;
         public bool Shift { get; private set; } = false;
@@ -798,7 +798,7 @@ namespace Rigel.EGUI
         public int Clicks { get; private set; } = 0;
         public int Delta { get; private set; } = 0;
         public Vector2 Pointer { get; private set; } = Vector2.Zero;
-        public Vector2 DragOffset { get; internal set; } = Vector2.Zero;
+        public Vector2 DragOffset { get; set; } = Vector2.Zero;
 
         public int RenderWidth;
         public int RenderHeight;

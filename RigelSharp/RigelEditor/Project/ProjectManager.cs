@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Rigel;
 using RigelEditor;
 using RigelEditor.EGUI;
+using Rigel.EGUI;
 
 namespace RigelEditor.Project
 {

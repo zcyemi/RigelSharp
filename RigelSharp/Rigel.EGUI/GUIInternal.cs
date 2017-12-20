@@ -10,7 +10,7 @@ using Rigel;
 
 namespace Rigel.EGUI
 {
-    internal static class GUIInternal
+    public static class GUIInternal
     {
         private static GUICtx s_ctx;
 

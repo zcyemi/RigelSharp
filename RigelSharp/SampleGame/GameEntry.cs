@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using RigelCore;
-using RigelCore.Engine;
+using Rigel;
+using Rigel.Engine;
 
 [assembly: GameScript(typeof(SampleGame.GameEntry))]
 namespace SampleGame

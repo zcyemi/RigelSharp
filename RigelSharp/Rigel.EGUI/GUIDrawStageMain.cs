@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Rigel.EGUI
 {
-    class GUIDrawStageMain : GUIDrawStage
+    public class GUIDrawStageMain : GUIDrawStage
     {
         private bool m_initedDraw = false;
         private bool m_needUpdateBuffer = false;
