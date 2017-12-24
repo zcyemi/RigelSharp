@@ -10,6 +10,9 @@ namespace RigelEngineLoader
     {
         static void Main(string[] args)
         {
+            int exitcode = (int)EngineLoader.LoadAndRun();
+
+            Environment.Exit(exitcode);
         }
     }
 }
