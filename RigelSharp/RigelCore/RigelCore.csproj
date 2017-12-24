@@ -72,6 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Alg\HashFunction.cs" />
+    <Compile Include="AssemblyLoader.cs" />
     <Compile Include="Engine\BaseComponent.cs" />
     <Compile Include="Engine\Camera.cs" />
     <Compile Include="Engine\GameEngine.cs" />
