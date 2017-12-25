@@ -38,6 +38,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rigel.SharpDX", "Rigel.Shar
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rigel.OpenTK", "Rigel.OpenTK\Rigel.OpenTK.csproj", "{4CE5A1C3-7273-4D6C-9EDD-E6F37441FF26}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenTKtest", "OpenTKtest\OpenTKtest.csproj", "{1E26E521-E357-4C62-B34B-E28C7AE22FD3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -92,6 +94,10 @@ Global
 		{4CE5A1C3-7273-4D6C-9EDD-E6F37441FF26}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4CE5A1C3-7273-4D6C-9EDD-E6F37441FF26}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4CE5A1C3-7273-4D6C-9EDD-E6F37441FF26}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E26E521-E357-4C62-B34B-E28C7AE22FD3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E26E521-E357-4C62-B34B-E28C7AE22FD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E26E521-E357-4C62-B34B-E28C7AE22FD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E26E521-E357-4C62-B34B-E28C7AE22FD3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -107,6 +113,7 @@ Global
 		{22813787-485F-4569-9CB6-1A2B52F646F6} = {B4ADBBED-121F-44F0-ACBF-6AE48E8E0971}
 		{922643BE-D399-4590-B63B-ADD764B1697E} = {963D1BE9-E7D6-46C0-8DE8-B1418948C15B}
 		{4CE5A1C3-7273-4D6C-9EDD-E6F37441FF26} = {963D1BE9-E7D6-46C0-8DE8-B1418948C15B}
+		{1E26E521-E357-4C62-B34B-E28C7AE22FD3} = {92535162-F07C-4460-9BDE-ED7492FD60D3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DA0B8DD1-8381-4910-BDF3-2D7C3339EB99}
