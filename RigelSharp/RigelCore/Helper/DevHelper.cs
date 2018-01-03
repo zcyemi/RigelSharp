@@ -21,4 +21,10 @@ namespace Rigel
             this.Msg = msg;
         }
     }
+
+    [AttributeUsage(AttributeTargets.All, AllowMultiple = false, Inherited = false)]
+    public class TEMPAttribute: Attribute
+    {
+
+    }
 }

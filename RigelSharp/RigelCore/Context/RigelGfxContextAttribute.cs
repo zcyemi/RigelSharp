@@ -10,9 +10,13 @@ namespace Rigel.Context
     {
         public GraphicsAPIEnum SupportGraphics;
         public PlatformEnum SupportPlatform;
+        public string ContextName;
+        public Type ContextType;
 
-        public RigelGfxContextAttribute(GraphicsAPIEnum supportGraphics,PlatformEnum supportPlatform)
+        public RigelGfxContextAttribute(string contextName,Type contextType,GraphicsAPIEnum supportGraphics,PlatformEnum supportPlatform)
         {
+            this.ContextName = contextName;
+            this.ContextType = contextType;
             this.SupportGraphics = supportGraphics;
             this.SupportPlatform = supportPlatform;
         }

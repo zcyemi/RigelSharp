@@ -4,13 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Rigel
+namespace Rigel.Context
 {
-    public class RgWindow : IDisposable
+    public interface IRigelGfxContext
     {
-        public void Dispose()
-        {
 
-        }
     }
 }

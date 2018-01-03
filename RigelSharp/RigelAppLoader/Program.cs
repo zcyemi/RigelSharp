@@ -15,7 +15,6 @@ using Buffer = SharpDX.Direct3D11.Buffer;
 using Device = SharpDX.Direct3D11.Device;
 
 
-using RigelEditor;
 
 namespace RigelAppLoader
 {

@@ -14,7 +14,15 @@ namespace RigelEngine
         [STAThread]
         static void Main()
         {
+            {
+                //Temp
+                Rigel.SharpDX.RigelSharpDX.Init();
+                Rigel.OpenTK.RigelOpenTK.Init();
+            }
 
+            Rigel.Context.RigelContextManager.CheckContextProvider();
+
+            RigelEngineApp.App.Run();
         }
     }
 }

@@ -8,9 +8,13 @@ using Rigel.Context;
 
 namespace Rigel.SharpDX
 {
-    [RigelGfxContext(GraphicsAPIEnum.DirectX,PlatformEnum.Windows)]
-    class RigelSharpDX
+    public static class RigelSharpDX
     {
+        public const string CONTEXT_NAME = "SharpDX";
 
+        public static void Init()
+        {
+
+        }
     }
 }
