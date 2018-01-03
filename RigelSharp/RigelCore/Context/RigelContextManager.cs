@@ -4,9 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RigelEngine
+namespace Rigel.Context
 {
-    public class RigelEngineEditorApplication
+    public static class RigelContextManager
     {
+
+        public static void Refresh()
+        {
+
+        }
     }
 }

@@ -9,14 +9,12 @@ using Rigel;
 
 namespace RigelEngine
 {
-    internal static class RigelEngineEntry
+    class RigelEngineEntry
     {
-        static void Run(string dataPath)
+        [STAThread]
+        static void Main()
         {
-            Console.WriteLine("[Entry]Run: " + dataPath);
 
-            int asmcount = AssemblyLoader.LoadAssemblies(Path.Combine(dataPath,"Assembly"));
-            Console.WriteLine("[Entry] AsmLoad:" + asmcount);
         }
     }
 }

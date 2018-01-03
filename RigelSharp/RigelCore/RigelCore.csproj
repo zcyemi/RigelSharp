@@ -74,6 +74,7 @@
     <Compile Include="Alg\HashFunction.cs" />
     <Compile Include="AssemblyLoader.cs" />
     <Compile Include="Context\PlatformEnum.cs" />
+    <Compile Include="Context\RigelContextManager.cs" />
     <Compile Include="Context\RigelGfxContextAttribute.cs" />
     <Compile Include="Context\RigelWindowContextAttribute.cs" />
     <Compile Include="Engine\BaseComponent.cs" />

@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace Rigel.Context
 {
-    class RigelWindowContextAttribute
+    public class RigelWindowContextAttribute : Attribute
     {
+        
     }
 }
