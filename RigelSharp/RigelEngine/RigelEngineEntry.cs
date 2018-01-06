@@ -22,7 +22,11 @@ namespace RigelEngine
 
             Rigel.Context.RigelContextManager.CheckContextProvider();
 
+            RigelEngineApp.App.Init();
+
             RigelEngineApp.App.Run();
+
+            RigelEngineApp.App.Destroy();
         }
     }
 }

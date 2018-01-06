@@ -52,6 +52,21 @@ namespace Rigel.SharpDX
                 this.Dispose();
         }
 
+        public IntPtr GetWindowHandler()
+        {
+            return this.Handle;
+        }
+
+        public int GetWindowHeight()
+        {
+            return this.ClientSize.Height;
+        }
+
+        public int GetWindowWidth()
+        {
+            return this.ClientSize.Width;
+        }
+
         public void Run(Action update)
         {
             if(update == null)

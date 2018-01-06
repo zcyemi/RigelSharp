@@ -15,5 +15,10 @@ namespace Rigel
         void Run(Action update);
 
         void DestroyWindow();
+
+        int GetWindowWidth();
+        int GetWindowHeight();
+
+        IntPtr GetWindowHandler();
     }
 }
