@@ -35,7 +35,9 @@ namespace Rigel.Rendering
             EventPostResizeBuffer.Invoke();
         }
 
-        public abstract void Render(Action immediateDrall = null);
+        public abstract void Render(Action<IGraphicsImmediatelyContext> immediateDrall = null);
+
+        public abstract IGraphicsImmediatelyContext ImmediatelyContext { get; }
 
 
 #region CommandBuffer

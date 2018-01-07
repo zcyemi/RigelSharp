@@ -20,5 +20,7 @@ namespace Rigel
         int GetWindowHeight();
 
         IntPtr GetWindowHandler();
+
+        IRigelWindowEventHandler EvnetHandler { get; }
     }
 }

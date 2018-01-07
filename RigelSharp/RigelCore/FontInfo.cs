@@ -75,16 +75,16 @@ namespace Rigel
 
         public FontInfo(string fontpath, uint pixelsize = 13)
         {
+
             FontFilePath = fontpath;
             FontPixelSize = pixelsize;
             m_ftface = new Face(s_ftLibrary, fontpath);
+
             m_ftface.SetPixelSizes(FontPixelSize, FontPixelSize);
 
             m_ascender = m_ftface.Size.Metrics.Ascender.Value >> 6;
 
         }
-
-
 
         public void GenerateFontTexture(ImageData img)
         {

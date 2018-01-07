@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Module\IRigelEngineModule.cs" />
     <Compile Include="Module\ModuleEditorGraphics.cs" />
     <Compile Include="Module\ModuleEngineGUI.cs" />
     <Compile Include="RigelModuleManager.cs" />
@@ -54,6 +55,10 @@
     <Compile Include="RigelEngineEntry.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Rigel.EGUI\Rigel.EGUI.csproj">
+      <Project>{19be01b0-d938-4005-b5d2-a132a1fb1839}</Project>
+      <Name>Rigel.EGUI</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Rigel.OpenTK\Rigel.OpenTK.csproj">
       <Project>{4ce5a1c3-7273-4d6c-9edd-e6f37441ff26}</Project>
       <Name>Rigel.OpenTK</Name>

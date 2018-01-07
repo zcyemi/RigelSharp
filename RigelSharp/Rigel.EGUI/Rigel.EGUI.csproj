@@ -42,6 +42,8 @@
   <ItemGroup>
     <Compile Include="GUI.cs" />
     <Compile Include="GUI.Impl.cs" />
+    <Compile Include="GUIBufferList.cs" />
+    <Compile Include="GUIBufferVertices.cs" />
     <Compile Include="GUIComponent.cs" />
     <Compile Include="GUIContent.cs" />
     <Compile Include="GUICtx.cs" />
@@ -53,6 +55,7 @@
     <Compile Include="GUIDrawStageWindows.cs" />
     <Compile Include="GUIDrawTarget.cs" />
     <Compile Include="GUIEvent.cs" />
+    <Compile Include="GUIEventHandler.cs" />
     <Compile Include="GUIGraphicsBind.cs" />
     <Compile Include="GUIInternal.cs" />
     <Compile Include="GUILayout.cs" />

@@ -13,6 +13,7 @@ namespace RigelEngine
 
 
         private ModuleEditorGraphics m_moduleEditorGraphics;
+        private ModuleEngineGUI m_moduleEngineGUI;
 
         public RigelModuleManager()
         {
@@ -23,15 +24,22 @@ namespace RigelEngine
         {
             m_moduleEditorGraphics = new ModuleEditorGraphics();
             m_moduleEditorGraphics.Init();
+
+            m_moduleEngineGUI = new ModuleEngineGUI();
+            m_moduleEngineGUI.Init();
         }
 
         public void Update()
         {
+            m_moduleEngineGUI.Update();
+
             m_moduleEditorGraphics.Update();
         }
 
         public void Destroy()
         {
+            m_moduleEngineGUI.Destroy();
+
             m_moduleEditorGraphics.Destroy();
         }
     }

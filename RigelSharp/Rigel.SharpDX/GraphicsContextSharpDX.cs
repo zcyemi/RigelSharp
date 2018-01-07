@@ -13,12 +13,16 @@ using SharpDX.Direct3D;
 using SharpDX.D3DCompiler;
 using SharpDX.DXGI;
 using SharpDX.Win32;
+using SharpDX.Mathematics;
+using SharpDX.Mathematics.Interop;
 using Buffer = SharpDX.Direct3D11.Buffer;
 using Device = SharpDX.Direct3D11.Device;
 
+
 namespace Rigel.SharpDX
 {
-    public class GraphicsContextSharpDX : GraphicsContextBase
+
+    public class GraphicsContextSharpDX : GraphicsContextBase,IGraphicsImmediatelyContext
     {
 
         private Device m_device;
@@ -39,6 +43,25 @@ namespace Rigel.SharpDX
         private int m_resizeWidth;
         private int m_resizeHeight;
         private bool m_needResize = true;
+
+
+        public override IGraphicsImmediatelyContext ImmediatelyContext
+        {
+            get
+            {
+                return this;
+            }
+        }
+
+        #region ImmediatelyContext
+
+        public void Clear(Vector4 color)
+        {
+            m_context.ClearRenderTargetView(m_renderTargetView, new RawColor4(color.x,color.y,color.z,color.w));
+        }
+
+        #endregion
+
 
 
         internal GraphicsContextSharpDX()
@@ -141,7 +164,7 @@ namespace Rigel.SharpDX
             if (m_device != null) m_device.Dispose();
         }
 
-        public override void Render(Action immediateDrall = null)
+        public override void Render(Action<IGraphicsImmediatelyContext> immediateDrall = null)
         {
             if (m_needResize)
             {
@@ -149,15 +172,17 @@ namespace Rigel.SharpDX
                 m_needResize = false;
             }
 
-            if(immediateDrall != null)
-            {
-                immediateDrall.Invoke();
-            }
-
-
             //clear
             m_context.ClearDepthStencilView(m_depthcStencilView, DepthStencilClearFlags.Depth, 1.0f, 0);
             m_context.ClearRenderTargetView(m_renderTargetView, Color.Black);
+
+
+            //immediate draw
+            if (immediateDrall != null)
+            {
+                immediateDrall.Invoke(ImmediatelyContext);
+            }
+
 
             //do render
             //{

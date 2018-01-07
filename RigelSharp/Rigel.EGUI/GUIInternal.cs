@@ -21,6 +21,12 @@ namespace Rigel.EGUI
 
         public static IGUIGraphicsBind GraphicsBind { get { return s_graphicsBind; } }
 
+
+        public static void Init(IRigelWindowEventHandler eventHandler,IGUIGraphicsBind bind,IFontInfo fontinfo)
+        {
+            Init(new GUIEventHandler(eventHandler), bind, fontinfo);
+        }
+
         public static void Init(IGUIEventHandler eventHandler,IGUIGraphicsBind graphicsBind,IFontInfo fontinfo)
         {
             s_eventHandler = eventHandler;

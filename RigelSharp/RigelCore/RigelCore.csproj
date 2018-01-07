@@ -75,6 +75,7 @@
     <Compile Include="AssemblyLoader.cs" />
     <Compile Include="Context\IRigelGfxContext.cs" />
     <Compile Include="Context\IRigelWindowContext.cs" />
+    <Compile Include="Context\IRigelWindowEventHandler.cs" />
     <Compile Include="Context\PlatformEnum.cs" />
     <Compile Include="Context\RigelContextManager.cs" />
     <Compile Include="Context\RigelGfxContextAttribute.cs" />
@@ -110,6 +111,7 @@
     <Compile Include="Rendering\GraphicsContextBase.cs" />
     <Compile Include="Rendering\GraphicsManager.cs" />
     <Compile Include="Context\IRigelWindow.cs" />
+    <Compile Include="Rendering\IGraphicsImmediateContext.cs" />
     <Compile Include="Rendering\RenderTextureIdentifier.cs" />
     <Compile Include="RigelAPI.cs" />
     <Compile Include="FontInfo.cs" />

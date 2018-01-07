@@ -10,21 +10,19 @@ using Rigel.Rendering;
 
 namespace RigelEngine.Module
 {
-    public class ModuleEditorGraphics
+    public class ModuleEditorGraphics: IRigelEngineModule
     {
         private GraphicsContextBase m_graphicsContext = null;
-
-
 
         public void Init()
         {
             m_graphicsContext = RigelEngineApp.App.ContextGFX.CreateGraphicsContext(null);
 
             Console.WriteLine(m_graphicsContext);
-
             m_graphicsContext.CreateRenderTarget(RigelEngineApp.App.MainWindow.GetWindowHandler(), RigelEngineApp.App.WindowWidth, RigelEngineApp.App.WindowHeight) ;
 
         }
+
 
         public void Update()
         {
@@ -33,7 +31,7 @@ namespace RigelEngine.Module
 
         public void Destroy()
         {
-
+            m_graphicsContext.Dispose();
         }
     }
 }
