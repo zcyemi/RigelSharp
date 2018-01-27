@@ -9,7 +9,7 @@
     <ProjectGuid>{F29A7E2D-8106-44A3-A404-64870126BE84}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RigelCore</RootNamespace>
+    <RootNamespace>Rigel</RootNamespace>
     <AssemblyName>RigelCore</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -72,6 +72,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Alg\HashFunction.cs" />
+    <Compile Include="AssemblyLoader.cs" />
+    <Compile Include="Context\IRigelGfxContext.cs" />
+    <Compile Include="Context\IRigelWindowContext.cs" />
+    <Compile Include="Context\IRigelWindowEventHandler.cs" />
+    <Compile Include="Context\PlatformEnum.cs" />
+    <Compile Include="Context\RigelContextManager.cs" />
+    <Compile Include="Context\RigelGfxContextAttribute.cs" />
+    <Compile Include="Context\RigelWindowContextAttribute.cs" />
     <Compile Include="Engine\BaseComponent.cs" />
     <Compile Include="Engine\Camera.cs" />
     <Compile Include="Engine\GameEngine.cs" />
@@ -100,9 +108,11 @@
     <Compile Include="Rendering\Graphics.cs" />
     <Compile Include="Rendering\GraphicsBuffer.cs" />
     <Compile Include="Rendering\GraphicsContext.cs" />
+    <Compile Include="Rendering\GraphicsContextBase.cs" />
     <Compile Include="Rendering\GraphicsManager.cs" />
+    <Compile Include="Context\IRigelWindow.cs" />
+    <Compile Include="Rendering\IGraphicsImmediateContext.cs" />
     <Compile Include="Rendering\RenderTextureIdentifier.cs" />
-    <Compile Include="RgWindow.cs" />
     <Compile Include="RigelAPI.cs" />
     <Compile Include="FontInfo.cs" />
     <Compile Include="RigelColor.cs" />

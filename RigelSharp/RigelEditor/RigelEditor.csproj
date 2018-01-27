@@ -76,42 +76,10 @@
     <Compile Include="EditorMenuManager.cs" />
     <Compile Include="EditorModule.cs" />
     <Compile Include="EditorTest.cs" />
-    <Compile Include="EGUI\GUI.cs" />
-    <Compile Include="EGUI\GUI.Impl.cs" />
-    <Compile Include="EGUI\GUIComponent.cs" />
-    <Compile Include="EGUI\GUIContent.cs" />
-    <Compile Include="EGUI\GUICtx.cs" />
-    <Compile Include="EGUI\GUIDock.cs" />
-    <Compile Include="EGUI\GUIDrag.cs" />
-    <Compile Include="EGUI\GUIDrawStage.cs" />
-    <Compile Include="EGUI\GUIDrawStageMain.cs" />
-    <Compile Include="EGUI\GUIDrawStageOverlay.cs" />
-    <Compile Include="EGUI\GUIDrawStageWindows.cs" />
-    <Compile Include="EGUI\GUIDrawTarget.cs" />
-    <Compile Include="EGUI\GUIInternal.cs" />
-    <Compile Include="EGUI\GUILayout.cs" />
-    <Compile Include="EGUI\GUIMenu.cs" />
-    <Compile Include="EGUI\GUIMessageBox.cs" />
-    <Compile Include="EGUI\GUIObject.cs" />
-    <Compile Include="EGUI\GUIObjectTabView.cs" />
-    <Compile Include="EGUI\GUIObjTextInput.cs" />
-    <Compile Include="EGUI\GUIOption.cs" />
-    <Compile Include="EGUI\GUIObjScrollView.cs" />
-    <Compile Include="EGUI\GUISamples.cs" />
-    <Compile Include="EGUI\GUITest.cs" />
-    <Compile Include="EGUI\GUITextProcessor.cs" />
-    <Compile Include="EGUI\GUITextureStorage.cs" />
-    <Compile Include="EGUI\GUIUtility.cs" />
-    <Compile Include="EGUI\GUIWindow.cs" />
-    <Compile Include="EGUI\IGUIBuffer.cs" />
-    <Compile Include="EGUI\IGUIEventHandler.cs" />
-    <Compile Include="EGUI\IGUIGraphicsBind.cs" />
     <Compile Include="EGUI\RigelEGUIBuffer.cs" />
     <Compile Include="EGUI\RigelEGUIBufferGUIWindow.cs" />
     <Compile Include="EditorGUIManager.cs" />
     <Compile Include="EGUI\RigelEGUICtx.Window.cs" />
-    <Compile Include="EGUI\GUIGraphicsBind.cs" />
-    <Compile Include="EGUI\GUIStyle.cs" />
     <Compile Include="EGUI\RigelEGUIWindow.cs" />
     <Compile Include="Helper\EditorReflectionHelper.cs" />
     <Compile Include="Platforms\GUIBufferDynamic.cs" />
@@ -129,7 +97,6 @@
     <Compile Include="EditorConfig.cs" />
     <Compile Include="RigelDrawCall.cs" />
     <Compile Include="EditorApplication.cs" />
-    <Compile Include="EGUI\GUIEvent.cs" />
     <Compile Include="EditorGraphicsManager.cs" />
     <Compile Include="Helper\EditorUtility.cs" />
   </ItemGroup>
@@ -137,6 +104,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Rigel.EGUI\Rigel.EGUI.csproj">
+      <Project>{19be01b0-d938-4005-b5d2-a132a1fb1839}</Project>
+      <Name>Rigel.EGUI</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RigelCore\RigelCore.csproj">
       <Project>{f29a7e2d-8106-44a3-a404-64870126be84}</Project>
       <Name>RigelCore</Name>

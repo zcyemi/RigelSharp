@@ -16,10 +16,11 @@ using Buffer = SharpDX.Direct3D11.Buffer;
 using Device = SharpDX.Direct3D11.Device;
 
 using RigelEditor;
-using RigelCore;
-using RigelCore.Rendering;
+using Rigel;
+using Rigel.Rendering;
 
 using RigelEditor.EGUI;
+using Rigel.EGUI;
 
 namespace RigelEditor.Platforms
 {
@@ -27,11 +28,11 @@ namespace RigelEditor.Platforms
     public struct RigelEGUIVertex
     {
         [FieldOffset(0)]
-        public RigelCore.Vector4 Position;
+        public Rigel.Vector4 Position;
         [FieldOffset(16)]
-        public RigelCore.Vector4 Color;
+        public Rigel.Vector4 Color;
         [FieldOffset(32)]
-        public RigelCore.Vector2 UV;
+        public Rigel.Vector2 UV;
     }
 
     internal class GUIGraphicsBindSharpDX : IDisposable, IGUIGraphicsBind

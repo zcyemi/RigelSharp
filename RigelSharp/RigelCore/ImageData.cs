@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Drawing.Imaging;
 using System.Drawing;
 
-namespace RigelCore
+namespace Rigel
 {
     public enum ImageDataDepth
     {

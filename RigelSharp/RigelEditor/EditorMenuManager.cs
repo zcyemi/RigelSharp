@@ -5,7 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
 
-using RigelCore;
+using Rigel;
+using Rigel.EGUI;
 
 using RigelEditor.EGUI;
 

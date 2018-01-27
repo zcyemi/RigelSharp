@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RigelCore
+namespace Rigel
 {
     public struct Vector2
     {
@@ -1269,11 +1269,6 @@ namespace RigelCore
         {
             return new Vector2(z, w);
         }
-
-        public float X { get { return x; } set { x = value; } }
-        public float Y { get { return y; } set { y = value; } }
-        public float Z { get { return z; } set { z = value; } }
-        public float W { get { return w; } set { w = value; } }
 
         /// <summary>
         ///   <para>Returns this vector with a magnitude of 1 (Read Only).</para>

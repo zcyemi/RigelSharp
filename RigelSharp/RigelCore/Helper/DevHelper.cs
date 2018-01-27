@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RigelCore
+namespace Rigel
 {
     class DevHelper
     {
@@ -20,5 +20,11 @@ namespace RigelCore
             this.Tag = tag;
             this.Msg = msg;
         }
+    }
+
+    [AttributeUsage(AttributeTargets.All, AllowMultiple = false, Inherited = false)]
+    public class TEMPAttribute: Attribute
+    {
+
     }
 }

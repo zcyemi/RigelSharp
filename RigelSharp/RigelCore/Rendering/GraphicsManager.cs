@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using SharpDX.Windows;
 using SharpDX;
 
-using RigelCore.Engine;
+using Rigel.Engine;
 
-namespace RigelCore.Rendering
+namespace Rigel.Rendering
 {
     public class GraphicsManager
     {

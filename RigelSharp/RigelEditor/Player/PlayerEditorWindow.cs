@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 
 using RigelEditor.EGUI;
 using RigelEditor;
-using RigelCore;
-using RigelCore.Rendering;
+using Rigel;
+using Rigel.Rendering;
+using Rigel.EGUI;
 
 namespace RigelEditor.Player
 {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RigelCore.Engine
+namespace Rigel.Engine
 {
     [AttributeUsage(AttributeTargets.Assembly,AllowMultiple = false,Inherited =false)]
     public class GameScriptAttribute :Attribute

@@ -8,10 +8,10 @@ using System.Reflection;
 using SharpDX;
 using SharpDX.Windows;
 
-using RigelCore.Rendering;
+using Rigel.Rendering;
 
 
-namespace RigelCore.Engine
+namespace Rigel.Engine
 {
     public static class GameEngine
     {

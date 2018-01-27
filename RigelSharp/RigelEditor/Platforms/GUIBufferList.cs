@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using RigelCore;
+using Rigel;
 using RigelEditor.EGUI;
 
 namespace RigelEditor.Platforms

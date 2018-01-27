@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using SharpDX;
 
-namespace RigelCore
+namespace Rigel
 {
     public class RigelColor
     {

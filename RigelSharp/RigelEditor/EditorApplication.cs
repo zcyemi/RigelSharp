@@ -14,7 +14,7 @@ using SharpDX.Windows;
 using Buffer = SharpDX.Direct3D11.Buffer;
 using Device = SharpDX.Direct3D11.Device;
 
-using RigelCore;
+using Rigel;
 using RigelEditor.EGUI;
 
 namespace RigelEditor

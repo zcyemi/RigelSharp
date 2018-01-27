@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RigelCore.Rendering
+namespace Rigel.Rendering
 {
     public enum GraphicsBufferType
     {

@@ -5,7 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 using RigelEditor.EGUI;
-using RigelCore;
+using Rigel;
+using Rigel.EGUI;
 
 namespace RigelEditor.Platforms
 {

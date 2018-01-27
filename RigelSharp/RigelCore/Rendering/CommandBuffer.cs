@@ -5,13 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 
 using SharpDX;
-using RigelCore;
-using RigelCore.Engine;
+using Rigel;
+using Rigel.Engine;
 
 using SharpDX.Direct3D11;
 
 
-namespace RigelCore.Rendering
+namespace Rigel.Rendering
 {
     public enum CommandBufferStage
     {

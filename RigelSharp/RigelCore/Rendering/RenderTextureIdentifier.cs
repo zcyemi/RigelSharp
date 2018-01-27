@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct3D11;
 
-namespace RigelCore.Rendering
+namespace Rigel.Rendering
 {
     public enum InternalRenderTextureIdentifier
     {

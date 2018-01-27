@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using RigelCore;
+using Rigel;
 using RigelEditor;
 using RigelEditor.EGUI;
+using Rigel.EGUI;
 
 namespace RigelEditor.Project
 {
